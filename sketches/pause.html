@@ -710,9 +710,26 @@
   /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one */
   .side {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 20px;
+  }
+  .sq:last-child {
+    grid-column: span 2;
+  }
+  .btn.wait {
+    color: var(--ink-2);
+    background: rgba(140, 100, 230, 0.18);
+  }
+  @media (max-width: 1200px) {
+    .side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: none;
+      grid-auto-rows: minmax(300px, auto);
+    }
+    #v-side {
+      overflow: auto;
+    }
   }
   .sq {
     padding: 12px 12px clamp(16px, 1.8vw, 24px);
@@ -777,6 +794,9 @@
     }
     .sq:first-child {
       grid-row: auto;
+    }
+    .sq:last-child {
+      grid-column: auto;
     }
   }
 
@@ -1644,6 +1664,13 @@
         ['Instagram', 'https://www.instagram.com/p/DepKV4VDKQ9/'],
       ],
     ],
+    [
+      'figma',
+      'Плагин для Figma',
+      'Плагин для Figma. Описание будет позже',
+      [],
+      'На рассмотрении в Figma',
+    ],
   ];
 
   /* ── World crossfade ── */
@@ -1725,10 +1752,11 @@
     vermis: 'rgba(220,200,170,.2)',
     shaman: 'rgba(250,200,60,.24)',
     dobro: 'rgba(250,150,60,.26)',
+    figma: 'rgba(140,100,230,.28)',
   };
   document.getElementById('side').innerHTML = SIDE.map(
-    ([ic, t, d, links]) =>
-      `<div class="pane sq"><div class="art" style="--tint:${TINT[ic]}"><img src="img/side-${ic}.webp" alt=""></div><b>${t}</b><span>${d}</span><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}</div></div>`,
+    ([ic, t, d, links, wait]) =>
+      `<div class="pane sq"><div class="art" style="--tint:${TINT[ic]}"><img src="img/side-${ic}.webp" alt=""></div><b>${t}</b><span>${d}</span><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}${wait ? `<span class="btn wait">${wait}</span>` : ''}</div></div>`,
   ).join('');
 
   /* ── Character: the latest finished quest leads straight to its case ── */
