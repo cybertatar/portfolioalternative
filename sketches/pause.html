@@ -23,7 +23,24 @@
     --gold-ink: #1d1708;
     --body: 'Golos Text', system-ui, sans-serif;
     --pixel: 'Handjet', 'Golos Text', system-ui, sans-serif;
+    /* The menu is laid out for ~1440×900 and scaled up on big monitors, like a game's UI scale */
+    --z: 1;
     color-scheme: dark;
+  }
+  @media (min-width: 1900px) and (min-height: 1050px) {
+    :root {
+      --z: 1.25;
+    }
+  }
+  @media (min-width: 2400px) and (min-height: 1300px) {
+    :root {
+      --z: 1.5;
+    }
+  }
+  @media (min-width: 3200px) and (min-height: 1800px) {
+    :root {
+      --z: 2;
+    }
   }
   * {
     box-sizing: border-box;
@@ -101,8 +118,9 @@
     padding-block: 20px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
-    max-width: 1320px;
+    max-width: 1600px;
     margin: 0 auto;
+    zoom: var(--z);
     transition:
       opacity 0.4s ease,
       transform 0.4s ease;
@@ -125,10 +143,23 @@
     align-items: center;
     gap: 12px;
   }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+  }
   .paused {
     font: 700 22px/1 var(--pixel);
-    color: var(--ink-2);
+    color: var(--gold);
     letter-spacing: 0.02em;
+  }
+  .brand span:last-child {
+    font-size: 15px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .tabs {
     display: flex;
@@ -158,17 +189,10 @@
     height: 2px;
     background: var(--gold);
   }
-  .me {
+  .top .write {
     justify-self: end;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    padding: 9px 14px;
     font-size: 14px;
-    color: var(--ink-2);
-  }
-  .me b {
-    font: 700 20px/1 var(--pixel);
-    color: var(--gold);
   }
   .dot {
     width: 8px;
@@ -182,6 +206,21 @@
     border-radius: 16px;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+  }
+  @media (min-width: 861px) and (min-height: 600px) {
+    .menu {
+      height: calc(100dvh / var(--z));
+      min-height: 0;
+    }
+    .view {
+      min-height: 0;
+    }
+    .view .pane {
+      overflow: auto;
+    }
+  }
+  #v-side {
+    display: grid;
   }
   .view[hidden] {
     display: none !important;
@@ -207,6 +246,18 @@
       grid-column: 1 / -1;
       grid-row: 2;
       overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs [role='tab'] {
+      padding-inline: 10px;
+      font-size: 15px;
+    }
+    .tabs [role='tab'][aria-selected='true']::after {
+      left: 10px;
+      right: 10px;
+    }
+    .brand span:last-child {
+      display: none;
     }
     .tabs .key {
       display: none;
@@ -216,7 +267,8 @@
     }
   }
 
-  /* Quests */
+  /* Quests: list on the left, quest card on the right. The card's scene takes whatever height
+   is left, so a tall screen shows a bigger picture instead of empty glass. */
   .quests {
     display: grid;
     grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
@@ -230,9 +282,9 @@
   }
   .qlist {
     padding: 10px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 2px;
-    align-content: start;
   }
   .group {
     font: 700 18px/1 var(--pixel);
@@ -241,7 +293,7 @@
   }
   .q {
     display: grid;
-    grid-template-columns: 32px minmax(0, 1fr) auto;
+    grid-template-columns: 32px minmax(0, 1fr);
     gap: 12px;
     align-items: center;
     padding: 12px;
@@ -264,26 +316,110 @@
     font-weight: 500;
   }
   .q small {
-    display: block;
+    display: flex;
+    gap: 8px;
     color: var(--ink-2);
     font-size: 13px;
   }
-  .q .st {
-    font-size: 12px;
+  .q small i {
+    font-style: normal;
     color: var(--ink-3);
-    white-space: nowrap;
   }
-  .q[aria-selected='true'] .st {
+  .q small i.open {
+    color: #5ccf8f;
+  }
+  .more {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+    padding: 14px 12px 6px;
+    border-top: 1px solid var(--line);
+    text-align: left;
+    border-radius: 0 0 8px 8px;
+  }
+  .more:hover b {
     color: var(--gold);
   }
-  .qd {
-    padding: clamp(20px, 3vw, 36px);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 28px;
+  .more b {
+    font: 700 18px/1 var(--pixel);
+    color: var(--ink-3);
   }
-  @media (max-width: 640px) {
-    .qd {
+  .more .icons {
+    display: flex;
+    gap: 8px;
+  }
+  .more img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: block;
+  }
+  .qd {
+    padding: 12px;
+    display: grid;
+    grid-template-rows: minmax(260px, 1fr) auto;
+    gap: 4px;
+  }
+  .scene {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 3%;
+    container-type: size;
+    background: #0d141b;
+  }
+  .scene canvas.ground {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7) saturate(0.9);
+  }
+  .scene::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 55%, rgba(11, 17, 24, 0.55));
+    pointer-events: none;
+  }
+  .scene .phone {
+    position: relative;
+    z-index: 1;
+    height: 88cqh;
+    width: auto;
+    margin-bottom: -6cqh;
+  }
+  .scene .phone:nth-child(odd) {
+    margin-bottom: -16cqh;
+  }
+  .scene .seal {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    font: 700 26px/1 var(--pixel);
+    color: var(--ink);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    background: rgba(11, 17, 24, 0.35);
+  }
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+    gap: 16px 40px;
+    padding: clamp(16px, 2vw, 28px) clamp(12px, 1.6vw, 24px) clamp(12px, 1.4vw, 20px);
+  }
+  .card > div:last-child:not(:first-child) {
+    align-self: end;
+  }
+  @media (max-width: 1100px) {
+    .card {
       grid-template-columns: 1fr;
     }
   }
@@ -294,38 +430,34 @@
   }
   .qd h1 {
     margin: 0 0 10px;
-    font: 600 clamp(28px, 3.6vw, 42px)/1.08 var(--body);
+    font: 600 clamp(28px, 3.2vw, 42px)/1.08 var(--body);
     letter-spacing: -0.015em;
     text-wrap: balance;
   }
   .qd .sub {
-    margin: 0 0 22px;
+    margin: 0 0 18px;
     color: var(--ink-2);
-    max-width: 56ch;
+    max-width: 58ch;
   }
   .facts {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    margin: 0 0 22px;
+    gap: 14px;
   }
   .fact {
     border-top: 1px solid var(--line-strong);
     padding-top: 10px;
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
   }
   .fact b {
-    display: block;
-    font: 600 clamp(24px, 2.6vw, 32px)/1.1 var(--body);
+    font: 600 clamp(24px, 2.4vw, 30px)/1.1 var(--body);
     font-variant-numeric: tabular-nums;
   }
   .fact span {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--ink-2);
-  }
-  @media (max-width: 480px) {
-    .facts {
-      grid-template-columns: 1fr 1fr;
-    }
   }
   .role {
     display: flex;
@@ -333,8 +465,8 @@
     align-items: flex-start;
     font-size: 14px;
     color: var(--ink-2);
-    margin: 0 0 24px;
-    max-width: 56ch;
+    margin: 0 0 20px;
+    max-width: 58ch;
   }
   .role canvas,
   .lockmsg canvas {
@@ -369,28 +501,18 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    padding: 14px 16px;
-    border: 1px dashed var(--line-strong);
-    border-radius: 10px;
     color: var(--ink-2);
     font-size: 15px;
-    margin: 0 0 22px;
-    max-width: 52ch;
-  }
-  .phones {
-    display: flex;
-    gap: 14px;
-    align-items: start;
+    margin: 0;
   }
   .phone {
-    width: 150px;
     aspect-ratio: 402 / 874;
-    border-radius: 24px;
+    border-radius: 7cqh;
     border: 4px solid #1e2732;
     background: #0d0e10;
     overflow: hidden;
     flex: none;
-    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9);
   }
   .phone img {
     display: block;
@@ -399,24 +521,14 @@
     object-fit: cover;
     object-position: top;
   }
-  .phones .phone + .phone {
-    margin-top: 44px;
-  }
-  @media (max-width: 640px) {
-    .phones {
-      justify-content: center;
-    }
-    .phone {
-      width: 130px;
-    }
-  }
 
-  /* Character */
+  /* Character: who (photo, name, contacts) on the left, what I do on the right. Age and status
+   live here only, not in the top bar. */
   .char {
     display: grid;
-    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
     gap: 20px;
-    align-items: start;
+    align-items: stretch;
   }
   @media (max-width: 860px) {
     .char {
@@ -424,103 +536,95 @@
     }
   }
   .hero {
-    padding: 24px;
-    display: grid;
-    justify-items: center;
-    gap: 14px;
-    text-align: center;
-  }
-  .hero .stage {
-    position: relative;
-    width: 100%;
-    display: grid;
-    place-items: center;
-    padding: 18px 0 10px;
-  }
-  .hero .stage::after {
-    content: '';
-    position: absolute;
-    bottom: 6px;
-    width: 60%;
-    height: 10px;
-    border-radius: 50%;
-    background: radial-gradient(rgba(233, 196, 106, 0.35), transparent 70%);
-  }
-  .hero .stage canvas {
-    width: 168px;
-    height: auto;
-    animation: idle 1.6s steps(2) infinite;
-  }
-  @keyframes idle {
-    50% {
-      transform: translateY(-3px);
-    }
-  }
-  .hero h2 {
-    margin: 0;
-    font: 600 26px/1.15 var(--body);
-  }
-  .hero .cls {
-    color: var(--ink-2);
-    margin: 0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
   .hero .photo {
     width: 100%;
     border-radius: 10px;
     aspect-ratio: 5 / 4;
     object-fit: cover;
-    opacity: 0.92;
+    object-position: 30% 40%;
+    display: block;
   }
-  .sheet {
-    padding: clamp(20px, 3vw, 32px);
-    display: grid;
-    gap: 28px;
-  }
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-  }
-  @media (max-width: 560px) {
-    .stats {
-      grid-template-columns: 1fr 1fr;
+  @media (min-width: 861px) and (min-height: 600px) {
+    .hero .photo {
+      flex: 1 1 0;
+      min-height: 220px;
+      aspect-ratio: auto;
     }
   }
-  .stat {
-    border-top: 1px solid var(--line-strong);
-    padding-top: 10px;
+  .hero .who {
+    padding: 4px 12px;
   }
-  .stat span {
-    display: block;
-    font-size: 13px;
+  .hero h2 {
+    margin: 0 0 6px;
+    font: 600 clamp(26px, 2.4vw, 32px)/1.1 var(--body);
+    letter-spacing: -0.01em;
+  }
+  .hero .cls {
     color: var(--ink-2);
+    margin: 0 0 14px;
+    font-size: 17px;
   }
-  .stat b {
-    font: 600 20px/1.3 var(--body);
+  .hero .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 14px;
+    color: var(--ink-2);
+    margin: 0;
   }
-  .stat b.gold {
-    color: var(--gold);
+  .hero .meta span {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .hero .links {
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 8px;
+  }
+  .hero .links .btn {
+    justify-content: center;
+  }
+  .hero .links .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .sheet {
+    padding: clamp(20px, 3vw, 36px);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
   }
   .sheet h3 {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     font: 700 20px/1 var(--pixel);
     color: var(--ink-3);
   }
   .bio {
     margin: 0;
-    max-width: 60ch;
-    font-size: 17px;
+    max-width: 34ch;
+    font: 500 clamp(22px, 2.2vw, 30px)/1.3 var(--body);
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
   }
   .gear {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
   }
   .slot {
     display: flex;
     gap: 12px;
     align-items: center;
-    padding: 12px;
+    padding: 14px;
     border: 1px solid var(--line);
     border-radius: 10px;
     font-size: 15px;
@@ -528,6 +632,55 @@
   }
   .slot canvas {
     flex: none;
+  }
+  .last {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .last button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    text-align: left;
+    background: rgba(238, 242, 245, 0.03);
+  }
+  .last button:hover {
+    border-color: rgba(233, 196, 106, 0.5);
+  }
+  .pic {
+    position: relative;
+    flex: 1;
+    min-height: 160px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .pic canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.8);
+  }
+  .last .cap {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 6px 4px;
+  }
+  .last b {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .last small {
+    color: var(--ink-2);
+    font-size: 14px;
   }
   .links {
     display: flex;
@@ -544,6 +697,7 @@
     font-size: 15px;
     color: var(--ink);
     text-decoration: none;
+    white-space: nowrap;
   }
   a.btn:hover {
     background: rgba(238, 242, 245, 0.06);
@@ -558,51 +712,76 @@
     background: #f1d283;
   }
 
-  /* Side quests */
+  /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one */
   .side {
-    padding: 10px;
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 20px;
   }
   .sq {
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-    gap: 16px;
-    align-items: center;
-    padding: 14px 12px;
-    border-bottom: 1px solid var(--line);
+    padding: 12px 12px clamp(16px, 1.8vw, 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
-  .sq:last-child {
-    border-bottom: 0;
+  .sq:first-child {
+    grid-row: span 2;
+  }
+  .sq .art {
+    flex: 1;
+    min-height: 120px;
+    margin: 0 0 16px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    container-type: size;
+    background:
+      radial-gradient(circle at 50% 55%, var(--tint) 0, transparent 60%),
+      repeating-conic-gradient(rgba(238, 242, 245, 0.035) 0 25%, transparent 0 50%) 0 0 / 16px 16px,
+      rgba(238, 242, 245, 0.03);
   }
   .sq img {
-    width: 48px;
-    height: 48px;
-    border-radius: 11px;
+    width: min(45cqmin, 160px);
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 22%;
     display: block;
+    box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.8);
+  }
+  .sq:first-child img {
+    width: min(45cqmin, 240px);
   }
   .sq b {
-    display: block;
-    font-weight: 500;
-    font-size: 17px;
+    font: 600 clamp(20px, 1.8vw, 24px)/1.2 var(--body);
+  }
+  .sq:first-child b {
+    font-size: clamp(26px, 2.6vw, 36px);
   }
   .sq span {
     color: var(--ink-2);
-    font-size: 14px;
+    font-size: 15px;
+    max-width: 36ch;
+  }
+  .sq > b,
+  .sq > span,
+  .sq .links {
+    margin-inline: clamp(6px, 1vw, 12px);
   }
   .sq .links {
-    justify-content: flex-end;
+    padding-top: 16px;
   }
   .sq .btn {
-    padding: 8px 12px;
+    padding: 9px 13px;
     font-size: 14px;
   }
-  @media (max-width: 640px) {
-    .sq {
-      grid-template-columns: 48px minmax(0, 1fr);
+  @media (max-width: 860px) {
+    .side {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
     }
-    .sq .links {
-      grid-column: 2;
-      justify-content: flex-start;
+    .sq:first-child {
+      grid-row: auto;
     }
   }
 
@@ -794,7 +973,9 @@
 
 <div class="menu">
   <div class="top">
-    <span class="paused">Пауза</span>
+    <div class="brand">
+      <span class="paused">Пауза</span><span>Даниил Тынчеров · продуктовый дизайнер</span>
+    </div>
     <div class="tabs" role="tablist" aria-label="Меню">
       <span class="key" aria-hidden="true">Q</span>
       <button role="tab" id="tab-char" aria-controls="v-char" aria-selected="false">
@@ -808,10 +989,9 @@
       </button>
       <span class="key" aria-hidden="true">E</span>
     </div>
-    <div class="me">
-      <span class="dot"></span><span class="status">Открыт к предложениям</span
-      ><b id="lvl">25 lvl</b>
-    </div>
+    <a class="btn write" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
+      >Написать</a
+    >
   </div>
 
   <!-- Quests -->
@@ -823,17 +1003,31 @@
   <!-- Character -->
   <div class="view char" id="v-char" role="tabpanel" aria-labelledby="tab-char" hidden>
     <div class="pane hero">
-      <div class="stage"><canvas class="px" data-sprite="swordsman" data-scale="7"></canvas></div>
-      <h2>Даниил Тынчеров</h2>
-      <p class="cls">Класс: продуктовый дизайнер</p>
       <img class="photo" src="img/portrait.webp" alt="Фото Даниила" />
+      <div class="who">
+        <h2>Даниил Тынчеров</h2>
+        <p class="cls">Продуктовый дизайнер</p>
+        <p class="meta">
+          <span id="age">25 лет</span><span><span class="dot"></span>Открыт к предложениям</span>
+        </p>
+      </div>
+      <div class="links">
+        <a class="btn gold" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
+          >Написать в Telegram</a
+        >
+        <span class="btn">tyncherovmail@icloud.com</span>
+        <div class="row">
+          <a
+            class="btn"
+            href="https://www.linkedin.com/in/daniil-tyncherov-455b713a8"
+            target="_blank"
+            rel="noopener"
+            >LinkedIn</a
+          ><span class="btn">Резюме (скоро)</span>
+        </div>
+      </div>
     </div>
     <div class="pane sheet">
-      <div class="stats">
-        <div class="stat"><span>Уровень</span><b class="gold" id="lvl2">25</b></div>
-        <div class="stat"><span>Статус</span><b>Открыт к предложениям</b></div>
-        <div class="stat"><span>Выполнено квестов</span><b>1 из 4</b></div>
-      </div>
       <div>
         <h3>О персонаже</h3>
         <p class="bio">
@@ -861,29 +1055,16 @@
           </div>
         </div>
       </div>
-      <div>
-        <h3>Связь</h3>
-        <div class="links">
-          <a class="btn gold" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
-            >Написать в Telegram</a
-          >
-          <span class="btn">tyncherovmail@icloud.com</span>
-          <a
-            class="btn"
-            href="https://www.linkedin.com/in/daniil-tyncherov-455b713a8"
-            target="_blank"
-            rel="noopener"
-            >LinkedIn</a
-          >
-          <span class="btn">Резюме (скоро)</span>
-        </div>
+      <div class="last">
+        <h3>Последний квест</h3>
+        <button id="last"></button>
       </div>
     </div>
   </div>
 
   <!-- Side quests -->
   <div class="view" id="v-side" role="tabpanel" aria-labelledby="tab-side" hidden>
-    <div class="pane side" id="side"></div>
+    <div class="side" id="side"></div>
   </div>
 
   <div class="hints">
@@ -1196,14 +1377,14 @@
   };
   document.querySelectorAll('canvas[data-sprite]').forEach(sprite);
 
-  /* Level from the birthday, like on the current site */
+  /* Age from the birthday, like the level on the current site */
   (function () {
     const b = new Date(2000, 10, 9),
       n = new Date();
     let a = n.getFullYear() - b.getFullYear();
     if (n < new Date(n.getFullYear(), 10, 9)) a--;
-    document.getElementById('lvl').textContent = a + ' lvl';
-    document.getElementById('lvl2').textContent = a;
+    const y = a % 10 === 1 && a % 100 !== 11 ? 'год' : a % 10 > 1 && a % 10 < 5 && (a % 100 < 10 || a % 100 > 20) ? 'года' : 'лет';
+    document.getElementById('age').textContent = a + ' ' + y;
   })();
 
   /* ── Worlds: one small top-down place per quest, in 8px tiles ── */
@@ -1348,7 +1529,7 @@
       id: 'psb',
       title: 'PSB-Bank Redesign concept',
       region: 'Финтех · 2026',
-      st: 'Выполнен',
+      st: 'Кейс открыт',
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
       facts: [
@@ -1364,7 +1545,7 @@
       id: 'vpn',
       title: 'BittVPN client',
       region: 'Telegram · 2026',
-      st: 'В пути',
+      st: 'Кейс пишется',
       icon: ['coin', 3],
       sub: 'Telegram Mini App для безопасного доступа в интернет через VPN.',
       lock: 'Кейс ещё пишется. Скоро здесь будет журнал этого квеста.',
@@ -1374,7 +1555,7 @@
       id: 'wb',
       title: 'WB Bank moneybox concept',
       region: 'Финтех · 2025',
-      st: 'Скоро',
+      st: 'Кейс позже',
       icon: ['chest', 2],
       sub: 'Переосмысление сценария копилки в банковском приложении.',
       lock: 'Не хватает маны. Этот кейс откроется позже.',
@@ -1384,7 +1565,7 @@
       id: 'mou',
       title: 'Mouette online clothing store',
       region: 'E-commerce · 2025',
-      st: 'NDA',
+      st: 'Под NDA',
       icon: ['heart', 3],
       sub: 'Интернет-магазин одежды для ателье.',
       lock: 'В эти края пути нет. Кейс под NDA.',
@@ -1465,12 +1646,17 @@
     b.append(mk(q.icon[0], q.icon[1], 'ic'));
     b.insertAdjacentHTML(
       'beforeend',
-      `<div><b>${q.title}</b><small>${q.region}</small></div><span class="st">${q.st}</span>`,
+      `<div><b>${q.title}</b><small>${q.region}<i class="${q.open ? 'open' : ''}">· ${q.st}</i></small></div>`,
     );
     b.addEventListener('click', () => select(i));
     b.addEventListener('dblclick', () => open());
     qlist.append(b);
   });
+  qlist.insertAdjacentHTML(
+    'beforeend',
+    `<button class="more" id="more"><b>Побочные квесты · ${SIDE.length}</b><span class="icons">${SIDE.map(([ic]) => `<img src="img/side-${ic}.webp" alt="">`).join('')}</span></button>`,
+  );
+  document.getElementById('more').addEventListener('click', () => tab(2));
   function select(i) {
     sel = (i + QUESTS.length) % QUESTS.length;
     const q = QUESTS[sel];
@@ -1480,13 +1666,17 @@
     const phones = q.phones
       .map((p) => `<div class="phone"><img src="img/${p}.webp" alt=""></div>`)
       .join('');
+    const seal = q.open ? '' : `<div class="seal">${q.st}</div>`;
     qd.innerHTML =
-      `<div><p class="region">${q.region}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
-      (q.facts
-        ? `<div class="facts">${q.facts.map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join('')}</div><p class="role"></p>`
-        : `<p class="lockmsg"></p>`) +
+      `<div class="scene">${phones}${seal}</div><div class="card"><div>` +
+      `<p class="region">${q.region}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
+      (q.facts ? `<p class="role"></p>` : `<p class="lockmsg"></p>`) +
       `<button class="cta" ${q.open ? '' : 'disabled'} id="cta"><span class="key">Enter</span>${q.open ? 'Открыть кейс' : 'Пока закрыт'}</button></div>` +
-      `<div class="phones">${phones}</div>`;
+      (q.facts
+        ? `<div class="facts">${q.facts.map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join('')}</div>`
+        : '') +
+      `</div>`;
+    qd.querySelector('.scene').prepend(world(mk('', 1, 'ground'), q.id));
     if (q.facts) {
       const r = qd.querySelector('.role');
       r.append(mk('spark', 2));
@@ -1501,10 +1691,32 @@
   }
 
   /* ── Side quests ── */
+  const TINT = {
+    kegl: 'rgba(240,190,70,.28)',
+    ytm: 'rgba(230,60,60,.22)',
+    vermis: 'rgba(220,200,170,.2)',
+    shaman: 'rgba(250,200,60,.24)',
+    dobro: 'rgba(250,150,60,.26)',
+  };
   document.getElementById('side').innerHTML = SIDE.map(
     ([ic, t, d, links]) =>
-      `<div class="sq"><img src="img/side-${ic}.webp" alt=""><div><b>${t}</b><span>${d}</span></div><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}</div></div>`,
+      `<div class="pane sq"><div class="art" style="--tint:${TINT[ic]}"><img src="img/side-${ic}.webp" alt=""></div><b>${t}</b><span>${d}</span><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}</div></div>`,
   ).join('');
+
+  /* ── Character: the latest finished quest leads straight to its case ── */
+  const lastQ = QUESTS.find((q) => q.open);
+  const last = document.getElementById('last');
+  last.innerHTML = '<div class="pic"></div>';
+  last.firstChild.append(world(mk('', 1), lastQ.id));
+  last.insertAdjacentHTML(
+    'beforeend',
+    `<div class="cap"><div><b>${lastQ.title}</b><small>${lastQ.region} · ${lastQ.facts[0][0]} ${lastQ.facts[0][1]}</small></div><span class="key">Enter</span></div>`,
+  );
+  last.addEventListener('click', () => {
+    tab(1);
+    select(QUESTS.indexOf(lastQ));
+    open();
+  });
 
   /* ── Tabs ── */
   const tabs = [...document.querySelectorAll('[role="tab"]')];
