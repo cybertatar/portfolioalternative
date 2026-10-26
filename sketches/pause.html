@@ -111,7 +111,7 @@
     position: relative;
     min-height: 100%;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     gap: 20px;
     padding-block: 20px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
@@ -141,25 +141,8 @@
     align-items: center;
     gap: 12px;
   }
-  .brand {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    min-width: 0;
-  }
-  .paused {
-    font: 700 22px/1 var(--pixel);
-    color: var(--gold);
-    letter-spacing: 0.02em;
-  }
-  .brand span:last-child {
-    font-size: 15px;
-    color: var(--ink-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .tabs {
+    grid-column: 2;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -223,26 +206,16 @@
   .view[hidden] {
     display: none !important;
   }
-  .hints {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px 20px;
-    font-size: 14px;
-    color: var(--ink-3);
-  }
-  .hints span {
-    display: inline-flex;
-    gap: 6px;
-    align-items: center;
-  }
   @media (max-width: 860px) {
     .top {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr;
+    }
+    /* Phone: tabs take the whole row; contacts are one tap away on «Персонаж» */
+    .top .write {
+      display: none;
     }
     .tabs {
-      grid-column: 1 / -1;
-      grid-row: 2;
+      grid-column: 1;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -254,13 +227,7 @@
       left: 10px;
       right: 10px;
     }
-    .brand span:last-child {
-      display: none;
-    }
     .tabs .key {
-      display: none;
-    }
-    .hints {
       display: none;
     }
   }
@@ -984,9 +951,6 @@
 
 <div class="menu">
   <div class="top">
-    <div class="brand">
-      <span class="paused">Пауза</span><span>Даниил Тынчеров · продуктовый дизайнер</span>
-    </div>
     <div class="tabs" role="tablist" aria-label="Меню">
       <span class="key" aria-hidden="true">Q</span>
       <button role="tab" id="tab-char" aria-controls="v-char" aria-selected="false">
@@ -1078,11 +1042,6 @@
     <div class="side" id="side"></div>
   </div>
 
-  <div class="hints">
-    <span><span class="key">Q</span><span class="key">E</span>Вкладки</span
-    ><span><span class="key">↑</span><span class="key">↓</span>Выбрать</span
-    ><span><span class="key">Enter</span>Открыть</span>
-  </div>
 </div>
 
 <!-- The case, unpaused -->
