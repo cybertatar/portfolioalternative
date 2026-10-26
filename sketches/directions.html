@@ -1,0 +1,1081 @@
+<title>Портфолио: три направления</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700&family=Golos+Text:wght@400;500;600&family=Handjet:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap"
+/>
+<style>
+  /* Chrome of the comparison page: quiet, so the three sketches carry the colour.
+   Each sketch below is a fixed look (it is a proposal of a site palette), so it keeps its own colours in both themes. */
+  :root {
+    --c-bg: #f4f5f7;
+    --c-fg: #16181d;
+    --c-muted: #5d636e;
+    --c-line: #d9dce2;
+    --c-tab: #ffffff;
+    --c-tab-on: #16181d;
+    --c-tab-on-fg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --c-bg: #121418;
+      --c-fg: #eceef2;
+      --c-muted: #a0a6b1;
+      --c-line: #2b2f37;
+      --c-tab: #1c1f25;
+      --c-tab-on: #eceef2;
+      --c-tab-on-fg: #121418;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --c-bg: #121418;
+    --c-fg: #eceef2;
+    --c-muted: #a0a6b1;
+    --c-line: #2b2f37;
+    --c-tab: #1c1f25;
+    --c-tab-on: #eceef2;
+    --c-tab-on-fg: #121418;
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: var(--c-bg);
+    color: var(--c-fg);
+    font:
+      400 16px/1.5 'Golos Text',
+      system-ui,
+      sans-serif;
+  }
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-block: 32px 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .intro h1 {
+    font:
+      600 28px/1.15 'Golos Text',
+      sans-serif;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .intro p {
+    margin: 0;
+    color: var(--c-muted);
+    max-width: 64ch;
+  }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 24px 0 16px;
+  }
+  .tabs button {
+    font:
+      500 15px/1 'Golos Text',
+      sans-serif;
+    padding: 12px 16px;
+    border: 1px solid var(--c-line);
+    background: var(--c-tab);
+    color: var(--c-fg);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .tabs button[aria-selected='true'] {
+    background: var(--c-tab-on);
+    color: var(--c-tab-on-fg);
+    border-color: var(--c-tab-on);
+  }
+  .tabs button:focus-visible {
+    outline: 2px solid #3b6fd8;
+    outline-offset: 2px;
+  }
+  .about {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+  .about h3 {
+    font:
+      600 13px/1.3 'Golos Text',
+      sans-serif;
+    margin: 0 0 4px;
+    color: var(--c-muted);
+  }
+  .about p {
+    margin: 0;
+    font-size: 15px;
+  }
+  @media (max-width: 760px) {
+    .about {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+  .label {
+    font:
+      500 13px/1 'Golos Text',
+      sans-serif;
+    color: var(--c-muted);
+    margin: 28px 0 10px;
+  }
+
+  /* Shared mock skeleton: home = profile column + case feed; case = sheet with a section. */
+  .mock {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .home {
+    display: grid;
+    grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+    gap: var(--gap);
+    padding: var(--gap);
+    align-items: start;
+  }
+  @media (max-width: 760px) {
+    .home {
+      grid-template-columns: 1fr;
+    }
+  }
+  .feed {
+    display: grid;
+    gap: var(--gap);
+    min-width: 0;
+  }
+  .phone {
+    width: 150px;
+    aspect-ratio: 402 / 874;
+    border-radius: 26px;
+    border: 5px solid #0d0e10;
+    background: #0d0e10;
+    overflow: hidden;
+    box-shadow: 0 18px 40px -18px rgba(10, 14, 20, 0.45);
+    flex: none;
+  }
+  .phone img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .phones {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 28px 16px 0;
+    overflow: hidden;
+    height: 300px;
+  }
+  .phones .phone:not(:nth-child(2)):not(:only-child) {
+    margin-top: 28px;
+  }
+  .portrait {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+  }
+  .case-sheet {
+    padding: clamp(20px, 4vw, 48px);
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  @media (max-width: 640px) {
+    .metrics {
+      grid-template-columns: 1fr;
+    }
+    .phones .phone:nth-child(3) {
+      display: none;
+    }
+  }
+
+  /* ───────── 1. Лист: cool white, ultramarine, a spec sheet under every case ───────── */
+  .d1 {
+    --gap: 24px;
+    --bg: #ffffff;
+    --panel: #eff1f4;
+    --ink: #111318;
+    --ink-2: #545a66;
+    --line: #e1e4e9;
+    --accent: #2440e6;
+    --display: 'Geologica', 'Golos Text', sans-serif;
+    --body: 'Golos Text', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+  }
+  .d1 .side {
+    display: grid;
+    gap: 16px;
+  }
+  .d1 .lvl {
+    font: 500 12px/1 var(--mono);
+    color: var(--accent);
+  }
+  .d1 .name {
+    font: 600 30px/1.05 var(--display);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .d1 .bio {
+    margin: 0;
+    font-size: 15px;
+  }
+  .d1 .contacts {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+  .d1 .contacts a {
+    font: 400 13px/1 var(--mono);
+    color: var(--ink);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .d1 .contacts a span {
+    color: var(--ink-2);
+  }
+  .d1 .btn {
+    font: 500 15px/1 var(--body);
+    background: var(--ink);
+    color: #fff;
+    padding: 14px;
+    text-align: center;
+    border-radius: 8px;
+  }
+  .d1 .status {
+    font-size: 14px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .d1 .status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1f9d63;
+  }
+  .d1 .case {
+    display: grid;
+    gap: 16px;
+  }
+  .d1 .case .phones {
+    background: var(--panel);
+    border-radius: 10px;
+  }
+  .d1 .case-title {
+    font: 600 clamp(28px, 4vw, 44px)/1 var(--display);
+    letter-spacing: -0.03em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .d1 .spec {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 16px;
+    border-top: 1px solid var(--ink);
+    padding-top: 10px;
+    margin: 0;
+  }
+  .d1 .spec div {
+    display: grid;
+    gap: 4px;
+    font-size: 14px;
+    min-width: 0;
+  }
+  .d1 .spec dt {
+    font: 400 11px/1 var(--mono);
+    color: var(--ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .d1 .spec dd {
+    margin: 0;
+  }
+  @media (max-width: 640px) {
+    .d1 .spec {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+  }
+  .d1 .eyebrow {
+    font: 400 12px/1 var(--mono);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 12px;
+  }
+  .d1 .h2 {
+    font: 600 clamp(28px, 4vw, 44px)/1.05 var(--display);
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  .d1 .lead {
+    max-width: 60ch;
+    color: var(--ink-2);
+    margin: 0 0 32px;
+  }
+  .d1 .metric {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+  .d1 .metric b {
+    font: 600 clamp(36px, 5vw, 56px)/1 var(--display);
+    letter-spacing: -0.03em;
+  }
+  .d1 .metric small {
+    font-size: 0.4em;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .d1 .bar {
+    height: 6px;
+    background: var(--panel);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .d1 .bar i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+  }
+  .d1 .metric p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  /* ───────── 2. Карта: cool map paper with a grid, navy ink, orange quest marker; the pixel stays ───────── */
+  .d2 {
+    --gap: 24px;
+    --bg: #e6edf2;
+    --grid: #d6e1e9;
+    --card: #ffffff;
+    --sunken: #eef3f7;
+    --ink: #172338;
+    --ink-2: #4b5a70;
+    --sky: #2a64b0;
+    --marker: #d9522a;
+    --display: 'Handjet', 'Golos Text', sans-serif;
+    --body: 'Golos Text', system-ui, sans-serif;
+    --px: polygon(
+      0 6px,
+      3px 6px,
+      3px 3px,
+      6px 3px,
+      6px 0,
+      calc(100% - 6px) 0,
+      calc(100% - 6px) 3px,
+      calc(100% - 3px) 3px,
+      calc(100% - 3px) 6px,
+      100% 6px,
+      100% calc(100% - 6px),
+      calc(100% - 3px) calc(100% - 6px),
+      calc(100% - 3px) calc(100% - 3px),
+      calc(100% - 6px) calc(100% - 3px),
+      calc(100% - 6px) 100%,
+      6px 100%,
+      6px calc(100% - 3px),
+      3px calc(100% - 3px),
+      3px calc(100% - 6px),
+      0 calc(100% - 6px)
+    );
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .d2 .card {
+    background: var(--card);
+    clip-path: var(--px);
+    padding: 24px;
+  }
+  .d2 .side {
+    display: grid;
+    gap: 14px;
+  }
+  .d2 .side .portrait {
+    clip-path: var(--px);
+  }
+  .d2 .name {
+    font: 700 40px/0.95 var(--display);
+    margin: 0;
+  }
+  .d2 .row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .d2 .row b {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .d2 .lvl {
+    font: 700 22px/1 var(--display);
+    background: var(--ink);
+    color: #fff;
+    padding: 4px 8px 2px;
+    clip-path: var(--px);
+    justify-self: start;
+  }
+  .d2 .bio {
+    margin: 0;
+    font-size: 15px;
+  }
+  .d2 .btn {
+    font: 500 15px/1 var(--body);
+    background: var(--sky);
+    color: #fff;
+    padding: 14px;
+    text-align: center;
+    clip-path: var(--px);
+  }
+  .d2 .case {
+    display: grid;
+    gap: 14px;
+  }
+  .d2 .case .phones {
+    background-color: var(--sunken);
+    clip-path: var(--px);
+    background-image: radial-gradient(circle, #cfdbe5 1.2px, transparent 1.4px);
+    background-size: 16px 16px;
+  }
+  .d2 .case-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    align-items: end;
+  }
+  .d2 .case-title {
+    font: 700 clamp(34px, 5vw, 56px)/0.95 var(--display);
+    margin: 0;
+  }
+  .d2 .case p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  .d2 .coords {
+    font: 500 20px/1 var(--display);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .d2 .quest {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font: 500 13px/1 var(--body);
+    color: var(--marker);
+  }
+  .d2 .quest::before {
+    content: '!';
+    font: 700 18px/1 var(--display);
+    color: #fff;
+    background: var(--marker);
+    width: 20px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    clip-path: var(--px);
+  }
+  .d2 .case-sheet {
+    background: var(--card);
+    clip-path: var(--px);
+  }
+  .d2 .eyebrow {
+    font: 500 14px/1 var(--body);
+    color: var(--sky);
+    margin: 0 0 8px;
+  }
+  .d2 .h2 {
+    font: 700 clamp(36px, 5vw, 56px)/0.95 var(--display);
+    margin: 0 0 16px;
+  }
+  .d2 .lead {
+    max-width: 60ch;
+    color: var(--ink-2);
+    margin: 0 0 28px;
+  }
+  .d2 .metric {
+    background: var(--sunken);
+    clip-path: var(--px);
+    padding: 20px;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+  .d2 .metric b {
+    font: 600 clamp(32px, 4vw, 44px)/1 var(--body);
+  }
+  .d2 .metric small {
+    font-size: 0.45em;
+    color: var(--ink-2);
+  }
+  .d2 .cells {
+    display: flex;
+    gap: 3px;
+  }
+  .d2 .cells i {
+    flex: 1;
+    height: 10px;
+    background: var(--sky);
+  }
+  .d2 .cells i.off {
+    background: #c9d6e2;
+  }
+  .d2 .metric p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  /* ───────── 3. Картридж: white shelf, each case is a solid block in its own brand colour, hard offset shadows ───────── */
+  .d3 {
+    --gap: 28px;
+    --bg: #ffffff;
+    --shelf: #eceef1;
+    --ink: #0f1014;
+    --ink-2: #4f5562;
+    --shadow: #0f1014;
+    --vpn: #0b0d10;
+    --psb: #e0601a;
+    --display: 'Handjet', 'Golos Text', sans-serif;
+    --body: 'Golos Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+  }
+  .d3 .side {
+    display: grid;
+    gap: 14px;
+    background: var(--shelf);
+    padding: 20px;
+    border: 2px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--shadow);
+  }
+  .d3 .side .portrait {
+    border: 2px solid var(--ink);
+  }
+  .d3 .name {
+    font: 700 42px/0.92 var(--display);
+    margin: 0;
+  }
+  .d3 .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .d3 .tag {
+    font: 600 13px/1 var(--body);
+    padding: 6px 8px;
+    border: 2px solid var(--ink);
+    background: #fff;
+  }
+  .d3 .tag.lvl {
+    background: #ffd23f;
+  }
+  .d3 .bio {
+    margin: 0;
+    font-size: 15px;
+  }
+  .d3 .btn {
+    font: 600 15px/1 var(--body);
+    background: var(--ink);
+    color: #fff;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 4px 4px 0 var(--psb);
+  }
+  .d3 .case {
+    color: #fff;
+    border: 2px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--shadow);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    padding: 24px 24px 0;
+    overflow: hidden;
+  }
+  .d3 .case.vpn {
+    background: var(--vpn);
+  }
+  .d3 .case.psb {
+    background: var(--psb);
+  }
+  .d3 .case .info {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    padding-bottom: 24px;
+    min-width: 0;
+  }
+  .d3 .case-title {
+    font: 700 clamp(40px, 6vw, 72px)/0.88 var(--display);
+    margin: 0;
+    text-wrap: balance;
+  }
+  .d3 .case p {
+    margin: 0;
+    max-width: 32ch;
+  }
+  .d3 .case .tags .tag {
+    background: transparent;
+    color: #fff;
+    border-color: currentColor;
+  }
+  .d3 .case .phones {
+    padding: 0;
+    height: 250px;
+    align-self: end;
+  }
+  @media (max-width: 640px) {
+    .d3 .case {
+      grid-template-columns: 1fr;
+    }
+    .d3 .case .phones {
+      height: 220px;
+      justify-content: flex-start;
+    }
+  }
+  .d3 .go {
+    justify-self: start;
+    font: 600 14px/1 var(--body);
+    background: #fff;
+    color: var(--ink);
+    padding: 10px 14px;
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .d3 .case-sheet {
+    border: 2px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--shadow);
+  }
+  .d3 .eyebrow {
+    font: 600 13px/1 var(--body);
+    display: inline-block;
+    padding: 6px 8px;
+    background: var(--psb);
+    color: #fff;
+    margin: 0 0 14px;
+  }
+  .d3 .h2 {
+    font: 700 clamp(40px, 6vw, 64px)/0.9 var(--display);
+    margin: 0 0 16px;
+  }
+  .d3 .lead {
+    max-width: 60ch;
+    color: var(--ink-2);
+    margin: 0 0 28px;
+  }
+  .d3 .metric {
+    border: 2px solid var(--ink);
+    padding: 18px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+    background: #fff;
+  }
+  .d3 .metric.hot {
+    background: var(--psb);
+    color: #fff;
+  }
+  .d3 .metric b {
+    font: 700 clamp(48px, 6vw, 72px)/0.85 var(--display);
+  }
+  .d3 .metric small {
+    font-size: 0.45em;
+  }
+  .d3 .metric p {
+    margin: 0;
+    font-size: 14px;
+  }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Три направления вместо бежевого</h1>
+    <p>
+      Контент тот же: профиль, лента кейсов и кусок кейса PSB с итогом теста. Меняются палитра,
+      шрифты, формы и фон. Наброски грубые: смотрим на характер, а не на пиксели.
+    </p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Направления">
+    <button role="tab" id="t-list" aria-controls="p-list" aria-selected="true">1. Лист</button>
+    <button role="tab" id="t-map" aria-controls="p-map" aria-selected="false">2. Карта</button>
+    <button role="tab" id="t-cart" aria-controls="p-cart" aria-selected="false">3. Картридж</button>
+  </div>
+
+  <!-- 1. Лист -->
+  <section role="tabpanel" id="p-list" aria-labelledby="t-list">
+    <div class="about">
+      <div>
+        <h3>Идея</h3>
+        <p>
+          Белый лист продуктового дизайнера: холодная бумага, чёрные чернила, один ультрамарин.
+          Работа на первом плане, оформление молчит.
+        </p>
+      </div>
+      <div>
+        <h3>Запоминается</h3>
+        <p>
+          Под каждым кейсом паспорт, как в спецификации: что, роль, на чём проверено, год. Цифры
+          теста крупно, как главный аргумент.
+        </p>
+      </div>
+      <div>
+        <h3>Чем жертвуем</h3>
+        <p>
+          Игра почти уходит: остаются «lvl 25» и сцены внутри кейса. Самый строгий и понятный
+          нанимающему, но меньше вас лично.
+        </p>
+      </div>
+    </div>
+    <p class="label">Главная</p>
+    <div class="mock d1">
+      <div class="home">
+        <aside class="side">
+          <img
+            class="portrait"
+            src="img/portrait.webp"
+            alt="Портрет Даниила"
+            style="border-radius: 10px"
+          />
+          <span class="lvl">LVL 25 · PRODUCT DESIGNER</span>
+          <h2 class="name">Даниил Тынчеров</h2>
+          <span class="status">Открыт к предложениям</span>
+          <p class="bio">
+            Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в
+            разработку.
+          </p>
+          <div class="contacts">
+            <a href="#p-list"><span>Почта</span>tyncherovmail@icloud.com</a>
+            <a href="#p-list"><span>Telegram</span>@everlastinghate</a>
+          </div>
+          <div class="btn">Резюме</div>
+        </aside>
+        <div class="feed">
+          <article class="case">
+            <div class="phones">
+              <div class="phone"><img src="img/psb-cb.webp" alt="" /></div>
+              <div class="phone"><img src="img/psb-main.webp" alt="" /></div>
+              <div class="phone"><img src="img/psb-success.webp" alt="" /></div>
+            </div>
+            <h3 class="case-title">PSB-Bank Redesign concept</h3>
+            <dl class="spec">
+              <div>
+                <dt>Что</dt>
+                <dd>Ключевые сценарии банка</dd>
+              </div>
+              <div>
+                <dt>Роль</dt>
+                <dd>Продуктовый дизайн, вдвоём</dd>
+              </div>
+              <div>
+                <dt>Проверка</dt>
+                <dd>Юзабилити-тест, 30 клиентов</dd>
+              </div>
+              <div>
+                <dt>Год</dt>
+                <dd>2026 · B2C</dd>
+              </div>
+            </dl>
+          </article>
+          <article class="case">
+            <div class="phones">
+              <div class="phone"><img src="img/vpn-main.webp" alt="" /></div>
+            </div>
+            <h3 class="case-title">BittVPN client</h3>
+            <dl class="spec">
+              <div>
+                <dt>Что</dt>
+                <dd>Telegram Mini App для VPN</dd>
+              </div>
+              <div>
+                <dt>Роль</dt>
+                <dd>Продуктовый дизайн</dd>
+              </div>
+              <div>
+                <dt>Платформа</dt>
+                <dd>Telegram</dd>
+              </div>
+              <div>
+                <dt>Год</dt>
+                <dd>2026 · B2C</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </div>
+    <p class="label">Кейс PSB, решение</p>
+    <div class="mock d1">
+      <div class="case-sheet">
+        <p class="eyebrow">Решения · кешбэк</p>
+        <h2 class="h2">Подключение кешбэка</h2>
+        <p class="lead">
+          Раньше кешбэк подключали через почту и браузер, теперь — в два касания на главной. Тест
+          показал, что путь стал в четыре раза быстрее.
+        </p>
+        <div class="metrics">
+          <div class="metric">
+            <b>23<small> с</small></b>
+            <div class="bar"><i style="width: 22%"></i></div>
+            <p>Медиана вместо 105 с</p>
+          </div>
+          <div class="metric">
+            <b>83<small>%</small></b>
+            <div class="bar"><i style="width: 83%"></i></div>
+            <p>Нашли кнопку с первого клика</p>
+          </div>
+          <div class="metric">
+            <b>5<small> шагов</small></b>
+            <div class="bar"><i style="width: 42%"></i></div>
+            <p>Вместо двенадцати</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Карта -->
+  <section role="tabpanel" id="p-map" aria-labelledby="t-map" hidden>
+    <div class="about">
+      <div>
+        <h3>Идея</h3>
+        <p>
+          Та же MMORPG, но холодная: не пергамент, а карта мира в клетку. Белые карточки с
+          пиксельными углами, тёмно-синие чернила, оранжевый маркер квеста.
+        </p>
+      </div>
+      <div>
+        <h3>Запоминается</h3>
+        <p>
+          Кейсы как места на карте: у каждого «регион», у нового — маркер «!». Заголовки остаются
+          пиксельными.
+        </p>
+      </div>
+      <div>
+        <h3>Чем жертвуем</h3>
+        <p>
+          Ближе всего к нынешнему сайту: меньше переделок, но и разница меньше. Сетка на фоне может
+          читаться как чертёж, а не как игра.
+        </p>
+      </div>
+    </div>
+    <p class="label">Главная</p>
+    <div class="mock d2">
+      <div class="home">
+        <aside class="side card">
+          <img class="portrait" src="img/portrait.webp" alt="Портрет Даниила" />
+          <span class="lvl">25 lvl</span>
+          <h2 class="name">Даниил Тынчеров</h2>
+          <div class="row">Класс <b>Product designer</b></div>
+          <p class="bio">
+            Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в
+            разработку.
+          </p>
+          <div class="btn">Резюме</div>
+        </aside>
+        <div class="feed">
+          <article class="case card">
+            <div class="phones">
+              <div class="phone"><img src="img/psb-cb.webp" alt="" /></div>
+              <div class="phone"><img src="img/psb-main.webp" alt="" /></div>
+              <div class="phone"><img src="img/psb-success.webp" alt="" /></div>
+            </div>
+            <span class="quest">Новый кейс</span>
+            <div class="case-head">
+              <h3 class="case-title">PSB-Bank Redesign concept</h3>
+              <span class="coords">Финтех · 2026</span>
+            </div>
+            <p>Переосмысление ключевых сценариев в мобильном приложении банка</p>
+          </article>
+          <article class="case card">
+            <div class="phones">
+              <div class="phone"><img src="img/vpn-main.webp" alt="" /></div>
+            </div>
+            <div class="case-head">
+              <h3 class="case-title">BittVPN client</h3>
+              <span class="coords">Telegram · 2026</span>
+            </div>
+            <p>Telegram Mini App для безопасного доступа в интернет через VPN</p>
+          </article>
+        </div>
+      </div>
+    </div>
+    <p class="label">Кейс PSB, решение</p>
+    <div class="mock d2" style="padding: 24px">
+      <div class="case-sheet">
+        <div style="padding: clamp(20px, 4vw, 48px)">
+          <p class="eyebrow">Решения</p>
+          <h2 class="h2">Подключение кешбэка</h2>
+          <p class="lead">
+            Раньше кешбэк подключали через почту и браузер, теперь — в два касания на главной. Тест
+            показал, что путь стал в четыре раза быстрее.
+          </p>
+          <div class="metrics">
+            <div class="metric">
+              <b>23<small> с</small></b>
+              <div class="cells">
+                <i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i
+                ><i class="off"></i><i class="off"></i><i class="off"></i>
+              </div>
+              <p>Медиана вместо 105 с</p>
+            </div>
+            <div class="metric">
+              <b>83<small>%</small></b>
+              <div class="cells">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i>
+              </div>
+              <p>Нашли кнопку с первого клика</p>
+            </div>
+            <div class="metric">
+              <b>5<small> шагов</small></b>
+              <div class="cells">
+                <i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i
+                ><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i
+                ><i class="off"></i>
+              </div>
+              <p>Вместо двенадцати</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Картридж -->
+  <section role="tabpanel" id="p-cart" aria-labelledby="t-cart" hidden>
+    <div class="about">
+      <div>
+        <h3>Идея</h3>
+        <p>
+          Полка с картриджами: белый фон, а каждый кейс — сплошной блок в цвете своего продукта.
+          Жёсткие тени со сдвигом, как у кнопок в старых играх.
+        </p>
+      </div>
+      <div>
+        <h3>Запоминается</h3>
+        <p>
+          Цвет переходит в кейс: у PSB страница с оранжевыми акцентами, у BittVPN — с чёрными.
+          Каждый кейс узнаётся с ленты.
+        </p>
+      </div>
+      <div>
+        <h3>Чем жертвуем</h3>
+        <p>
+          Самый смелый и шумный. Обложки придётся пересобрать под цвет, пастельная нежность Фрирен и
+          Зельды уходит в сторону Nintendo.
+        </p>
+      </div>
+    </div>
+    <p class="label">Главная</p>
+    <div class="mock d3">
+      <div class="home">
+        <aside class="side">
+          <img class="portrait" src="img/portrait.webp" alt="Портрет Даниила" />
+          <h2 class="name">Даниил Тынчеров</h2>
+          <div class="tags">
+            <span class="tag lvl">25 lvl</span><span class="tag">Product designer</span>
+          </div>
+          <p class="bio">
+            Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в
+            разработку.
+          </p>
+          <div class="btn">Резюме</div>
+        </aside>
+        <div class="feed">
+          <article class="case psb">
+            <div class="info">
+              <div class="tags"><span class="tag">B2C</span><span class="tag">2026</span></div>
+              <h3 class="case-title">PSB-Bank Redesign concept</h3>
+              <p>Переосмысление ключевых сценариев в мобильном приложении банка</p>
+              <span class="go">Открыть кейс →</span>
+            </div>
+            <div class="phones">
+              <div class="phone"><img src="img/psb-main.webp" alt="" /></div>
+              <div class="phone"><img src="img/psb-success.webp" alt="" /></div>
+            </div>
+          </article>
+          <article class="case vpn">
+            <div class="info">
+              <div class="tags"><span class="tag">B2C</span><span class="tag">2026</span></div>
+              <h3 class="case-title">BittVPN client</h3>
+              <p>Telegram Mini App для безопасного доступа в интернет через VPN</p>
+              <span class="go">Открыть кейс →</span>
+            </div>
+            <div class="phones">
+              <div class="phone" style="border-color: #2a2e36">
+                <img src="img/vpn-main.webp" alt="" />
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+    <p class="label">Кейс PSB, решение</p>
+    <div class="mock d3" style="padding: 28px">
+      <div class="case-sheet" style="padding: clamp(20px, 4vw, 48px)">
+        <span class="eyebrow">Решения</span>
+        <h2 class="h2">Подключение кешбэка</h2>
+        <p class="lead">
+          Раньше кешбэк подключали через почту и браузер, теперь — в два касания на главной. Тест
+          показал, что путь стал в четыре раза быстрее.
+        </p>
+        <div class="metrics">
+          <div class="metric hot">
+            <b>23<small> с</small></b>
+            <p>Медиана вместо 105 с</p>
+          </div>
+          <div class="metric">
+            <b>83<small>%</small></b>
+            <p>Нашли кнопку с первого клика</p>
+          </div>
+          <div class="metric">
+            <b>5<small> шагов</small></b>
+            <p>Вместо двенадцати</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  function show(id) {
+    tabs.forEach((t) => {
+      const on = t.getAttribute('aria-controls') === id;
+      t.setAttribute('aria-selected', String(on));
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => show(t.getAttribute('aria-controls'))));
+  const start = location.hash.slice(1);
+  if (tabs.some((t) => t.getAttribute('aria-controls') === start)) show(start);
+</script>
