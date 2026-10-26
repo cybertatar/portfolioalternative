@@ -365,13 +365,14 @@
   }
   /* Rows sit `--inset` from the pane, so their text lines up with the pane's `--pad` */
   .qlist {
+    align-self: start;
     padding: var(--inset);
     display: flex;
     flex-direction: column;
     gap: var(--s2);
   }
-  /* Four quests share the list's height; each row shows a glimpse of its world on the right,
-     melting into the glass, so the list is as tall as the card next to it without empty glass */
+  /* Rows of a normal height; each shows a glimpse of its world on the right, melting into the
+     glass. The list is as tall as its rows, not stretched to the card next to it */
   .q {
     position: relative;
     overflow: hidden;
@@ -380,15 +381,10 @@
     gap: var(--s3);
     align-items: center;
     width: 100%;
-    min-height: 72px;
+    min-height: 76px;
     padding: var(--s2) var(--pad-in);
     border-radius: var(--r-in);
     text-align: left;
-  }
-  @media (min-width: 861px) and (min-height: 600px) {
-    .q {
-      flex: 1 1 0;
-    }
   }
   .q > :not(.glimpse) {
     position: relative;
