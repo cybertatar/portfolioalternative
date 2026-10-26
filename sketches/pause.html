@@ -365,14 +365,16 @@
   }
   /* Rows sit `--inset` from the pane, so their text lines up with the pane's `--pad` */
   .qlist {
-    align-self: start;
+    position: relative;
+    overflow: hidden;
     padding: var(--inset);
     display: flex;
     flex-direction: column;
     gap: var(--s2);
   }
   /* Rows of a normal height; each shows a glimpse of its world on the right, melting into the
-     glass. The list is as tall as its rows, not stretched to the card next to it */
+     glass. The list is as tall as the card next to it; below the rows the selected quest's world
+     opens up from the pane's bottom edge and melts upward into the glass */
   .q {
     position: relative;
     overflow: hidden;
@@ -400,6 +402,24 @@
     mask-image: linear-gradient(90deg, transparent 15%, #000 85%);
     transition: opacity 0.2s ease;
   }
+  .qlist .floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 55%;
+    object-fit: cover;
+    pointer-events: none;
+    filter: brightness(0.75);
+    -webkit-mask-image: linear-gradient(transparent, #000 75%);
+    mask-image: linear-gradient(transparent, #000 75%);
+  }
+  @media (max-width: 860px) {
+    .qlist .floor {
+      display: none;
+    }
+  }
   .q:hover .glimpse,
   .q[aria-selected='true'] .glimpse {
     opacity: 0.6;
@@ -419,13 +439,15 @@
   }
   .q small {
     display: flex;
-    gap: var(--s2);
+    flex-wrap: wrap;
+    gap: 0 var(--s2);
     color: var(--ink-2);
     font-size: 13px;
   }
   .q small i {
     font-style: normal;
     color: var(--ink-3);
+    margin-left: var(--s2);
   }
   .q small i.open {
     color: var(--green);
@@ -497,6 +519,11 @@
     .card {
       grid-template-columns: 1fr;
     }
+  }
+  .qd .region,
+  #pregion {
+    display: flex;
+    gap: var(--s3);
   }
   .qd .region {
     font: 700 18px/1 var(--pixel);
@@ -712,8 +739,13 @@
     font-weight: 600;
   }
   .last small {
+    display: block;
     font-size: 14px;
     color: var(--ink-2);
+  }
+  .last small.tags {
+    display: flex;
+    gap: var(--s2);
   }
 
   /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one,
@@ -1599,7 +1631,8 @@
     {
       id: 'psb',
       title: 'PSB-Bank Redesign concept',
-      region: 'Финтех · 2026',
+      area: 'Финтех',
+      year: '2026',
       st: 'Кейс открыт',
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
@@ -1615,7 +1648,8 @@
     {
       id: 'vpn',
       title: 'BittVPN client',
-      region: 'Telegram · 2026',
+      area: 'Telegram',
+      year: '2026',
       st: 'Кейс пишется',
       icon: ['coin', 3],
       sub: 'Telegram Mini App для безопасного доступа в интернет через VPN.',
@@ -1625,7 +1659,8 @@
     {
       id: 'wb',
       title: 'WB Bank moneybox concept',
-      region: 'Финтех · 2025',
+      area: 'Финтех',
+      year: '2025',
       st: 'Кейс позже',
       icon: ['chest', 2],
       sub: 'Переосмысление сценария копилки в банковском приложении.',
@@ -1635,7 +1670,8 @@
     {
       id: 'mou',
       title: 'Mouette online clothing store',
-      region: 'E-commerce · 2025',
+      area: 'E-commerce',
+      year: '2025',
       st: 'Под NDA',
       icon: ['heart', 3],
       sub: 'Интернет-магазин одежды для ателье.',
@@ -1711,10 +1747,16 @@
     front = back;
   }
 
+  /* Area and year of a quest as separate words: parts are set apart by space, never by a dot */
+  const tags = (q) => `<span>${q.area}</span><span>${q.year}</span>`;
+
   /* ── Quests view ── */
   const qlist = document.getElementById('qlist'),
     qd = document.getElementById('qd');
   let sel = 0;
+  const floor = mk('', 1, 'floor');
+  floor.setAttribute('aria-hidden', 'true');
+  qlist.append(floor);
   QUESTS.forEach((q, i) => {
     const b = document.createElement('button');
     b.className = 'q';
@@ -1723,7 +1765,7 @@
     b.append(world(mk('', 1, 'glimpse'), q.id), mk(q.icon[0], q.icon[1], 'ic'));
     b.insertAdjacentHTML(
       'beforeend',
-      `<div><b>${q.title}</b><small>${q.region}<i class="${q.open ? 'open' : ''}">· ${q.st}</i></small></div>`,
+      `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small></div>`,
     );
     b.addEventListener('click', () => select(i));
     b.addEventListener('dblclick', () => open());
@@ -1741,7 +1783,7 @@
     const seal = q.open ? '' : `<div class="seal">${q.st}</div>`;
     qd.innerHTML =
       `<div class="scene window">${phones}${seal}</div><div class="card"><div>` +
-      `<p class="region">${q.region}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
+      `<p class="region">${tags(q)}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
       (q.facts ? `<p class="role"></p>` : `<p class="lockmsg"></p>`) +
       `<button class="cta" ${q.open ? '' : 'disabled'} id="cta"><span class="key">Enter</span>${q.open ? 'Открыть кейс' : 'Пока закрыт'}</button></div>` +
       (q.facts
@@ -1751,6 +1793,7 @@
     const ground = world(mk('', 1, 'ground'), q.id);
     qd.querySelector('.scene').prepend(ground);
     tint(qd, ground);
+    world(floor, q.id);
     if (q.facts) {
       const r = qd.querySelector('.role');
       r.append(mk('spark', 2));
@@ -1788,7 +1831,7 @@
   last.firstChild.append(world(mk('', 1), lastQ.id));
   last.insertAdjacentHTML(
     'beforeend',
-    `<div class="cap"><div><b>${lastQ.title}</b><small>${lastQ.region} · ${lastQ.facts[0][0]} ${lastQ.facts[0][1]}</small></div><span class="key">Enter</span></div>`,
+    `<div class="cap"><div><b>${lastQ.title}</b><small class="tags">${tags(lastQ)}</small><small>${lastQ.facts[0][0]} ${lastQ.facts[0][1]}</small></div><span class="key">Enter</span></div>`,
   );
   last.addEventListener('click', () => {
     tab(1);
@@ -1818,7 +1861,7 @@
     const q = QUESTS[sel];
     if (!q.open || cur() !== 1) return;
     document.getElementById('where').textContent = 'Квест: ' + q.title.split(' ')[0];
-    document.getElementById('pregion').textContent = q.region;
+    document.getElementById('pregion').innerHTML = tags(q);
     document.getElementById('ptitle').textContent = q.title;
     document.getElementById('plead').textContent = q.sub;
     document.getElementById('pfacts').innerHTML = q.facts
