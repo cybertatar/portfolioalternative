@@ -409,7 +409,7 @@
     color: var(--green);
   }
   .q-sub,
-  .q .facts,
+  .q-chips,
   .q-go {
     display: none;
   }
@@ -476,35 +476,44 @@
       line-height: 1.45;
       color: var(--ink-2);
     }
-    /* Numbers in a column of tiles, as on the right of the desktop card. A closed quest puts one
-       tile of the same height in that place: its pixel sign and why it is closed */
-    .q .facts {
-      display: grid;
-      grid-template-columns: 1fr;
+    /* Results as chips: they wrap on their own and take a line or two. A closed quest puts a
+       line of the same height in that place: its pixel sign and why it is closed */
+    .q-chips {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
       gap: var(--s2);
       min-height: var(--facts-h, 0px);
       margin-top: var(--s3);
     }
-    .q .fact {
-      padding: var(--s2) var(--s3);
-    }
-    .q .fact b {
-      margin-bottom: 2px;
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .q .fact span {
+    .q-chips span {
+      padding: 6px var(--s3);
+      border-radius: 999px;
+      background: var(--fill-2);
       font-size: 13px;
+      line-height: 1.3;
+      color: var(--ink-2);
+      white-space: nowrap;
     }
-    .q .fact.lock {
+    .q-chips span b {
+      display: inline;
+      font-size: inherit;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .q-chips.lock {
+      flex-wrap: nowrap;
       align-items: center;
-      justify-content: center;
+      align-content: center;
       gap: var(--s3);
-      text-align: center;
     }
-    .q .fact.lock span {
-      max-width: 26ch;
-      font-size: 14px;
+    .q-chips.lock span {
+      padding: 0;
+      background: none;
+      white-space: normal;
+    }
+    .q-chips.lock canvas {
+      flex: none;
     }
     .q-go {
       display: flex;
@@ -1754,6 +1763,8 @@
         ['83%', 'нашли путь с первого клика'],
         ['30', 'клиентов банка в тесте'],
       ],
+      // The same results, short enough for chips on a phone: each one reads as a result by itself
+      chips: ['Кешбэк <b>в 4 раза</b> быстрее', '<b>83%</b> с первого клика', '<b>30</b> клиентов в тесте'],
       role: 'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.',
       phones: ['psb-main', 'psb-success'],
       open: true,
@@ -1875,7 +1886,7 @@
   /* On a phone every quest card is as tall as the one with numbers: the closed ones' tile takes
      the height of the metric tiles */
   function evenCards() {
-    const m = qlist.querySelector('.q .facts:not(:has(.lock))');
+    const m = qlist.querySelector('.q-chips:not(.lock)');
     qlist.style.setProperty('--facts-h', '0px');
     if (m && phone.matches) qlist.style.setProperty('--facts-h', m.offsetHeight + 'px');
   }
@@ -1895,14 +1906,14 @@
       `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
         // Phone only: the row is the whole quest card, so it carries the summary and the way in
         `<p class="q-sub">${q.sub}</p>` +
-        (q.facts
-          ? factsHTML(q.facts)
-          : `<div class="facts"><div class="fact lock"><span>${q.lock}</span></div></div>`) +
+        (q.chips
+          ? `<p class="q-chips">${q.chips.map((c) => `<span>${c}</span>`).join('')}</p>`
+          : `<p class="q-chips lock"><span>${q.lock}</span></p>`) +
         `<span class="q-go${q.open ? ' on' : ''}">${q.open ? 'Открыть кейс' : 'Пока закрыт'}</span>` +
         `</div>`,
     );
-    const lock = b.querySelector('.fact.lock');
-    if (lock) lock.prepend(mk(q.icon[0], q.icon[1] * 2));
+    const lock = b.querySelector('.q-chips.lock');
+    if (lock) lock.prepend(mk(q.icon[0], q.icon[1]));
     b.addEventListener('click', () => {
       select(i);
       if (phone.matches) open();
