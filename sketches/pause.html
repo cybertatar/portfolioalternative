@@ -215,14 +215,21 @@
   .tabs [role='tab'][aria-selected='true'] {
     color: var(--ink);
   }
-  .tabs [role='tab'][aria-selected='true']::after {
-    content: '';
+  /* One gold line under the tabs that travels between them; while a phone pages through the
+     tabs it follows the finger, as Telegram's folder tabs do */
+  .tabs {
+    position: relative;
+  }
+  .tabs .ink {
     position: absolute;
-    left: var(--s4);
-    right: var(--s4);
+    left: 0;
     bottom: 2px;
     height: 2px;
     background: var(--gold);
+    pointer-events: none;
+    transition:
+      transform 0.25s ease,
+      width 0.25s ease;
   }
   .top .write {
     justify-self: end;
@@ -255,23 +262,36 @@
     mask-image: linear-gradient(#000 75%, transparent);
     border-radius: var(--r) var(--r) 0 0;
   }
-  /* A tab reached by a swipe slides in from the side the finger came from */
-  .view[data-enter='right'] {
-    animation: enter-right 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* On a desktop the pager adds nothing: one tab shows at a time. On a phone the tabs lie side by
+     side in a strip that scrolls sideways and snaps to whole tabs, so a swipe drags the page under
+     the finger and lets it settle on the next one. The strip is as tall as the tab in view */
+  .pager {
+    display: contents;
   }
-  .view[data-enter='left'] {
-    animation: enter-left 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  @keyframes enter-right {
-    from {
-      opacity: 0;
-      transform: translateX(40px);
+  @media (max-width: 860px) {
+    .pager {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      margin-inline: calc(-1 * var(--gap));
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      transition: height 0.25s ease;
     }
-  }
-  @keyframes enter-left {
-    from {
-      opacity: 0;
-      transform: translateX(-40px);
+    .pager::-webkit-scrollbar {
+      display: none;
+    }
+    .pager > .view,
+    .pager > .view[hidden] {
+      display: grid !important;
+      flex: 0 0 100%;
+      min-width: 0;
+      padding-inline: var(--gap);
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
   }
   .view[hidden] {
@@ -293,10 +313,6 @@
     .tabs [role='tab'] {
       padding-inline: var(--s3);
       font-size: 15px;
-    }
-    .tabs [role='tab'][aria-selected='true']::after {
-      left: var(--s3);
-      right: var(--s3);
     }
     .tabs .key {
       display: none;
@@ -1163,12 +1179,8 @@
     >
   </div>
 
-  <!-- Quests -->
-  <div class="view quests" id="v-quests" role="tabpanel" aria-labelledby="tab-quests" hidden>
-    <div class="pane qlist" role="listbox" aria-label="Квесты" id="qlist"></div>
-    <div class="pane qd" id="qd"></div>
-  </div>
-
+  <!-- The three tabs; on a phone they lie side by side and the finger pages through them -->
+  <div class="pager" id="pager">
   <!-- Character -->
   <div class="view char" id="v-char" role="tabpanel" aria-labelledby="tab-char">
     <div class="pane hero" style="--tone: rgba(110, 125, 140, 0.42)">
@@ -1233,9 +1245,16 @@
     </div>
   </div>
 
+  <!-- Quests -->
+  <div class="view quests" id="v-quests" role="tabpanel" aria-labelledby="tab-quests" hidden>
+    <div class="pane qlist" role="listbox" aria-label="Квесты" id="qlist"></div>
+    <div class="pane qd" id="qd"></div>
+  </div>
+
   <!-- Side quests -->
   <div class="view" id="v-side" role="tabpanel" aria-labelledby="tab-side" hidden>
     <div class="side" id="side"></div>
+  </div>
   </div>
 
 </div>
@@ -2015,65 +2034,96 @@
   /* ── Tabs ── */
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   const worldOf = { 'v-char': 'char', 'v-side': 'side' };
-  /* `from` is the side the new tab slides in from after a swipe: 1 from the right, -1 from the left */
-  function tab(k, from = 0) {
-    k = (k + tabs.length) % tabs.length;
+  const pager = document.getElementById('pager');
+  const views = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
+  const ink = document.createElement('span');
+  ink.className = 'ink';
+  document.querySelector('.tabs').append(ink);
+  /* The ink line at a tab position that may lie between two tabs (1.4 = 40% of the way from the
+     second tab to the third) */
+  function inkAt(pos) {
+    const i = Math.max(0, Math.min(tabs.length - 1, Math.floor(pos)));
+    const f = Math.max(0, Math.min(1, pos - i));
+    const box = (t) => {
+      const pad = parseFloat(getComputedStyle(t).paddingLeft);
+      return [t.offsetLeft + pad, t.offsetWidth - 2 * pad];
+    };
+    const [ax, aw] = box(tabs[i]),
+      [bx, bw] = box(tabs[Math.min(i + 1, tabs.length - 1)]);
+    ink.style.transform = `translateX(${ax + (bx - ax) * f}px)`;
+    ink.style.width = `${aw + (bw - aw) * f}px`;
+  }
+  /* Make tab k the current one: its button, its world, its content */
+  function setTab(k) {
     tabs.forEach((t, i) => {
       t.setAttribute('aria-selected', String(i === k));
-      document.getElementById(t.getAttribute('aria-controls')).hidden = i !== k;
+      views[i].hidden = i !== k;
     });
-    const id = tabs[k].getAttribute('aria-controls');
-    const view = document.getElementById(id);
-    view.removeAttribute('data-enter');
-    if (from) {
-      void view.offsetWidth;
-      view.dataset.enter = from > 0 ? 'right' : 'left';
-      tabs[k].scrollIntoView({ inline: 'center', block: 'nearest' });
-      if (document.querySelector('.menu').getBoundingClientRect().top < 0) scrollTo(0, 0);
-    }
+    const id = views[k].id;
     if (worldOf[id]) showWorld(worldOf[id]);
     else {
       select(sel);
       evenCards();
     }
+    ink.style.transition = '';
+    inkAt(k);
+    if (phone.matches) {
+      pager.style.height = views[k].offsetHeight + 'px';
+      tabs[k].scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    }
+  }
+  /* Go to tab k: on a phone the strip glides there, on a desktop the tab just shows */
+  function tab(k, smooth = true) {
+    k = (k + tabs.length) % tabs.length;
+    setTab(k);
+    if (phone.matches)
+      pager.scrollTo({ left: k * pager.clientWidth, behavior: smooth ? 'smooth' : 'instant' });
   }
   tabs.forEach((t, i) => t.addEventListener('click', () => tab(i)));
+  /* While the strip moves, the ink follows it and the strip is as tall as the taller of the two
+     tabs in view; once it rests, the tab it rests on becomes the current one */
+  let settle,
+    touching = false;
+  /* A finger that pauses mid-swipe has not let go: the strip only counts as resting once it is
+     released and has stopped */
+  pager.addEventListener('touchstart', () => (touching = true), { passive: true });
+  const release = () => {
+    touching = false;
+    pager.dispatchEvent(new Event('scroll'));
+  };
+  pager.addEventListener('touchend', release, { passive: true });
+  pager.addEventListener('touchcancel', release, { passive: true });
+  pager.addEventListener(
+    'scroll',
+    () => {
+      if (!phone.matches) return;
+      const pos = pager.scrollLeft / pager.clientWidth;
+      const i = Math.floor(pos);
+      ink.style.transition = 'none';
+      inkAt(pos);
+      const h = Math.max(views[i]?.offsetHeight || 0, views[i + 1]?.offsetHeight || 0);
+      if (h > pager.offsetHeight) pager.style.height = h + 'px';
+      clearTimeout(settle);
+      if (touching) return;
+      settle = setTimeout(() => {
+        const k = Math.round(pager.scrollLeft / pager.clientWidth);
+        setTab(k);
+        if (document.querySelector('.menu').getBoundingClientRect().top < 0)
+          scrollTo({ top: 0, behavior: 'smooth' });
+      }, 120);
+    },
+    { passive: true },
+  );
+  phone.addEventListener('change', () => {
+    pager.style.height = '';
+    tab(cur(), false);
+  });
+  addEventListener('resize', () => {
+    if (phone.matches) pager.scrollLeft = cur() * pager.clientWidth;
+    inkAt(cur());
+  });
   const cur = () => tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
 
-  /* ── Phone: swipe across the menu to change tabs. Left goes to the next tab, right to the
-   previous one, no wrapping around. Only a clearly sideways, quick move counts, so scrolling the
-   page never flips a tab; the tab bar scrolls sideways itself, so swipes on it are left alone ── */
-  (() => {
-    const menu = document.querySelector('.menu');
-    const MIN = 60;
-    let start = null;
-    menu.addEventListener(
-      'touchstart',
-      (e) => {
-        const t = e.touches[0];
-        start =
-          e.touches.length === 1 && !e.target.closest('.tabs')
-            ? { x: t.clientX, y: t.clientY, at: Date.now() }
-            : null;
-      },
-      { passive: true },
-    );
-    menu.addEventListener(
-      'touchend',
-      (e) => {
-        if (!start || document.body.classList.contains('playing')) return;
-        const t = e.changedTouches[0];
-        const dx = t.clientX - start.x,
-          dy = t.clientY - start.y,
-          quick = Date.now() - start.at < 700;
-        start = null;
-        if (!quick || Math.abs(dx) < MIN || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-        const k = cur() + (dx < 0 ? 1 : -1);
-        if (k >= 0 && k < tabs.length) tab(k, dx < 0 ? 1 : -1);
-      },
-      { passive: true },
-    );
-  })();
 
   /* ── Unpause into the case, pause back ── */
   const play = document.getElementById('play');
@@ -2118,7 +2168,8 @@
     }
   });
   select(0);
-  tab(0);
+  tab(0, false);
+  document.fonts.ready.then(() => inkAt(cur()));
   addEventListener('resize', evenCards);
   document.fonts.ready.then(evenCards);
 </script>
