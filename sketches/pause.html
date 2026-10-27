@@ -2089,7 +2089,8 @@
   pager.addEventListener('touchstart', () => (touching = true), { passive: true });
   const release = () => {
     touching = false;
-    pager.dispatchEvent(new Event('scroll'));
+    // Settle only a strip left between two tabs; a vertical scroll never moved it
+    if (pager.scrollLeft % pager.clientWidth) pager.dispatchEvent(new Event('scroll'));
   };
   pager.addEventListener('touchend', release, { passive: true });
   pager.addEventListener('touchcancel', release, { passive: true });
@@ -2107,9 +2108,16 @@
       if (touching) return;
       settle = setTimeout(() => {
         const k = Math.round(pager.scrollLeft / pager.clientWidth);
-        setTab(k);
-        if (document.querySelector('.menu').getBoundingClientRect().top < 0)
-          scrollTo({ top: 0, behavior: 'smooth' });
+        // Only a new tab brings the page back to the top; an ordinary scroll down stays put
+        if (k !== cur()) {
+          setTab(k);
+          if (document.querySelector('.menu').getBoundingClientRect().top < 0)
+            scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          ink.style.transition = '';
+          inkAt(k);
+          pager.style.height = views[k].offsetHeight + 'px';
+        }
       }, 120);
     },
     { passive: true },
