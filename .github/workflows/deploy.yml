@@ -1,10 +1,10 @@
 name: Deploy to GitHub Pages
 
-# The pause menu goes live on every push to main and to the working branch, so the owner can
-# share the link for reviews while it is still being made.
+# The pause menu goes live on every push to main (the github-pages environment only lets main
+# deploy, as on the main site).
 on:
   push:
-    branches: [main, claude/stoic-gauss-ngswig]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
