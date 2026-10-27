@@ -1128,10 +1128,10 @@
   <div class="top">
     <div class="tabs" role="tablist" aria-label="Меню">
       <span class="key" aria-hidden="true">Q</span>
-      <button role="tab" id="tab-char" aria-controls="v-char" aria-selected="false">
+      <button role="tab" id="tab-char" aria-controls="v-char" aria-selected="true">
         Персонаж
       </button>
-      <button role="tab" id="tab-quests" aria-controls="v-quests" aria-selected="true">
+      <button role="tab" id="tab-quests" aria-controls="v-quests" aria-selected="false">
         Квесты
       </button>
       <button role="tab" id="tab-side" aria-controls="v-side" aria-selected="false">
@@ -1145,13 +1145,13 @@
   </div>
 
   <!-- Quests -->
-  <div class="view quests" id="v-quests" role="tabpanel" aria-labelledby="tab-quests">
+  <div class="view quests" id="v-quests" role="tabpanel" aria-labelledby="tab-quests" hidden>
     <div class="pane qlist" role="listbox" aria-label="Квесты" id="qlist"></div>
     <div class="pane qd" id="qd"></div>
   </div>
 
   <!-- Character -->
-  <div class="view char" id="v-char" role="tabpanel" aria-labelledby="tab-char" hidden>
+  <div class="view char" id="v-char" role="tabpanel" aria-labelledby="tab-char">
     <div class="pane hero" style="--tone: rgba(110, 125, 140, 0.42)">
       <img class="photo window" src="img/portrait.webp" alt="Фото Даниила" />
       <div class="who">
@@ -2004,7 +2004,10 @@
     });
     const id = tabs[k].getAttribute('aria-controls');
     if (worldOf[id]) showWorld(worldOf[id]);
-    else select(sel);
+    else {
+      select(sel);
+      evenCards();
+    }
   }
   tabs.forEach((t, i) => t.addEventListener('click', () => tab(i)));
   const cur = () => tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
@@ -2052,7 +2055,7 @@
     }
   });
   select(0);
-  evenCards();
+  tab(0);
   addEventListener('resize', evenCards);
   document.fonts.ready.then(evenCards);
 </script>
