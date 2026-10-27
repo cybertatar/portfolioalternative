@@ -458,12 +458,16 @@
       top: var(--pad);
       left: var(--pad);
     }
+    /* Four groups, each a step apart: title with its line, summary, numbers, button. Inside a
+       group things sit close (4px), between groups 16–24px */
     .q > div {
-      padding: 0 var(--pad);
+      padding: var(--s2) var(--pad) var(--s1);
     }
     .q b {
+      margin-bottom: var(--s1);
       font-size: 18px;
       font-weight: 600;
+      line-height: 1.25;
     }
     .q-sub {
       display: -webkit-box;
@@ -471,8 +475,8 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       min-height: calc(2 * 1.45em);
-      margin-top: var(--s2);
-      font-size: 15px;
+      margin-top: var(--s4);
+      font-size: 14px;
       line-height: 1.45;
       color: var(--ink-2);
     }
@@ -485,7 +489,7 @@
       gap: var(--s3);
       align-items: start;
       min-height: var(--facts-h, 0px);
-      margin-top: var(--s4);
+      margin-top: var(--s5);
     }
     .q-stats span {
       font-size: 12px;
@@ -494,7 +498,7 @@
     }
     .q-stats span b {
       display: block;
-      margin-bottom: 2px;
+      margin-bottom: var(--s1);
       font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -515,7 +519,7 @@
     .q-go {
       display: flex;
       justify-content: center;
-      margin-top: var(--s3);
+      margin-top: var(--s5);
       padding: var(--s3);
       border-radius: var(--r-ctl);
       background: var(--fill-2);
