@@ -255,6 +255,25 @@
     mask-image: linear-gradient(#000 75%, transparent);
     border-radius: var(--r) var(--r) 0 0;
   }
+  /* A tab reached by a swipe slides in from the side the finger came from */
+  .view[data-enter='right'] {
+    animation: enter-right 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .view[data-enter='left'] {
+    animation: enter-left 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes enter-right {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+  }
+  @keyframes enter-left {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+  }
   .view[hidden] {
     display: none !important;
   }
@@ -1996,13 +2015,22 @@
   /* ── Tabs ── */
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   const worldOf = { 'v-char': 'char', 'v-side': 'side' };
-  function tab(k) {
+  /* `from` is the side the new tab slides in from after a swipe: 1 from the right, -1 from the left */
+  function tab(k, from = 0) {
     k = (k + tabs.length) % tabs.length;
     tabs.forEach((t, i) => {
       t.setAttribute('aria-selected', String(i === k));
       document.getElementById(t.getAttribute('aria-controls')).hidden = i !== k;
     });
     const id = tabs[k].getAttribute('aria-controls');
+    const view = document.getElementById(id);
+    view.removeAttribute('data-enter');
+    if (from) {
+      void view.offsetWidth;
+      view.dataset.enter = from > 0 ? 'right' : 'left';
+      tabs[k].scrollIntoView({ inline: 'center', block: 'nearest' });
+      if (document.querySelector('.menu').getBoundingClientRect().top < 0) scrollTo(0, 0);
+    }
     if (worldOf[id]) showWorld(worldOf[id]);
     else {
       select(sel);
@@ -2011,6 +2039,41 @@
   }
   tabs.forEach((t, i) => t.addEventListener('click', () => tab(i)));
   const cur = () => tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
+
+  /* ── Phone: swipe across the menu to change tabs. Left goes to the next tab, right to the
+   previous one, no wrapping around. Only a clearly sideways, quick move counts, so scrolling the
+   page never flips a tab; the tab bar scrolls sideways itself, so swipes on it are left alone ── */
+  (() => {
+    const menu = document.querySelector('.menu');
+    const MIN = 60;
+    let start = null;
+    menu.addEventListener(
+      'touchstart',
+      (e) => {
+        const t = e.touches[0];
+        start =
+          e.touches.length === 1 && !e.target.closest('.tabs')
+            ? { x: t.clientX, y: t.clientY, at: Date.now() }
+            : null;
+      },
+      { passive: true },
+    );
+    menu.addEventListener(
+      'touchend',
+      (e) => {
+        if (!start || document.body.classList.contains('playing')) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - start.x,
+          dy = t.clientY - start.y,
+          quick = Date.now() - start.at < 700;
+        start = null;
+        if (!quick || Math.abs(dx) < MIN || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        const k = cur() + (dx < 0 ? 1 : -1);
+        if (k >= 0 && k < tabs.length) tab(k, dx < 0 ? 1 : -1);
+      },
+      { passive: true },
+    );
+  })();
 
   /* ── Unpause into the case, pause back ── */
   const play = document.getElementById('play');
