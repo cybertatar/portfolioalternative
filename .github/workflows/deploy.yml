@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+# The pause menu goes live on every push to main and to the working branch, so the owner can
+# share the link for reviews while it is still being made.
+on:
+  push:
+    branches: [main, claude/stoic-gauss-ngswig]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      # The sketch is a page body written for artifacts, which add the document around it; here
+      # it gets its own doctype and charset and becomes the site's front page
+      - name: Build the site
+        run: |
+          mkdir -p _site
+          cp -r sketches/img _site/img
+          { printf '<!doctype html>\n<html lang="ru">\n<meta charset="utf-8" />\n'; cat sketches/pause.html; } > _site/index.html
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
