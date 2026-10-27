@@ -996,40 +996,33 @@
     font-weight: 600;
     color: var(--gold-ink);
   }
+  /* Phone: the cover goes on top, still 16:9, melting down into its colour; under it the title,
+     the status line and a full-width button. No stats: the full card is on «Квесты» */
   @media (max-width: 860px) {
     .last button {
-      grid-template-columns: 64px minmax(0, 1fr);
-      gap: 0 var(--s3);
-      padding: var(--s2);
-      background: var(--fill);
+      grid-template-columns: 1fr;
+      gap: 0;
+      background: linear-gradient(var(--tone, transparent), transparent 70%), var(--fill);
     }
     .lq-cover {
-      width: 64px;
-      height: 64px;
-      aspect-ratio: 1;
-      border-radius: calc(var(--r-in) - var(--s2));
-      -webkit-mask-image: none;
-      mask-image: none;
+      -webkit-mask-image: linear-gradient(#000 70%, transparent);
+      mask-image: linear-gradient(#000 70%, transparent);
     }
-    .lq-cover .phone,
+    .lq-cover .phone {
+      left: 50%;
+      bottom: -18cqh;
+      height: 96cqh;
+    }
+    .lq-body {
+      padding: var(--s2) var(--pad) var(--pad);
+    }
     .lq-stats {
       display: none;
     }
-    .lq-body {
-      display: contents;
-    }
-    .last .lq-body b {
-      grid-column: 2;
-      align-self: end;
-      font-size: 17px;
-    }
-    .lq-line {
-      grid-column: 2;
-      align-self: start;
-    }
     .lq-go {
-      grid-column: 1 / -1;
-      margin-top: var(--s3);
+      align-self: stretch;
+      margin-top: var(--s4);
+      padding: var(--s3);
       text-align: center;
     }
   }
