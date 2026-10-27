@@ -423,13 +423,14 @@
     color: var(--green);
   }
   .q-sub,
-  .q-fact,
+  .q .facts,
   .q-go {
     display: none;
   }
   /* Phone: no list beside a card; every quest is its own card in one scroll (the list-detail
-     layout collapses to the list, and a tap goes straight into the case). Each card: its world on
-     top, then title, summary, the headline number and the way in */
+     layout collapses to the list, and a tap goes straight into the case). Every card has the same
+     parts in the same places: its world, title, summary, a row for numbers (or why the case is
+     closed), and a full-width button at the bottom */
   @media (max-width: 860px) {
     #qd {
       display: none;
@@ -473,30 +474,60 @@
       font-weight: 600;
     }
     .q-sub {
-      display: block;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: calc(3 * 1.45em);
       margin-top: var(--s3);
       font-size: 15px;
+      line-height: 1.45;
       color: var(--ink-2);
     }
-    .q-fact {
-      display: block;
-      margin-top: var(--s3);
+    .q .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s2);
+      min-height: 112px;
+      margin-top: var(--s4);
+    }
+    .q .fact {
+      padding: var(--s2) var(--s2) var(--s3);
+      border-radius: var(--r-ctl);
+    }
+    .q .fact b {
+      margin-bottom: var(--s1);
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .q .fact span {
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    .q .fact small {
+      font-size: 11px;
+    }
+    .q .fact.lock {
+      grid-column: 1 / -1;
+      justify-content: center;
+      padding: var(--s3) var(--s4);
+    }
+    .q .fact.lock span {
       font-size: 14px;
-      color: var(--ink-2);
-    }
-    .q-fact b {
-      display: inline;
-      font-size: 18px;
-      color: var(--ink);
     }
     .q-go {
-      display: inline-flex;
+      display: flex;
+      justify-content: center;
       margin-top: var(--s4);
-      padding: var(--s3) var(--s4);
+      padding: var(--s4);
       border-radius: var(--r-ctl);
-      background: var(--gold);
-      font-size: 15px;
+      background: var(--fill-2);
+      font-size: 16px;
       font-weight: 600;
+      color: var(--ink-3);
+    }
+    .q-go.on {
+      background: var(--gold);
       color: var(--gold-ink);
     }
   }
@@ -572,6 +603,15 @@
   }
   .card .fact b {
     font-size: clamp(26px, 2.2vw, 30px);
+  }
+  .card > div:first-child {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .card .cta {
+    margin-top: auto;
   }
   @media (max-width: 1100px) {
     .card {
@@ -1719,7 +1759,7 @@
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
       facts: [
-        ['4×', 'быстрее подключить кешбэк', '23 с вместо 105'],
+        ['В 4 раза', 'быстрее подключить кешбэк', '23 с вместо 105'],
         ['83%', 'нашли путь с первого клика'],
         ['30', 'клиентов банка в тесте'],
       ],
@@ -1831,7 +1871,6 @@
 
   /* Area and year of a quest as separate words: parts are set apart by space, never by a dot */
   const tags = (q) => `<span>${q.area}</span><span>${q.year}</span>`;
-
   const factsHTML = (facts) =>
     `<div class="facts">${facts
       .map(
@@ -1839,6 +1878,7 @@
           `<div class="fact"><b>${n}</b><span>${what}</span>${more ? `<small>${more}</small>` : ''}</div>`,
       )
       .join('')}</div>`;
+
 
   const phone = matchMedia('(max-width: 860px)');
 
@@ -1857,8 +1897,10 @@
       `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
         // Phone only: the row is the whole quest card, so it carries the summary and the way in
         `<p class="q-sub">${q.sub}</p>` +
-        (q.facts ? `<p class="q-fact"><b>${q.facts[0][0]}</b> ${q.facts[0][1]}</p>` : '') +
-        (q.open ? `<span class="q-go">Открыть кейс</span>` : '') +
+        (q.facts
+          ? factsHTML(q.facts)
+          : `<div class="facts"><div class="fact lock"><span>${q.lock}</span></div></div>`) +
+        `<span class="q-go${q.open ? ' on' : ''}">${q.open ? 'Открыть кейс' : 'Пока закрыт'}</span>` +
         `</div>`,
     );
     b.addEventListener('click', () => {
