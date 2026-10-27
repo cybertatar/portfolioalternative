@@ -865,8 +865,11 @@
     background: var(--fill);
     font-size: 15px;
   }
+  /* Every skill icon takes the same 32px box, so the labels start on one line */
   .slot canvas {
     flex: none;
+    width: 32px;
+    height: 32px;
   }
   .last {
     flex: 1;
@@ -1242,19 +1245,19 @@
         <h3 class="label">Умения</h3>
         <div class="gear">
           <div class="slot">
-            <canvas class="px" data-sprite="card" data-scale="2"></canvas>Сценарии и интерфейсы
+            <canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas>Сценарии и интерфейсы
           </div>
           <div class="slot">
-            <canvas class="px" data-sprite="heart" data-scale="3"></canvas>Интервью с пользователями
+            <canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas>Интервью с пользователями
           </div>
           <div class="slot">
-            <canvas class="px" data-sprite="spark" data-scale="3"></canvas>Юзабилити-тесты
+            <canvas class="px" data-sprite="skill-test" data-scale="2"></canvas>Юзабилити-тесты
           </div>
           <div class="slot">
-            <canvas class="px" data-sprite="chest" data-scale="2"></canvas>Живые прототипы на коде
+            <canvas class="px" data-sprite="skill-code" data-scale="2"></canvas>Живые прототипы на коде
           </div>
           <div class="slot">
-            <canvas class="px" data-sprite="coin" data-scale="3"></canvas>Передача в разработку
+            <canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas>Передача в разработку
           </div>
         </div>
       </div>
@@ -1542,6 +1545,97 @@
       'PppppppppppppppP',
       'PpqqqppppppppppP',
       '.PPPPPPPPPPPPPP.',
+    ],
+    /* Skill icons: one 16x16 grid each, so every one sits in the same 32px box */
+    'skill-screens': [
+      '....SSSSSSSS....',
+      '...SkkkkkkkkS...',
+      '...SkppppppkS...',
+      '...SkpwwwwpkS...',
+      '...SkpwwwwpkS...',
+      '...SkppppppkS...',
+      '...SkpwwwppkS...',
+      '...SkppppppkS...',
+      '...SkpwwwwpkS...',
+      '...SkppppppkS...',
+      '...SkpoooopkS...',
+      '...SkppppppkS...',
+      '...SkkkkkkkkS...',
+      '...SkkksskkkS...',
+      '....SSSSSSSS....',
+      '................',
+    ],
+    'skill-talk': [
+      '................',
+      '.wwwwwwwww......',
+      'wwwwwwwwwwv.....',
+      'wwkkwkkkwwv.....',
+      'wwwwwwwwwwv.....',
+      'wwkkkwkkwwv.....',
+      '.wwwwwwwwv......',
+      '..wv..rrrrrrrr..',
+      '..v..rrrrrrrrrR.',
+      '.....rrqrrqrrqR.',
+      '.....rrrrrrrrrR.',
+      '......rRRRRRRR..',
+      '............RR..',
+      '.............R..',
+      '................',
+      '................',
+    ],
+    'skill-test': [
+      '................',
+      '................',
+      '....SSSSS.......',
+      '...SppqppS......',
+      '..SppppppaS.....',
+      '..SpppppaaS.....',
+      '..SapppaapS.....',
+      '..SaapaappS.....',
+      '..SpaaapppS.....',
+      '...SpppppSL.....',
+      '....SSSSSLLL....',
+      '..........LLL...',
+      '...........LLL..',
+      '............LL..',
+      '................',
+      '................',
+    ],
+    'skill-code': [
+      '................',
+      '................',
+      '.PPPPPPPPPPPPPP.',
+      '.PrPoPaPPPPPPPP.',
+      '.PPPPPPPPPPPPPP.',
+      '.gkkkkkkkkkkkkg.',
+      '.gkkkkkkkkkkkkg.',
+      '.gkkkokkakokkkg.',
+      '.gkkokkkakkokkg.',
+      '.gkokkkakkkkokg.',
+      '.gkkokkakkkokkg.',
+      '.gkkkoakkkokkkg.',
+      '.gkkkkkkkkkkkkg.',
+      '.gggggggggggggg.',
+      '................',
+      '................',
+    ],
+    'skill-ship': [
+      '................',
+      '................',
+      '................',
+      '......tttLLttt..',
+      '.....ttttLLtttt.',
+      '.....HHHHLLHHHH.',
+      '.....hhhhLLhhhh.',
+      '..o..hhhhLLhhhh.',
+      '...o.hhhhLLhhhh.',
+      'ooooohhhhLLhhhh.',
+      '...o.hhhhLLhhhh.',
+      '..o..hhhhLLhhhh.',
+      '.....HHHHHHHHHH.',
+      '................',
+      '................',
+      '................',
     ],
     frog: [
       '...aa.........',
