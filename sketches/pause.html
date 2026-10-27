@@ -883,7 +883,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: var(--s5);
-    align-items: center;
+    align-items: stretch;
     padding: 0;
     border-radius: var(--r-in);
     overflow: hidden;
@@ -893,9 +893,12 @@
   .last button:hover .lq-go {
     background: #f1d283;
   }
+  /* At least 16:9; when the text beside it is taller, the cover grows with the card (cropping its
+     sides) instead of leaving bands above and below */
   .lq-cover {
     position: relative;
     aspect-ratio: 16 / 9;
+    height: 100%;
     overflow: hidden;
     container-type: size;
     -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
@@ -920,6 +923,7 @@
   .lq-body {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: flex-start;
     padding: var(--s5) var(--s5) var(--s5) 0;
   }
@@ -967,21 +971,6 @@
     }
     .lq-body {
       padding: var(--s4) var(--s4) var(--s4) 0;
-    }
-    .lq-stats {
-      grid-template-columns: 1fr;
-      gap: var(--s1);
-      margin-top: var(--s3);
-    }
-    .lq-stats span {
-      display: flex;
-      gap: var(--s2);
-      align-items: baseline;
-    }
-    .last .lq-stats span b {
-      display: inline;
-      margin: 0;
-      font-size: 15px;
     }
     .lq-go {
       margin-top: var(--s3);
