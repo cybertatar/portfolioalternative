@@ -2287,6 +2287,15 @@
     });
   })();
 
+  /* The pager is as tall as the tab in view, and stays so when that tab grows or shrinks later
+     (a font arriving, cards evening out), or its bottom would be cut off */
+  const fit = new ResizeObserver(() => {
+    // not mid-drag: then the pager holds the taller of the two tabs on purpose
+    if (!phone.matches || document.querySelector('.tabs').classList.contains('dragging')) return;
+    const v = views[cur()];
+    if (pager.offsetHeight !== v.offsetHeight) pager.style.height = v.offsetHeight + 'px';
+  });
+  views.forEach((v) => fit.observe(v));
   phone.addEventListener('change', () => {
     pager.style.height = '';
     track.style.transform = '';
