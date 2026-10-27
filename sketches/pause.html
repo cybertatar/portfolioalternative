@@ -263,35 +263,44 @@
     border-radius: var(--r) var(--r) 0 0;
   }
   /* On a desktop the pager adds nothing: one tab shows at a time. On a phone the tabs lie side by
-     side in a strip that scrolls sideways and snaps to whole tabs, so a swipe drags the page under
-     the finger and lets it settle on the next one. The strip is as tall as the tab in view */
-  .pager {
+     side on a track that the finger drags, Telegram-style (see the swipe code): the page follows
+     the finger and a quick flick is enough to turn it. Vertical moves stay the browser's own
+     scroll (touch-action: pan-y). The pager is as tall as the tab in view */
+  .pager,
+  .track {
     display: contents;
   }
   @media (max-width: 860px) {
     .pager {
-      position: relative;
+      display: block;
+      min-width: 0;
+      margin-inline: calc(-1 * var(--gap));
+      overflow: clip;
+      touch-action: pan-y;
+      transition: height 0.3s ease;
+    }
+    .track {
       display: flex;
       align-items: flex-start;
-      margin-inline: calc(-1 * var(--gap));
-      overflow-x: auto;
-      overflow-y: hidden;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      transition: height 0.25s ease;
+      will-change: transform;
     }
-    .pager::-webkit-scrollbar {
-      display: none;
+    /* Pictures and links are not dragged around by the browser: a sideways move turns the page */
+    .track img,
+    .track a {
+      -webkit-user-drag: none;
+      user-select: none;
     }
-    .pager > .view,
-    .pager > .view[hidden] {
+    .track > .view,
+    .track > .view[hidden] {
       display: grid !important;
       flex: 0 0 100%;
       min-width: 0;
       padding-inline: var(--gap);
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
+    }
+    /* A tab is not a scroll box of its own here, or the browser takes the gesture for it */
+    .track > .view,
+    .track > #v-side {
+      overflow: visible;
     }
   }
   .view[hidden] {
@@ -1181,6 +1190,7 @@
 
   <!-- The three tabs; on a phone they lie side by side and the finger pages through them -->
   <div class="pager" id="pager">
+  <div class="track" id="track">
   <!-- Character -->
   <div class="view char" id="v-char" role="tabpanel" aria-labelledby="tab-char">
     <div class="pane hero" style="--tone: rgba(110, 125, 140, 0.42)">
@@ -1254,6 +1264,7 @@
   <!-- Side quests -->
   <div class="view" id="v-side" role="tabpanel" aria-labelledby="tab-side" hidden>
     <div class="side" id="side"></div>
+  </div>
   </div>
   </div>
 
@@ -2072,62 +2083,106 @@
       tabs[k].scrollIntoView({ inline: 'nearest', block: 'nearest' });
     }
   }
-  /* Go to tab k: on a phone the strip glides there, on a desktop the tab just shows */
-  function tab(k, smooth = true) {
+  const track = document.getElementById('track');
+  const SLIDE = 'transform 0.32s cubic-bezier(0.22, 0.8, 0.2, 1)';
+  /* Put the track at a tab position (fractional while dragging) */
+  function place(pos, animate) {
+    track.style.transition = animate ? SLIDE : 'none';
+    track.style.transform = `translateX(${-pos * pager.clientWidth}px)`;
+  }
+  /* Go to tab k: on a phone the track slides there, on a desktop the tab just shows */
+  function tab(k, animate = true) {
     k = (k + tabs.length) % tabs.length;
+    const moved = k !== cur();
     setTab(k);
-    if (phone.matches)
-      pager.scrollTo({ left: k * pager.clientWidth, behavior: smooth ? 'smooth' : 'instant' });
+    if (!phone.matches) return;
+    place(k, animate);
+    if (moved && document.querySelector('.menu').getBoundingClientRect().top < 0)
+      scrollTo({ top: 0, behavior: 'smooth' });
   }
   tabs.forEach((t, i) => t.addEventListener('click', () => tab(i)));
-  /* While the strip moves, the ink follows it and the strip is as tall as the taller of the two
-     tabs in view; once it rests, the tab it rests on becomes the current one */
-  let settle,
-    touching = false;
-  /* A finger that pauses mid-swipe has not let go: the strip only counts as resting once it is
-     released and has stopped */
-  pager.addEventListener('touchstart', () => (touching = true), { passive: true });
-  const release = () => {
-    touching = false;
-    // Settle only a strip left between two tabs; a vertical scroll never moved it
-    if (pager.scrollLeft % pager.clientWidth) pager.dispatchEvent(new Event('scroll'));
-  };
-  pager.addEventListener('touchend', release, { passive: true });
-  pager.addEventListener('touchcancel', release, { passive: true });
-  pager.addEventListener(
-    'scroll',
-    () => {
-      if (!phone.matches) return;
-      const pos = pager.scrollLeft / pager.clientWidth;
-      const i = Math.floor(pos);
+
+  /* ── Phone: page through the tabs like Telegram's folders. The move is decided in the first few
+   pixels: mostly sideways, it is ours and the track follows the finger; mostly up or down, it is the
+   page's scroll and we let go. On release a quick flick turns the page however short it was;
+   a slow drag turns it past a third of the width. Past the first and last tab the track only gives
+   a little, like a rubber band ── */
+  (() => {
+    const DECIDE = 8, // px before the direction is decided
+      FLICK = 0.25, // px per ms over the last moments that counts as a flick…
+      FLICK_MIN = 20, // …if the finger travelled at least this far
+      FAR = 1 / 3; // share of the width a slow drag must cover
+    let g = null;
+    pager.querySelectorAll('img, a').forEach((el) => (el.draggable = false));
+    pager.addEventListener('dragstart', (e) => e.preventDefault());
+    pager.addEventListener('pointerdown', (e) => {
+      if (!phone.matches || e.pointerType === 'mouse' || document.body.classList.contains('playing'))
+        return;
+      g = { id: e.pointerId, x: e.clientX, y: e.clientY, from: cur(), mode: 'wait', trail: [] };
+    });
+    pager.addEventListener('pointermove', (e) => {
+      if (!g || e.pointerId !== g.id) return;
+      const dx = e.clientX - g.x,
+        dy = e.clientY - g.y;
+      if (g.mode === 'wait') {
+        if (Math.abs(dx) < DECIDE && Math.abs(dy) < DECIDE) return;
+        if (Math.abs(dx) <= Math.abs(dy)) return (g = null);
+        g.mode = 'drag';
+        pager.setPointerCapture(e.pointerId);
+        const n = views[g.from + (dx < 0 ? 1 : -1)];
+        if (n) pager.style.height = Math.max(views[g.from].offsetHeight, n.offsetHeight) + 'px';
+      }
+      const w = pager.clientWidth,
+        last = tabs.length - 1;
+      let pos = g.from - dx / w;
+      if (pos < 0) pos *= 0.3;
+      if (pos > last) pos = last + (pos - last) * 0.3;
+      place(pos, false);
       ink.style.transition = 'none';
-      inkAt(pos);
-      const h = Math.max(views[i]?.offsetHeight || 0, views[i + 1]?.offsetHeight || 0);
-      if (h > pager.offsetHeight) pager.style.height = h + 'px';
-      clearTimeout(settle);
-      if (touching) return;
-      settle = setTimeout(() => {
-        const k = Math.round(pager.scrollLeft / pager.clientWidth);
-        // Only a new tab brings the page back to the top; an ordinary scroll down stays put
-        if (k !== cur()) {
-          setTab(k);
-          if (document.querySelector('.menu').getBoundingClientRect().top < 0)
-            scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          ink.style.transition = '';
-          inkAt(k);
-          pager.style.height = views[k].offsetHeight + 'px';
-        }
-      }, 120);
-    },
-    { passive: true },
-  );
+      inkAt(Math.max(0, Math.min(last, pos)));
+      g.trail.push([e.timeStamp, e.clientX]);
+      while (g.trail.length > 2 && e.timeStamp - g.trail[0][0] > 100) g.trail.shift();
+    });
+    const end = (e) => {
+      if (!g || e.pointerId !== g.id) return;
+      const was = g;
+      g = null;
+      if (was.mode !== 'drag') return;
+      // Speed over the last ~100 ms of movement: a flick is fast at the end, however short
+      const [t0, x0] = was.trail[0] || [e.timeStamp, e.clientX];
+      const [t1, x1] = was.trail[was.trail.length - 1] || [e.timeStamp, e.clientX];
+      const v = (x1 - x0) / Math.max(1, t1 - t0);
+      const dx = e.clientX - was.x;
+      const flick = Math.abs(dx) >= FLICK_MIN && Math.abs(v) >= FLICK && Math.sign(v) === Math.sign(dx);
+      let k = was.from;
+      if ((flick && dx < 0) || dx < -pager.clientWidth * FAR) k++;
+      else if ((flick && dx > 0) || dx > pager.clientWidth * FAR) k--;
+      k = Math.max(0, Math.min(tabs.length - 1, k));
+      if (k === was.from) {
+        place(k, true);
+        ink.style.transition = '';
+        inkAt(k);
+        pager.style.height = views[k].offsetHeight + 'px';
+      } else tab(k);
+      // The lift that ends a drag is not a tap on whatever lies under the finger
+      const eat = (c) => (c.stopPropagation(), c.preventDefault());
+      addEventListener('click', eat, { capture: true, once: true });
+      setTimeout(() => removeEventListener('click', eat, true), 300);
+    };
+    pager.addEventListener('pointerup', end);
+    pager.addEventListener('pointercancel', (e) => {
+      if (g && e.pointerId === g.id && g.mode === 'drag') end(e);
+      else g = null;
+    });
+  })();
+
   phone.addEventListener('change', () => {
     pager.style.height = '';
+    track.style.transform = '';
     tab(cur(), false);
   });
   addEventListener('resize', () => {
-    if (phone.matches) pager.scrollLeft = cur() * pager.clientWidth;
+    if (phone.matches) place(cur(), false);
     inkAt(cur());
   });
   const cur = () => tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
