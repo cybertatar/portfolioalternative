@@ -871,32 +871,37 @@
     width: 32px;
     height: 32px;
   }
+  /* The latest quest. Desktop: a quest card on its side — a 16:9 cover (its world with the
+     phone screen, melting right into its colour), then title, line, stats and the way in; it
+     closes the page at the bottom. Phone: one compact row with a square cover and a full-width
+     button, since the full card is one swipe away on «Квесты» */
   .last {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    margin-top: auto;
   }
-  /* A tile with a picture 8px inside it: the picture's corners follow the tile's */
   .last button {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--s2);
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--s5);
+    align-items: center;
+    padding: 0;
     border-radius: var(--r-in);
-    background: var(--fill);
+    overflow: hidden;
+    background: linear-gradient(90deg, var(--tone, transparent), transparent 75%), var(--fill);
     text-align: left;
   }
-  .last button:hover {
-    background: var(--fill-2);
+  .last button:hover .lq-go {
+    background: #f1d283;
   }
-  .pic {
+  .lq-cover {
     position: relative;
-    flex: 1;
-    min-height: 160px;
-    border-radius: calc(var(--r-in) - var(--s2));
+    aspect-ratio: 16 / 9;
     overflow: hidden;
+    container-type: size;
+    -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
+    mask-image: linear-gradient(90deg, #000 75%, transparent);
   }
-  .pic canvas {
+  .lq-cover canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -904,26 +909,129 @@
     object-fit: cover;
     filter: brightness(0.8);
   }
-  .last .cap {
+  .lq-cover .phone {
+    position: absolute;
+    left: 46%;
+    bottom: -14cqh;
+    height: 92cqh;
+    transform: translateX(-50%);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
+  }
+  .lq-body {
     display: flex;
-    gap: var(--s4);
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--s3) var(--s2) var(--s1);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--s5) var(--s5) var(--s5) 0;
   }
-  .last b {
+  .last .lq-body b {
     display: block;
-    font-size: 18px;
+    margin-bottom: var(--s1);
+    font-size: 20px;
     font-weight: 600;
+    line-height: 1.25;
   }
-  .last small {
-    display: block;
-    font-size: 14px;
+  .lq-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s3);
+    font-size: 13px;
     color: var(--ink-2);
   }
-  .last small.tags {
-    display: flex;
-    gap: var(--s2);
+  .lq-line i {
+    font-style: normal;
+    color: var(--green);
+  }
+  .lq-stats {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
+    margin-top: var(--s4);
+  }
+  .lq-stats span {
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--ink-2);
+  }
+  .last .lq-stats span b {
+    display: block;
+    margin-bottom: var(--s1);
+    font-size: 17px;
+    color: var(--ink);
+  }
+  /* Too narrow for cover and text side by side: the text needs about 340px */
+  @media (min-width: 861px) and (max-width: 1279px) {
+    .last button {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: var(--s4);
+    }
+    .lq-body {
+      padding: var(--s4) var(--s4) var(--s4) 0;
+    }
+    .lq-stats {
+      grid-template-columns: 1fr;
+      gap: var(--s1);
+      margin-top: var(--s3);
+    }
+    .lq-stats span {
+      display: flex;
+      gap: var(--s2);
+      align-items: baseline;
+    }
+    .last .lq-stats span b {
+      display: inline;
+      margin: 0;
+      font-size: 15px;
+    }
+    .lq-go {
+      margin-top: var(--s3);
+    }
+  }
+  .lq-go {
+    margin-top: var(--s5);
+    padding: var(--s3) var(--s5);
+    border-radius: var(--r-ctl);
+    background: var(--gold);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold-ink);
+  }
+  @media (max-width: 860px) {
+    .last button {
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 0 var(--s3);
+      padding: var(--s2);
+      background: var(--fill);
+    }
+    .lq-cover {
+      width: 64px;
+      height: 64px;
+      aspect-ratio: 1;
+      border-radius: calc(var(--r-in) - var(--s2));
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .lq-cover .phone,
+    .lq-stats {
+      display: none;
+    }
+    .lq-body {
+      display: contents;
+    }
+    .last .lq-body b {
+      grid-column: 2;
+      align-self: end;
+      font-size: 17px;
+    }
+    .lq-line {
+      grid-column: 2;
+      align-self: start;
+    }
+    .lq-go {
+      grid-column: 1 / -1;
+      margin-top: var(--s3);
+      text-align: center;
+    }
   }
 
   /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one,
@@ -1216,7 +1324,7 @@
         </p>
       </div>
       <div class="links">
-        <a class="btn gold" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
+        <a class="btn" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
           >Написать в Telegram</a
         >
         <a class="btn" href="mailto:tyncherovmail@icloud.com" title="tyncherovmail@icloud.com"
@@ -2134,12 +2242,15 @@
   /* ── Character: the latest finished quest leads straight to its case ── */
   const lastQ = QUESTS.find((q) => q.open);
   const last = document.getElementById('last');
-  last.innerHTML = '<div class="pic"></div>';
-  last.firstChild.append(world(mk('', 1), lastQ.id));
-  last.insertAdjacentHTML(
-    'beforeend',
-    `<div class="cap"><div><b>${lastQ.title}</b><small class="tags">${tags(lastQ)}</small><small>${lastQ.facts[0][0]} ${lastQ.facts[0][1]}</small></div></div>`,
-  );
+  last.innerHTML =
+    `<div class="lq-cover"><div class="phone"><img src="img/${lastQ.phones[0]}.webp" alt=""></div></div>` +
+    `<div class="lq-body"><b>${lastQ.title}</b>` +
+    `<small class="lq-line">${tags(lastQ)}<i>${lastQ.st}</i></small>` +
+    `<p class="lq-stats">${lastQ.stats.map(([n, l]) => `<span><b>${n}</b>${l}</span>`).join('')}</p>` +
+    `<span class="lq-go">Открыть кейс</span></div>`;
+  const lastWorld = world(mk('', 1), lastQ.id);
+  last.querySelector('.lq-cover').prepend(lastWorld);
+  tint(last, lastWorld);
   last.addEventListener('click', () => {
     tab(1);
     select(QUESTS.indexOf(lastQ));
