@@ -1,4 +1,5 @@
 <title>Портфолио: меню паузы</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="claude:viewport-fit-sides" content="cover" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -421,6 +422,84 @@
   .q small i.open {
     color: var(--green);
   }
+  .q-sub,
+  .q-fact,
+  .q-go {
+    display: none;
+  }
+  /* Phone: no list beside a card; every quest is its own card in one scroll (the list-detail
+     layout collapses to the list, and a tap goes straight into the case). Each card: its world on
+     top, then title, summary, the headline number and the way in */
+  @media (max-width: 860px) {
+    #qd {
+      display: none;
+    }
+    .qlist {
+      padding: 0;
+      gap: var(--s3);
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .q,
+    .q[aria-selected='true'] {
+      display: block;
+      padding: 0 0 var(--pad);
+      border-radius: var(--r);
+      background: var(--glass);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    .q .glimpse {
+      position: relative;
+      inset: auto;
+      display: block;
+      width: 100%;
+      height: 140px;
+      opacity: 1;
+      -webkit-mask-image: linear-gradient(#000 60%, transparent);
+      mask-image: linear-gradient(#000 60%, transparent);
+    }
+    .q .ic {
+      position: absolute;
+      top: var(--pad);
+      left: var(--pad);
+    }
+    .q > div {
+      padding: 0 var(--pad);
+    }
+    .q b {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .q-sub {
+      display: block;
+      margin-top: var(--s3);
+      font-size: 15px;
+      color: var(--ink-2);
+    }
+    .q-fact {
+      display: block;
+      margin-top: var(--s3);
+      font-size: 14px;
+      color: var(--ink-2);
+    }
+    .q-fact b {
+      display: inline;
+      font-size: 18px;
+      color: var(--ink);
+    }
+    .q-go {
+      display: inline-flex;
+      margin-top: var(--s4);
+      padding: var(--s3) var(--s4);
+      border-radius: var(--r-ctl);
+      background: var(--gold);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gold-ink);
+    }
+  }
   .qd {
     padding: 0;
     display: grid;
@@ -475,22 +554,39 @@
   }
   /* Text under the scene, `--pad` from the pane's sides and bottom; the scene's melting edge
      already parts them, so the gap above is a smaller step */
-  /* One column read top-down: what the quest was, its numbers, then the way in */
+  /* Text on the left, read top-down and ending with the button right where reading ends, on the
+     same left edge as the title; the numbers that back it up stacked on the right */
   .card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+    gap: var(--s5) var(--s6);
+    align-items: start;
     padding: var(--s4) var(--pad) var(--pad);
   }
-  .card > div:first-child {
-    display: contents;
-  }
   .card .facts {
-    align-self: stretch;
-    margin-bottom: var(--s5);
+    grid-template-columns: 1fr;
+    gap: var(--s3);
   }
-  .card .cta {
-    order: 1;
+  .card .fact {
+    padding: var(--s3) var(--s4);
+  }
+  .card .fact b {
+    font-size: clamp(26px, 2.2vw, 30px);
+  }
+  @media (max-width: 1100px) {
+    .card {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* The scene is a second, bigger way in: it opens the case too */
+  .qd.can-open .scene {
+    cursor: pointer;
+  }
+  .qd.can-open .scene canvas.ground {
+    transition: filter 0.2s ease;
+  }
+  .qd.can-open .scene:hover canvas.ground {
+    filter: brightness(0.85) saturate(1);
   }
   .qd .region,
   #pregion {
@@ -1744,6 +1840,8 @@
       )
       .join('')}</div>`;
 
+  const phone = matchMedia('(max-width: 860px)');
+
   /* ── Quests view ── */
   const qlist = document.getElementById('qlist'),
     qd = document.getElementById('qd');
@@ -1756,9 +1854,17 @@
     b.append(world(mk('', 1, 'glimpse'), q.id), mk(q.icon[0], q.icon[1], 'ic'));
     b.insertAdjacentHTML(
       'beforeend',
-      `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small></div>`,
+      `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
+        // Phone only: the row is the whole quest card, so it carries the summary and the way in
+        `<p class="q-sub">${q.sub}</p>` +
+        (q.facts ? `<p class="q-fact"><b>${q.facts[0][0]}</b> ${q.facts[0][1]}</p>` : '') +
+        (q.open ? `<span class="q-go">Открыть кейс</span>` : '') +
+        `</div>`,
     );
-    b.addEventListener('click', () => select(i));
+    b.addEventListener('click', () => {
+      select(i);
+      if (phone.matches) open();
+    });
     b.addEventListener('dblclick', () => open());
     qlist.append(b);
   });
@@ -1794,6 +1900,8 @@
       l.append(q.lock);
     }
     qd.querySelector('#cta').addEventListener('click', open);
+    qd.classList.toggle('can-open', !!q.open);
+    qd.querySelector('.scene').addEventListener('click', open);
     showWorld(q.id);
   }
 
