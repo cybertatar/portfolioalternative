@@ -409,7 +409,7 @@
     color: var(--green);
   }
   .q-sub,
-  .q-chips,
+  .q-stats,
   .q-go {
     display: none;
   }
@@ -476,43 +476,40 @@
       line-height: 1.45;
       color: var(--ink-2);
     }
-    /* Results as chips: they wrap on their own and take a line or two. A closed quest puts a
-       line of the same height in that place: its pixel sign and why it is closed */
-    .q-chips {
-      display: flex;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      gap: var(--s2);
+    /* Results as a row of stats, like the counters on a social profile: a big number and a word
+       or two under it, no boxes. A closed quest puts a line of the same height in that place: its
+       pixel sign and why it is closed */
+    .q-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s3);
+      align-items: start;
       min-height: var(--facts-h, 0px);
-      margin-top: var(--s3);
+      margin-top: var(--s4);
     }
-    .q-chips span {
-      padding: 6px var(--s3);
-      border-radius: 999px;
-      background: var(--fill-2);
-      font-size: 13px;
+    .q-stats span {
+      font-size: 12px;
       line-height: 1.3;
       color: var(--ink-2);
+    }
+    .q-stats span b {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
       white-space: nowrap;
     }
-    .q-chips span b {
-      display: inline;
-      font-size: inherit;
-      font-weight: 600;
-      color: var(--ink);
-    }
-    .q-chips.lock {
-      flex-wrap: nowrap;
+    .q-stats.lock {
+      display: flex;
       align-items: center;
-      align-content: center;
       gap: var(--s3);
     }
-    .q-chips.lock span {
-      padding: 0;
-      background: none;
-      white-space: normal;
+    .q-stats.lock span {
+      font-size: 13px;
     }
-    .q-chips.lock canvas {
+    .q-stats.lock canvas {
       flex: none;
     }
     .q-go {
@@ -1763,8 +1760,12 @@
         ['83%', 'нашли путь с первого клика'],
         ['30', 'клиентов банка в тесте'],
       ],
-      // The same results, short enough for chips on a phone: each one reads as a result by itself
-      chips: ['Кешбэк <b>в 4 раза</b> быстрее', '<b>83%</b> с первого клика', '<b>30</b> клиентов в тесте'],
+      // The same results for a phone's row of stats: the number and a label of a word or two
+      stats: [
+        ['В 4 раза', 'быстрее кешбэк'],
+        ['83%', 'с первого клика'],
+        ['30', 'клиентов в тесте'],
+      ],
       role: 'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.',
       phones: ['psb-main', 'psb-success'],
       open: true,
@@ -1886,7 +1887,7 @@
   /* On a phone every quest card is as tall as the one with numbers: the closed ones' tile takes
      the height of the metric tiles */
   function evenCards() {
-    const m = qlist.querySelector('.q-chips:not(.lock)');
+    const m = qlist.querySelector('.q-stats:not(.lock)');
     qlist.style.setProperty('--facts-h', '0px');
     if (m && phone.matches) qlist.style.setProperty('--facts-h', m.offsetHeight + 'px');
   }
@@ -1906,13 +1907,13 @@
       `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
         // Phone only: the row is the whole quest card, so it carries the summary and the way in
         `<p class="q-sub">${q.sub}</p>` +
-        (q.chips
-          ? `<p class="q-chips">${q.chips.map((c) => `<span>${c}</span>`).join('')}</p>`
-          : `<p class="q-chips lock"><span>${q.lock}</span></p>`) +
+        (q.stats
+          ? `<p class="q-stats">${q.stats.map(([n, l]) => `<span><b>${n}</b>${l}</span>`).join('')}</p>`
+          : `<p class="q-stats lock"><span>${q.lock}</span></p>`) +
         `<span class="q-go${q.open ? ' on' : ''}">${q.open ? 'Открыть кейс' : 'Пока закрыт'}</span>` +
         `</div>`,
     );
-    const lock = b.querySelector('.q-chips.lock');
+    const lock = b.querySelector('.q-stats.lock');
     if (lock) lock.prepend(mk(q.icon[0], q.icon[1]));
     b.addEventListener('click', () => {
       select(i);
