@@ -215,6 +215,16 @@
   .tabs [role='tab'][aria-selected='true'] {
     color: var(--ink);
   }
+  .tabs [role='tab'] {
+    transition: color 0.15s ease;
+  }
+  /* While a swipe is under way the light follows the finger, not the tab being left */
+  .tabs.dragging [role='tab'][aria-selected='true']:not(.lit) {
+    color: var(--ink-2);
+  }
+  .tabs.dragging [role='tab'].lit {
+    color: var(--ink);
+  }
   /* One gold line under the tabs that travels between them; while a phone pages through the
      tabs it follows the finger, as Telegram's folder tabs do */
   .tabs {
@@ -2108,6 +2118,7 @@
    a slow drag turns it past a third of the width. Past the first and last tab the track only gives
    a little, like a rubber band ── */
   (() => {
+    const bar = document.querySelector('.tabs');
     const DECIDE = 8, // px before the direction is decided
       FLICK = 0.25, // px per ms over the last moments that counts as a flick…
       FLICK_MIN = 20, // …if the finger travelled at least this far
@@ -2140,6 +2151,10 @@
       place(pos, false);
       ink.style.transition = 'none';
       inkAt(Math.max(0, Math.min(last, pos)));
+      // The tab the finger is heading to lights up once past halfway, before the finger lets go
+      const near = Math.max(0, Math.min(last, Math.round(pos)));
+      bar.classList.add('dragging');
+      tabs.forEach((t, i) => t.classList.toggle('lit', i === near));
       g.trail.push([e.timeStamp, e.clientX]);
       while (g.trail.length > 2 && e.timeStamp - g.trail[0][0] > 100) g.trail.shift();
     });
@@ -2148,6 +2163,8 @@
       const was = g;
       g = null;
       if (was.mode !== 'drag') return;
+      bar.classList.remove('dragging');
+      tabs.forEach((t) => t.classList.remove('lit'));
       // Speed over the last ~100 ms of movement: a flick is fast at the end, however short
       const [t0, x0] = was.trail[0] || [e.timeStamp, e.clientX];
       const [t1, x1] = was.trail[was.trail.length - 1] || [e.timeStamp, e.clientX];
