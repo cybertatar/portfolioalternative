@@ -875,11 +875,15 @@
      phone screen, melting right into its colour), then title, line, stats and the way in; it
      closes the page at the bottom. Phone: one compact row with a square cover and a full-width
      button, since the full card is one swipe away on «Квесты» */
+  /* Right under the skills, taking the rest of the panel's height, so no gap opens above it */
   .last {
-    margin-top: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     container: lq / inline-size;
   }
   .last button {
+    flex: 1;
     width: 100%;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -929,7 +933,7 @@
   .lq-body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-start;
     padding: var(--s5) var(--s5) var(--s5) 0;
   }
