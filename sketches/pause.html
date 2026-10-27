@@ -430,18 +430,23 @@
       backdrop-filter: none;
     }
     .q,
+    .q:hover,
     .q[aria-selected='true'] {
       display: block;
+      overflow: hidden;
       padding: 0 0 var(--pad);
       border-radius: var(--r);
       background: var(--glass);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
     }
+    .q:hover {
+      background: linear-gradient(var(--fill), var(--fill)), var(--glass);
+    }
     .q .glimpse {
       display: block;
       width: 100%;
-      height: 140px;
+      height: 104px;
       border-radius: 0;
       -webkit-mask-image: linear-gradient(#000 60%, transparent);
       mask-image: linear-gradient(#000 60%, transparent);
@@ -461,11 +466,11 @@
     }
     .q-sub {
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      min-height: calc(3 * 1.45em);
-      margin-top: var(--s3);
+      min-height: calc(2 * 1.45em);
+      margin-top: var(--s2);
       font-size: 15px;
       line-height: 1.45;
       color: var(--ink-2);
@@ -475,17 +480,20 @@
     .q .facts {
       display: grid;
       grid-template-columns: 1fr;
-      gap: var(--s3);
+      gap: var(--s2);
       min-height: var(--facts-h, 0px);
-      margin-top: var(--s4);
+      margin-top: var(--s3);
     }
     .q .fact {
-      padding: var(--s3) var(--s4);
+      padding: var(--s2) var(--s3);
     }
     .q .fact b {
-      margin-bottom: var(--s1);
-      font-size: 22px;
+      margin-bottom: 2px;
+      font-size: 18px;
       font-weight: 600;
+    }
+    .q .fact span {
+      font-size: 13px;
     }
     .q .fact.lock {
       align-items: center;
@@ -500,8 +508,8 @@
     .q-go {
       display: flex;
       justify-content: center;
-      margin-top: var(--s4);
-      padding: var(--s4);
+      margin-top: var(--s3);
+      padding: var(--s3);
       border-radius: var(--r-ctl);
       background: var(--fill-2);
       font-size: 16px;
@@ -1741,7 +1749,7 @@
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
       facts: [
-        ['В 4 раза', 'быстрее подключить кешбэк', '23 с вместо 105'],
+        ['В 4 раза', 'быстрее подключить кешбэк'],
         ['83%', 'нашли путь с первого клика'],
         ['30', 'клиентов банка в тесте'],
       ],
