@@ -1,0 +1,143 @@
+<!doctype html>
+<!--
+  The PSB cover for sketches/pause.html, from the main site's scene (Portfolio
+  tools/case-covers/psb.html): the same fan of five phones, but the screens are shot from the live
+  prototype (node tools/psb-screens.js) and sit as on the clickable phone (.live-ph in pause.html:
+  the screen over the body, 410×882 of 450×920 at 20/19, 64pt corners), so the cover, the fan in
+  the head of the case and the live phone show one status bar and one tab bar.
+  Rendered by tools/render-covers.js.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --paper-3: #e8e1d2;
+        --line-2: #cfc6b2;
+        --ink-1: #29251e;
+        --s: 4px; /* pixel corner step */
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        background: var(--paper-3);
+      }
+      /* Barely-there pattern of pixel coins and hearts, like tiles on a game map.
+         Each tile is 32×32 game pixels drawn at 3px; fades out toward the top. */
+      body::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'%3E%3Cpath fill='%23cfc6b2' d='M7 5h1v1h-1zM8 5h1v1h-1zM9 5h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM9 6h1v1h-1zM10 6h1v1h-1zM5 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM9 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM9 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM5 9h1v1h-1zM6 9h1v1h-1zM7 9h1v1h-1zM9 9h1v1h-1zM10 9h1v1h-1zM11 9h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM7 11h1v1h-1zM8 11h1v1h-1zM9 11h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM22 22h1v1h-1zM23 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM20 23h1v1h-1zM21 23h1v1h-1zM22 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM22 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM23 26h1v1h-1z'/%3E%3C/svg%3E");
+        background-size: 96px 96px;
+        mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35), #000 85%);
+        opacity: 0.5;
+      }
+      /* Stepped corners, same shape as .px-clip on the site */
+      .px {
+        clip-path: polygon(
+          0 calc(var(--s) * 2),
+          var(--s) calc(var(--s) * 2),
+          var(--s) var(--s),
+          calc(var(--s) * 2) var(--s),
+          calc(var(--s) * 2) 0,
+          calc(100% - var(--s) * 2) 0,
+          calc(100% - var(--s) * 2) var(--s),
+          calc(100% - var(--s)) var(--s),
+          calc(100% - var(--s)) calc(var(--s) * 2),
+          100% calc(var(--s) * 2),
+          100% calc(100% - var(--s) * 2),
+          calc(100% - var(--s)) calc(100% - var(--s) * 2),
+          calc(100% - var(--s)) calc(100% - var(--s)),
+          calc(100% - var(--s) * 2) calc(100% - var(--s)),
+          calc(100% - var(--s) * 2) 100%,
+          calc(var(--s) * 2) 100%,
+          calc(var(--s) * 2) calc(100% - var(--s)),
+          var(--s) calc(100% - var(--s)),
+          var(--s) calc(100% - var(--s) * 2),
+          0 calc(100% - var(--s) * 2)
+        );
+      }
+
+      /* Fan: every phone shares one pivot far below the frame */
+      .phone {
+        --k: 0.8; /* scale from Figma points */
+        position: absolute;
+        left: calc(960px - 225px * var(--k));
+        top: 150px;
+        width: calc(450px * var(--k));
+        height: calc(920px * var(--k));
+        transform-origin: 50% 2400px;
+        transform: rotate(var(--a));
+        filter: drop-shadow(0 24px 32px rgb(41 37 30 / 0.22));
+      }
+      .phone .screen {
+        position: absolute;
+        left: calc(20px * var(--k));
+        top: calc(19px * var(--k));
+        width: calc(410px * var(--k));
+        height: calc(882px * var(--k));
+        border-radius: calc(64px * var(--k));
+        object-fit: cover;
+        object-position: top;
+      }
+      .phone .body {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .p1 {
+        --a: -18deg;
+        z-index: 1;
+      }
+      .p2 {
+        --a: -9deg;
+        z-index: 2;
+      }
+      .p3 {
+        --a: 0deg;
+        z-index: 3;
+      }
+      .p4 {
+        --a: 9deg;
+        z-index: 2;
+      }
+      .p5 {
+        --a: 18deg;
+        z-index: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone p1">
+      <img class="body" src="../../sketches/img/iphone-17-pro.webp" alt="" />
+      <img class="screen" src="../../sketches/img/psb-fan-account.webp" alt="" />
+    </div>
+    <div class="phone p2">
+      <img class="body" src="../../sketches/img/iphone-17-pro.webp" alt="" />
+      <img class="screen" src="../../sketches/img/psb-fan-cb-off.webp" alt="" />
+    </div>
+    <div class="phone p3">
+      <img class="body" src="../../sketches/img/iphone-17-pro.webp" alt="" />
+      <img class="screen" src="../../sketches/img/psb-fan-main.webp" alt="" />
+    </div>
+    <div class="phone p4">
+      <img class="body" src="../../sketches/img/iphone-17-pro.webp" alt="" />
+      <img class="screen" src="../../sketches/img/psb-fan-cb-connect.webp" alt="" />
+    </div>
+    <div class="phone p5">
+      <img class="body" src="../../sketches/img/iphone-17-pro.webp" alt="" />
+      <img class="screen" src="../../sketches/img/psb-fan-cb-on.webp" alt="" />
+    </div>
+  </body>
+</html>

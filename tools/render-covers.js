@@ -44,7 +44,8 @@ const OBJECTS_ONLY =
   'html,body{background:transparent!important}.pattern,body::before{display:none!important}';
 const SHADOW = 'drop-shadow(0 32px 48px rgb(0 0 0 / 0.55))';
 const COVERS = [
-  { id: 'psb', file: path.join(src, 'psb.html'), css: `.phone{filter:${SHADOW}!important}` },
+  // PSB's screens come from the live prototype (tools/psb-screens.js), so its scene is ours
+  { id: 'psb', file: path.join(root, 'tools/covers/psb.html'), css: `.phone{filter:${SHADOW}!important}` },
   { id: 'vpn', file: path.join(src, 'bittvpn.html'), css: `.pass,.phone{filter:${SHADOW}!important}` },
   {
     id: 'mou',

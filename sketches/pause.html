@@ -1500,13 +1500,15 @@
     transform: rotate(var(--a));
     container-type: inline-size;
   }
+  /* The screen as on the live phone (.live-ph .screen), shot from the prototype itself
+     (tools/psb-screens.js): the fan folds into the live phone without a jump */
   .fan-ph .scr {
     position: absolute;
-    left: calc(24 / 450 * 100%);
-    top: calc(23 / 920 * 100%);
-    width: calc(402 / 450 * 100%);
-    height: calc(874 / 920 * 100%);
-    border-radius: calc(60 / 450 * 100cqw);
+    left: calc(20 / 450 * 100%);
+    top: calc(19 / 920 * 100%);
+    width: calc(410 / 450 * 100%);
+    height: calc(882 / 920 * 100%);
+    border-radius: calc(64 / 450 * 100cqw);
     object-fit: cover;
     object-position: top;
   }
@@ -5559,7 +5561,7 @@
     if (fan) return fan;
     const side = (s, i) =>
       `<div class="fan-ph" style="--a:${FAN.turn[i]}deg;z-index:${FAN.z[i]}">` +
-      `<img class="scr" src="img/psb-fan-${s}.webp" alt=""><img class="body" src="img/iphone-17-pro.webp" alt=""></div>`;
+      `<img class="body" src="img/iphone-17-pro.webp" alt=""><img class="scr" src="img/psb-fan-${s}.webp" alt=""></div>`;
     const el = document.createElement('div');
     el.className = 'fan';
     el.innerHTML =
