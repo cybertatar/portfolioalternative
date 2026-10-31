@@ -101,6 +101,11 @@
   body {
     height: 100%;
   }
+  /* The page never scrolls sideways: whatever runs past the edge is cut, and clip (unlike hidden)
+     leaves the pinned top bar pinned */
+  html {
+    overflow-x: clip;
+  }
   body {
     margin: 0;
     background: var(--bg);
@@ -260,7 +265,8 @@
     top: 0;
     bottom: calc(-1 * var(--s3));
     left: 50%;
-    width: 100vw;
+    /* The menu is zoomed, and the zoom stretches vw too: divided back, the glass is one screen wide */
+    width: calc(100vw / var(--z));
     transform: translateX(-50%);
     background: var(--glass-strong);
     -webkit-backdrop-filter: blur(10px);
@@ -350,6 +356,15 @@
     transition:
       transform 0.25s ease,
       width 0.25s ease;
+  }
+  .tabs .ruler {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   .pane {
     background: linear-gradient(var(--tone, transparent), transparent 80%), var(--glass);
@@ -4048,21 +4063,37 @@
   const views = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
   const ink = document.createElement('span');
   ink.className = 'ink';
-  document.querySelector('.tabs').append(ink);
+  /* A ruler in the ink's own coordinates: where its zero lies on screen and how long its 100px
+     are. Under the UI's zoom Safari and Firefox report offsets and paddings in other units than
+     Chrome does, so the ink is placed by what the screen shows, not by those numbers */
+  const ruler = document.createElement('span');
+  ruler.className = 'ruler';
+  document.querySelector('.tabs').append(ink, ruler);
+  /* The word of a tab on screen, without the tab's padding */
+  function word(t) {
+    const r = document.createRange();
+    r.selectNodeContents(t);
+    const b = r.getBoundingClientRect();
+    return [b.left, b.width];
+  }
   /* The ink line at a tab position that may lie between two tabs (1.4 = 40% of the way from the
      second tab to the third) */
   function inkAt(pos) {
     const i = Math.max(0, Math.min(tabs.length - 1, Math.floor(pos)));
     const f = Math.max(0, Math.min(1, pos - i));
-    const box = (t) => {
-      const pad = parseFloat(getComputedStyle(t).paddingLeft);
-      return [t.offsetLeft + pad, t.offsetWidth - 2 * pad];
-    };
-    const [ax, aw] = box(tabs[i]),
-      [bx, bw] = box(tabs[Math.min(i + 1, tabs.length - 1)]);
-    ink.style.transform = `translateX(${ax + (bx - ax) * f}px)`;
-    ink.style.width = `${aw + (bw - aw) * f}px`;
+    const [ax, aw] = word(tabs[i]),
+      [bx, bw] = word(tabs[Math.min(i + 1, tabs.length - 1)]);
+    const r = ruler.getBoundingClientRect(),
+      k = r.width / 100 || 1;
+    ink.style.transform = `translateX(${(ax + (bx - ax) * f - r.left) / k}px)`;
+    ink.style.width = `${(aw + (bw - aw) * f) / k}px`;
   }
+  /* A word that changes its width (a font arriving late, the other language) takes the ink along;
+     mid-swipe the finger leads it */
+  const inkFit = new ResizeObserver(() => {
+    if (!document.querySelector('.tabs').classList.contains('dragging')) inkAt(cur());
+  });
+  tabs.forEach((t) => inkFit.observe(t));
   /* Make tab k the current one: its button, its world, its content */
   function setTab(k) {
     tabs.forEach((t, i) => {
