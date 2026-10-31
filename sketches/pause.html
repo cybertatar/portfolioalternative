@@ -926,7 +926,7 @@
     color: var(--ink-2);
     max-width: 72ch;
   }
-  .role,
+  .why,
   .lockmsg {
     display: flex;
     gap: var(--s3);
@@ -936,7 +936,7 @@
     font-size: var(--fs-ui);
     color: var(--ink-2);
   }
-  .role canvas,
+  .why canvas,
   .lockmsg canvas {
     margin-top: 3px;
     flex: none;
@@ -2900,7 +2900,7 @@
       'Пройти Tears of the Kingdom на 100%': 'Finish Tears of the Kingdom at 100%',
       // Quests
       'Финтех': 'Fintech',
-      'Кейс открыт': 'Case open',
+      'Готов': 'Ready',
       'Кейс пишется': 'Being written',
       'Кейс позже': 'Case later',
       'Под NDA': 'Under NDA',
@@ -2913,8 +2913,8 @@
       'быстрее кешбэк': 'faster cashback',
       'с первого клика': 'on the first click',
       'клиентов в тесте': 'customers tested',
-      'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.':
-        'Role: product design as a pair — interviews, user flows, interface, a live prototype in code, a usability test.',
+      'Проблема: кешбэк подключался за 12 шагов, через браузер и почту, а CVV открывался только по коду из СМС.':
+        'The problem: activating cashback took 12 steps, through a browser and a mail app, and the CVV showed only after a code from a text message.',
       'Telegram Mini App для безопасного доступа в интернет через VPN.':
         'A Telegram Mini App for secure internet access over VPN.',
       'Кейс ещё пишется. Скоро здесь будет журнал этого квеста.':
@@ -4660,7 +4660,7 @@
       title: 'PSB-Bank Redesign concept',
       area: 'Финтех',
       year: '2026',
-      st: 'Кейс открыт',
+      st: 'Готов',
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
       facts: [
@@ -4674,7 +4674,7 @@
         ['83%', 'с первого клика'],
         ['30', 'клиентов в тесте'],
       ],
-      role: 'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.',
+      problem: 'Проблема: кешбэк подключался за 12 шагов, через браузер и почту, а CVV открывался только по коду из СМС.',
       open: true,
     },
     {
@@ -4893,16 +4893,16 @@
     qd.innerHTML =
       `<div class="scene window">${coverArt(q.id, 'cover')}${seal}</div><div class="card"><div>` +
       `<p class="region">${tags(q)}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
-      (q.facts ? `<p class="role"></p>` : `<p class="lockmsg"></p>`) +
+      (q.facts ? `<p class="why"></p>` : `<p class="lockmsg"></p>`) +
       `<button class="cta" ${q.open ? '' : 'disabled'} id="cta">${q.open ? 'Открыть кейс' : 'Пока закрыт'}</button></div>` +
       (q.facts
         ? factsHTML(q.facts)
         : '') +
       `</div>`;
     if (q.facts) {
-      const r = qd.querySelector('.role');
+      const r = qd.querySelector('.why');
       r.append(mk('spark', 2));
-      r.append(q.role);
+      r.append(q.problem);
     } else {
       const l = qd.querySelector('.lockmsg');
       l.append(mk(q.id === 'mou' ? 'heart' : 'chest', 2));
