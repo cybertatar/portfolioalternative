@@ -1060,14 +1060,13 @@
     }
   }
   /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
-     a coin for one under way, empty boxes for the rest. The rows share the card's height, but
-     only up to a point: on a tall screen they stop spreading and gather in the middle */
+     a coin for one under way, empty boxes for the rest. A plain list from the top of the card,
+     one step between rows, so a new wish is just one more row */
   .wl {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: var(--s3);
+    gap: var(--s4);
     margin: 0;
     padding: var(--pad);
     border-radius: var(--r-in);
@@ -1075,8 +1074,6 @@
     list-style: none;
   }
   .wl li {
-    flex: 1 0 auto;
-    max-height: 52px;
     display: flex;
     gap: var(--s3);
     align-items: center;
