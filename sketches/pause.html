@@ -2744,6 +2744,154 @@
       }
     }
 
+    /* ── Mouette: chalk cliffs over the sea on a clear morning, the one daylight world. An
+       atelier with a striped awning stands on the clifftop, a sand spit curls in at the bottom
+       right; gulls (mouette is French for one) glide over the water ── */
+    const cliffTop = (x) => 62 + 3 * Math.sin(x * 0.05) + 1.5 * Math.sin(x * 0.21);
+    const cliffFace = (y) => 128 + (y - 64) * 0.28 + 4 * Math.sin(y * 0.3) + 2 * Math.sin(y * 0.9);
+    const shore = (x) => 160 - 18 * smooth(190, 320, x) + 2 * Math.sin(x * 0.08);
+    function mouSky(set, P) {
+      const cols = ['#6fa8c0', '#86b8cb', '#a0c8d6', '#bcd8e0', '#d6e6ea', '#e9f1f1'].map(P),
+        cloud = P('#ffffff'),
+        cloudSh = P('#d3e2e8'),
+        r = rng(61);
+      for (let y = 0; y < 96; y++) {
+        const f = Math.min((y / 92) * (cols.length - 1), cols.length - 1.001),
+          i = f | 0;
+        for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+      }
+      // A few soft clouds: lumps lit from above, flat and shaded underneath
+      for (let k = 0; k < 6; k++) {
+        const cx = r() * PW,
+          cy = 14 + r() * 44,
+          w = 14 + r() * 26;
+        for (let y = cy - 8; y < cy + 4; y++)
+          for (let x = cx - w; x < cx + w; x++) {
+            const bump = 5 + 2.5 * Math.sin((x - cx) * 0.22 + k) + Math.sin((x - cx) * 0.5);
+            const d = Math.abs(x - cx) / w;
+            if (d < 1 && y > cy - bump * (1 - d * d) && y < cy + 3) set(x, y, y > cy && dith(x | 0, y | 0, 0.6) ? cloudSh : cloud);
+          }
+      }
+    }
+    function mouSea(set, P) {
+      const cols = ['#8cc3cf', '#5fa6b8', '#3f8fa8', '#2f7f98', '#245f78'].map(P),
+        far = P('#9fb8c0'),
+        glint = P('#eaf6f8'),
+        r = rng(67);
+      for (let y = 92; y < PH; y++) {
+        const f = Math.min(((y - 92) / 80) * (cols.length - 1), cols.length - 1.001),
+          i = f | 0;
+        for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+      }
+      // A far headland on the horizon
+      for (let x = 226; x < PW; x++) {
+        const top = 92 - 7 * smooth(226, 262, x) + Math.sin(x * 0.2);
+        for (let y = top | 0; y < 93; y++) set(x, y, far);
+      }
+      for (let k = 0; k < 70; k++) {
+        const y = 95 + r() * 80,
+          x0 = r() * PW,
+          len = 1 + r() * (2 + (y - 92) * 0.06);
+        for (let x = x0; x < x0 + len; x++) set(x, y, glint);
+      }
+    }
+    function mouSand(set, P) {
+      const sand = P('#e4d6b4'),
+        sandD = P('#cdbd97'),
+        wet = P('#b9a985'),
+        foam = P('#ffffff');
+      for (let x = 170; x < PW; x++) {
+        const top = shore(x);
+        for (let y = top | 0; y < PH; y++) set(x, y, y < top + 2 ? wet : dith(x, y, (y - top) / 30) ? sandD : sand);
+        if (dith(x, top | 0, 0.7)) set(x, top - 1, foam);
+        if (dith(x, (top | 0) - 2, 0.25)) set(x, top - 2, foam);
+      }
+    }
+    function mouCliff(set, P) {
+      const chalk = P('#ece6d8'),
+        chalkSh = P('#c9c2b2'),
+        chalkD = P('#a9a292'),
+        strata = P('#d6cfbf'),
+        grass = P('#7aa36a'),
+        grassD = P('#5e8a55'),
+        rock = P('#6d6a66'),
+        foam = P('#ffffff');
+      for (let y = 0; y < PH; y++)
+        for (let x = 0; x < PW; x++) {
+          if (y < cliffTop(x)) continue;
+          const face = cliffFace(Math.max(64, y));
+          if (x > face) continue;
+          // Light from the left: the face toward the sea is in shade, and the chalk greys a little
+          // toward the water; thin seams of flint run along it, never across (that read as bricks)
+          const toEdge = face - x;
+          let col = toEdge < 6 ? (dith(x, y, (y - 64) / 120) ? chalkD : chalkSh) : dith(x, y, Math.max(0, (y - 110) / 140)) ? chalkSh : chalk;
+          if (toEdge >= 6 && Math.abs(Math.sin((y + 2 * Math.sin(x * 0.07)) * 0.55)) > 0.985) col = strata;
+          if (y < cliffTop(x) + 3) col = y < cliffTop(x) + 1.5 || dith(x, y, 0.5) ? grass : grassD;
+          if (y > 166 + 3 * Math.sin(x * 0.11) + 2 * Math.sin(x * 0.37)) col = dith(x, y, 0.6) ? rock : chalkD;
+          set(x, y, col);
+        }
+      // Surf where the cliff meets the sea
+      for (let y = 150; y < PH; y++) {
+        const e = cliffFace(y);
+        for (let x = e; x < e + 6; x++) if (dith(x | 0, y, 1 - (x - e) / 6)) set(x, y, foam);
+      }
+    }
+    function mouAtelier(set, P) {
+      const wall = P('#f4f1ea'),
+        wallSh = P('#d8d2c4'),
+        roof = P('#5c6b7a'),
+        roofD = P('#47535f'),
+        red = P('#d94a3d'),
+        white = P('#ffffff'),
+        glass = P('#9fd0ef'),
+        door = P('#3a3a3a'),
+        x0 = 56,
+        ground = Math.round(cliffTop(70));
+      for (let y = ground - 12; y < ground; y++)
+        for (let x = x0; x < x0 + 26; x++) set(x, y, x > x0 + 21 ? wallSh : wall);
+      for (let k = 0; k < 7; k++)
+        for (let x = x0 - 2 + k; x < x0 + 28 - k; x++) set(x, ground - 13 - k, k < 2 ? roofD : roof);
+      for (const wx of [x0 + 3, x0 + 18]) for (let y = ground - 9; y < ground - 5; y++) for (let x = wx; x < wx + 4; x++) set(x, y, glass);
+      for (let y = ground - 7; y < ground; y++) for (let x = x0 + 11; x < x0 + 15; x++) set(x, y, door);
+      // The striped awning over the door and windows
+      for (let x = x0 - 1; x < x0 + 27; x++) {
+        const c = ((x - x0 + 1) >> 1) % 2 ? white : red;
+        set(x, ground - 11, c);
+        set(x, ground - 10, c);
+        if ((x - x0) % 2 === 0) set(x, ground - 9, c);
+      }
+    }
+    // Gulls: a white bird gliding, now and then a beat of the wings; far ones are just a small V
+    function pxGull(g, p, flip, t) {
+      const x = Math.round(p.x),
+        y = Math.round(p.y + Math.sin(t * 0.0009 + p.phase) * 1.5),
+        up = Math.sin(t * 0.004 + p.phase * 3) > 0.55;
+      g.fillStyle = '#ffffff';
+      if (p.z < 0.9) {
+        g.fillStyle = '#5a666e';
+        g.fillRect(x, y - (up ? 1 : 0), 1, 1);
+        g.fillRect(x + 1, y, 1, 1);
+        g.fillRect(x + 2, y - (up ? 1 : 0), 1, 1);
+        return;
+      }
+      if (up) {
+        g.fillRect(x, y - 2, 1, 1);
+        g.fillRect(x + 1, y - 1, 1, 1);
+        g.fillRect(x + 4, y - 1, 1, 1);
+        g.fillRect(x + 5, y - 2, 1, 1);
+      } else {
+        g.fillRect(x, y, 2, 1);
+        g.fillRect(x + 4, y, 2, 1);
+        g.fillRect(x + 1, y - 1, 1, 1);
+        g.fillRect(x + 4, y - 1, 1, 1);
+      }
+      g.fillRect(x + 2, y, 2, 1);
+      // Dark wingtips, so a white bird still shows against the chalk and the pale sky
+      g.fillStyle = '#3e4a52';
+      g.fillRect(x, y - (up ? 2 : 0), 1, 1);
+      g.fillRect(x + 5, y - (up ? 2 : 0), 1, 1);
+    }
+
     /* What falls in each world, in scene pixels: sakura petals, maple leaves */
     function pxPetal(g, p, flip) {
       const x = Math.round(p.x),
@@ -2794,6 +2942,12 @@
         // Sparks rise instead of falling: slower, barely drifting
         fall: { draw: pxSpark, per: 70000, max: 20, min: 8, wind: 0.12, sink: -0.35, rise: true },
       },
+      mou: {
+        paint: [mouSky, mouSea, mouSand, mouCliff, mouAtelier],
+        focus: '35% 50%', // the cliff and the atelier stay in view on a tall phone
+        // A few gulls gliding over the water, slowly, at their own heights
+        fall: { draw: pxGull, per: 300000, max: 5, min: 3, wind: 0.7, sink: 0, fly: true },
+      },
     };
     const art = {};
     // Each scene is drawn once and kept: the menu returns to it on every visit
@@ -2819,6 +2973,9 @@
         if (cfg && cfg.rise) {
           p.x = r() * w;
           p.y = first ? r() * h : h + 4;
+        } else if (cfg && cfg.fly) {
+          p.x = first ? r() * w : -10;
+          p.y = h * (0.12 + r() * 0.4);
         } else {
           p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
           p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
