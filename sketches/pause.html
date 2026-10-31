@@ -1462,6 +1462,122 @@
     width: 100%;
     height: clamp(280px, 56.25vw, 62vh);
   }
+  /* A case with a live prototype (PSB): the head is taller (HEAD in the script sets it), and its
+     cover's fan is drawn as phones, not as a picture. Once the cover has landed, the fan folds
+     into its middle phone, and that phone grows into the clickable prototype of the main site
+     (sketches/live/psb, LivePhone.astro there). The fan keeps the cover's own geometry (Portfolio
+     tools/case-covers/psb.html) in a 16:9 frame fitted whole into the head, as the cover's
+     objects are, and melts the same way, until the grown phone takes the melt away */
+  .stagefront .head {
+    position: relative;
+  }
+  .fan {
+    position: absolute;
+    inset: 0;
+    container-type: size;
+    pointer-events: none;
+    -webkit-mask: linear-gradient(var(--melt-short)) top / 100% 100% no-repeat;
+    mask: linear-gradient(var(--melt-short)) top / 100% 100% no-repeat;
+  }
+  .fan-frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(100cqw, 100cqh * 16 / 9);
+    aspect-ratio: 16 / 9;
+    transform: translate(-50%, -50%);
+    container-type: inline-size;
+  }
+  /* The cover's phones: 360×736 at 150px from the top of 1920×1080, turned about one pivot
+     2400px below their top */
+  .fan-ph {
+    position: absolute;
+    left: calc(780 / 1920 * 100%);
+    top: calc(150 / 1080 * 100%);
+    width: calc(360 / 1920 * 100%);
+    aspect-ratio: 450 / 920;
+    transform-origin: 50% calc(2400 / 736 * 100%);
+    transform: rotate(var(--a));
+    container-type: inline-size;
+  }
+  .fan-ph .scr {
+    position: absolute;
+    left: calc(24 / 450 * 100%);
+    top: calc(23 / 920 * 100%);
+    width: calc(402 / 450 * 100%);
+    height: calc(874 / 920 * 100%);
+    border-radius: calc(60 / 450 * 100cqw);
+    object-fit: cover;
+    object-position: top;
+  }
+  .fan-ph .body,
+  .live-ph .body {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* The cover's shadow, as long as the phone is wide: 32px and 48px on a 360px phone. Only
+       the body casts it, so nothing is filtered over the live app */
+    filter: drop-shadow(0 calc(32 / 360 * 100cqw) calc(48 / 360 * 100cqw) rgb(0 0 0 / 0.55));
+  }
+  /* The middle phone is the prototype at its full size; in the fan it is scaled down onto the
+     cover's middle phone (transform from the top left corner, set by the script) */
+  .live-ph {
+    position: absolute;
+    aspect-ratio: 450 / 920;
+    transform-origin: 0 0;
+    container-type: inline-size;
+  }
+  .live-ph.on {
+    pointer-events: auto;
+  }
+  /* The screen covers most of the body's black border and its island; the app draws its own */
+  .live-ph .screen {
+    position: absolute;
+    left: calc(20 / 450 * 100%);
+    top: calc(19 / 920 * 100%);
+    width: calc(410 / 450 * 100%);
+    height: calc(882 / 920 * 100%);
+    border-radius: calc(64 / 450 * 100cqi);
+    overflow: hidden;
+    /* The tab bar's backdrop blur escapes overflow clipping; clip-path holds it */
+    clip-path: inset(0 round calc(64 / 450 * 100cqi));
+    background: #0e1116;
+  }
+  .live-ph .poster,
+  .live-ph .app {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .live-ph .poster {
+    object-fit: cover;
+    object-position: top;
+  }
+  .live-ph .app {
+    /* The page's type must not leak into the app, which is drawn for the browser default */
+    font-family: 'Onest Variable', Onest, system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    color: initial;
+    /* The body's island (124×35.5pt, 18.5pt below the screen top) in the app's 402pt units */
+    --prototype-island-top: 18.14px;
+    --prototype-island-width: 121.6px;
+    --prototype-island-height: 34.8px;
+    --prototype-radius: 62.75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  /* The app shows once the phone has grown, and goes back to the poster before it folds */
+  .live-ph.on .app[data-psb-ready] {
+    opacity: 1;
+  }
   .headline {
     padding-top: var(--s5);
     padding-left: max(var(--gap), env(safe-area-inset-left, 0px));
@@ -1731,7 +1847,7 @@
     ><span class="where" id="where"></span>
   </div>
   <div class="stagefront">
-    <img class="cover-art head-cover" id="pcover" alt="">
+    <div class="head" id="phead"><img class="cover-art head-cover" id="pcover" alt=""></div>
     <div class="headline">
       <div class="title">
         <p id="pregion"></p>
@@ -2171,6 +2287,7 @@
       'Кейс пишется': 'Being written',
       'Кейс позже': 'Case later',
       'Под NDA': 'Under NDA',
+      'Живой прототип приложения ПСБ': 'Live prototype of the PSB app',
       'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.':
         'Together with a colleague, we rethought the core flows in a bank’s mobile app and checked them in a usability test with 30 customers.',
       'В 4 раза': '4×',
@@ -3691,6 +3808,8 @@
       ],
       role: 'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.',
       open: true,
+      // The cover's fan folds into the live prototype in the head of the case (see .fan)
+      live: true,
     },
     {
       id: 'vpn',
@@ -4238,8 +4357,12 @@
     AWAY = 1.1, // how far a pane flies: its distance from the middle of the screen, times this
     AWAY_MIN = 0.15, // a pane in the middle still leaves, at least this share of the screen
     AWAY_SCALE = 1.3,
-    // The head of the case, as .head-cover sets it: clamp(280px, 56.25vw, 62vh)
-    HEAD = () => Math.max(280, Math.min(innerWidth * 0.5625, innerHeight * 0.62));
+    // The head of the case, as .head-cover sets it: clamp(280px, 56.25vw, 62vh). With a live
+    // prototype it is nearly a screen tall, so the grown phone is big enough to use (set inline)
+    HEAD = (q) =>
+      q && q.live
+        ? Math.max(560, Math.min(innerHeight * 0.9, 1000))
+        : Math.max(280, Math.min(innerWidth * 0.5625, innerHeight * 0.62));
   const GO = 'cubic-bezier(0.5, 0, 0.8, 0.4)',
     GROW = 'cubic-bezier(0.6, 0, 0.15, 1)';
   let trip = null; // the dive into the open case, replayed backwards on pause
@@ -4265,7 +4388,7 @@
   }
 
   // The cover lifted out of its card grows into the head of the case
-  function dive(src) {
+  function dive(src, h) {
     const b = src.getBoundingClientRect(),
       c = src.cloneNode();
     // Only the cover's own look: the classes of its place (hidden off the phone card) stay behind
@@ -4273,7 +4396,7 @@
     document.body.append(c);
     src.style.visibility = 'hidden';
     const from = { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px' },
-      to = { left: '0px', top: '0px', width: innerWidth + 'px', height: HEAD() + 'px' };
+      to = { left: '0px', top: '0px', width: innerWidth + 'px', height: h + 'px' };
     return [c, c.animate([from, to], { duration: DIVE_MS, easing: GROW, fill: 'both' })];
   }
 
@@ -4294,9 +4417,151 @@
     document.getElementById('ptitle').textContent = q.title;
     document.getElementById('plead').textContent = q.sub;
     document.getElementById('pfacts').innerHTML = factsHTML(q.facts);
-    pcover.src = `img/cover-${q.id}.webp`;
+    // A live head draws the cover's objects itself (the fan), the picture keeps the background
+    pcover.src = q.live ? BLANK : `img/cover-${q.id}.webp`;
     pcover.style.backgroundImage = `url(img/cover-${q.id}-bg.webp)`;
+    pcover.style.height = q.live ? HEAD(q) + 'px' : '';
+    if (q.live) placeFan(HEAD(q));
+    else if (fan) fan.el.hidden = true;
   }
+
+  /* ── The live head: the cover's fan as phones, folding into the PSB prototype (see .fan) ── */
+  const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  const FAN = {
+    screens: ['account', 'cb-off', 'main', 'cb-connect', 'cb-on'],
+    turn: [-18, -9, 0, 9, 18],
+    z: [1, 2, 3, 2, 1],
+    mid: 2, // the middle phone is the live one
+  };
+  const FOLD_MS = 1100, // the side phones close in, then the middle one grows (GROW_AT)
+    FOLD_HOLD = 80, // a breath between the landing and the fold
+    CLOSED_AT = 0.42, // the side phones lie under the middle one
+    GONE_AT = 0.56, // and are gone under it
+    GROW_AT = 0.36, // the middle phone starts growing as the sides close
+    UNFOLD_RATE = 1.8, // on pause the fold plays back faster
+    APP_FADE_MS = 300, // the app's fade over its poster (.live-ph .app)
+    LIVE_TOP = 76, // the grown phone stays clear of the HUD
+    LIVE_BOTTOM = 24,
+    LIVE_MAX = 860, // the prototype at about its own size (402pt wide)
+    MELT_GONE = '100% 260%'; // the melt stretched below the head: the grown phone is whole
+  let fan = null;
+
+  // The prototype's own scripts, once (they mount on every [data-psb-live-route] they find)
+  let liveLoaded = false;
+  function loadLive() {
+    if (liveLoaded) return;
+    liveLoaded = true;
+    for (const name of ['style-data.js', 'app.js']) {
+      const s = document.createElement('script');
+      s.src = 'live/psb/' + name;
+      // UTF-8 whatever the page says: the bundle's Russian text broke under another charset
+      s.charset = 'utf-8';
+      s.async = false;
+      document.body.append(s);
+    }
+  }
+
+  function buildFan() {
+    if (fan) return fan;
+    const side = (s, i) =>
+      `<div class="fan-ph" style="--a:${FAN.turn[i]}deg;z-index:${FAN.z[i]}">` +
+      `<img class="scr" src="img/psb-fan-${s}.webp" alt=""><img class="body" src="img/iphone-17-pro.webp" alt=""></div>`;
+    const el = document.createElement('div');
+    el.className = 'fan';
+    el.innerHTML =
+      `<div class="fan-frame">${FAN.screens.map((s, i) => (i === FAN.mid ? '' : side(s, i))).join('')}</div>` +
+      // The body goes first: the screen paints over its display border
+      `<div class="live-ph"><img class="body" src="img/iphone-17-pro.webp" alt=""><div class="screen">` +
+      `<img class="poster" src="img/psb-fan-${FAN.screens[FAN.mid]}.webp" alt="">` +
+      `<div class="app" data-psb-live-route="/" role="region" aria-label="Живой прототип приложения ПСБ"></div>` +
+      `</div></div>`;
+    phead.append(el);
+    const live = el.querySelector('.live-ph'),
+      app = el.querySelector('.app');
+    // The app draws a 402pt-wide viewport, scaled to the screen, as tall as the screen allows
+    new ResizeObserver(() => {
+      if (!app.clientWidth) return;
+      const scale = app.clientWidth / 402;
+      app.style.setProperty('--prototype-scale', String(scale));
+      app.style.setProperty('--prototype-height', `${app.clientHeight / scale}px`);
+    }).observe(app);
+    fan = { el, live, sides: [...el.querySelectorAll('.fan-ph')], from: 'none' };
+    return fan;
+  }
+
+  /* Where the grown phone stands in a head h tall, and the transform that lays it onto the
+     cover's middle phone: the 16:9 frame fitted whole, the phone 360px wide at (780, 150) */
+  function placeFan(h) {
+    const f = buildFan(),
+      W = document.documentElement.clientWidth,
+      gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gap')) || 16,
+      room = h - LIVE_TOP - LIVE_BOTTOM,
+      ph = Math.min(LIVE_MAX, room, ((W - 2 * gap) * 920) / 450),
+      pw = (ph * 450) / 920,
+      x = (W - pw) / 2,
+      y = LIVE_TOP + (room - ph) / 2;
+    const fw = Math.min(W, (h * 16) / 9),
+      fh = (fw * 9) / 16,
+      cx = (W - fw) / 2 + (fw * 780) / 1920,
+      cy = (h - fh) / 2 + (fh * 150) / 1080,
+      k = (fw * 360) / 1920 / pw;
+    f.el.hidden = false;
+    Object.assign(f.live.style, { left: x + 'px', top: y + 'px', width: pw + 'px' });
+    f.from = `translate(${cx - x}px, ${cy - y}px) scale(${k})`;
+    f.live.style.transform = f.from;
+    if (f.grow) f.grow.effect.setKeyframes(growFrames(f.from));
+  }
+  const growFrames = (from) => [
+    { transform: from },
+    { transform: from, offset: GROW_AT, easing: GROW },
+    { transform: 'none' },
+  ];
+
+  // The fold, once the cover has landed: the sides turn shut under the middle phone and go, the
+  // middle phone grows and the melt slides off it; then the app comes in over its poster
+  function fold() {
+    const f = fan,
+      ms = reduceMotion.matches ? 0 : FOLD_MS,
+      o = { duration: ms, delay: ms && FOLD_HOLD, fill: 'both' };
+    const sides = f.sides.map((el, i) => {
+      const a = `rotate(${el.style.getPropertyValue('--a')})`;
+      return el.animate(
+        [
+          { transform: a, opacity: 1, easing: GROW },
+          { transform: 'rotate(0deg)', opacity: 1, offset: CLOSED_AT },
+          { transform: 'rotate(0deg)', opacity: 0, offset: GONE_AT },
+          { transform: 'rotate(0deg)', opacity: 0 },
+        ],
+        o,
+      );
+    });
+    f.grow = f.live.animate(growFrames(f.from), o);
+    const melt = (size) => ({ maskSize: size, webkitMaskSize: size });
+    const unmelt = f.el.animate(
+      [melt('100% 100%'), { ...melt('100% 100%'), offset: GROW_AT, easing: GROW }, melt(MELT_GONE)],
+      o,
+    );
+    const all = [...sides, f.grow, unmelt];
+    f.grow.finished.then(() => f.live.classList.add('on'), () => {});
+    return all;
+  }
+  // On pause the fold plays back to the fan (the app has given way to its poster by then)
+  function unfold(anims) {
+    if (!anims) return Promise.resolve();
+    return Promise.all(
+      anims.map((a) => {
+        a.playbackRate = -UNFOLD_RATE;
+        a.play();
+        return a.finished;
+      }),
+    );
+  }
+  addEventListener('resize', () => {
+    const q = trip && QUESTS[trip.sel];
+    if (!q || !q.live) return;
+    pcover.style.height = HEAD(q) + 'px';
+    placeFan(HEAD(q));
+  });
 
   /* src: the cover to dive into; on the desktop «Квесты» it is the cover of the open card. The
      dive starts from whichever tab holds the cover and comes back to it */
@@ -4314,10 +4579,11 @@
     if (!src) return;
     fillCase(q);
     const card = src.closest('button');
-    trip = { scroll: scrollY, back: card || document.activeElement, src, clone: null, veil: null, anims: [] };
+    trip = { sel, scroll: scrollY, back: card || document.activeElement, src, clone: null, veil: null, anims: [], fold: null };
     const t = trip;
+    if (q.live) loadLive();
     if (!reduceMotion.matches) {
-      const [clone, grow] = dive(src),
+      const [clone, grow] = dive(src, HEAD(q)),
         [v, fade] = veil();
       Object.assign(t, { clone, veil: v });
       trip.anims = [grow, fade, ...flyOut(panesOf(views[cur()], card), DIVE_MS)];
@@ -4338,6 +4604,7 @@
       document.body.classList.remove('flying');
       // The head now shows the very same cover: the lifted one can go out of sight
       if (t.clone) t.clone.style.visibility = 'hidden';
+      if (q.live && trip === t) t.fold = fold();
       // Focus moves for the keyboard, without lighting the button up after a click
       document.getElementById('back').focus({ preventScroll: true, focusVisible: false });
     });
@@ -4370,6 +4637,7 @@
     document.body.classList.remove('landed');
     const done = () => {
       t.anims.forEach((a) => a.cancel());
+      if (t.fold) t.fold.forEach((a) => a.cancel());
       if (t.clone) t.clone.remove();
       if (t.veil) t.veil.remove();
       t.src.style.visibility = '';
@@ -4385,9 +4653,15 @@
       t.anims.forEach((a) => a.reverse());
       Promise.all(t.anims.map((a) => a.finished)).then(done);
     };
-    // The case fades while the page rides up to its head; the cover goes back once both are done
-    if (t.anims.length) Promise.all([scrollUp(), new Promise((r) => setTimeout(r, LEAVE_MS))]).then(back);
-    else back();
+    // The case fades while the page rides up to its head; a live head folds back into its fan;
+    // the cover goes back once all is done
+    // The app gives way to its poster first, so the phone folds with one screen on it
+    if (t.fold) fan.live.classList.remove('on');
+    if (t.anims.length)
+      Promise.all([scrollUp(), new Promise((r) => setTimeout(r, t.fold ? APP_FADE_MS : LEAVE_MS))])
+        .then(() => unfold(t.fold))
+        .then(back);
+    else unfold(t.fold).then(back);
   }
   document.getElementById('back').addEventListener('click', pause);
 
