@@ -1,0 +1,218 @@
+<!doctype html>
+<!--
+  Interview cut for the PSB case, 1920×1080 → sketches/img/psb/interviews.{ru,en}.mp4.
+  Built by render.mjs: it cuts the respondents' footage out of the co-author's finished cut
+  (dark theme, burned-in subtitles; the cards sit clear of the subtitles, so the crops are clean),
+  then steps this page frame by frame through window.render(t) and screenshots it.
+  Open it in a browser with ?t=12.5&lang=en to look at a single frame (footage needs
+  `node render.mjs <source> --frames-only` first).
+  Same story as the original: three respondents, one card per take — landscape and portrait
+  video, and an audio-only respondent with a still avatar and a live waveform.
+  Dressed as the pause menu: see ../pause.css.
+  Colours mirror src/styles/tokens/colors.css.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@600&family=Handjet:wght@700&display=block"
+      rel="stylesheet"
+    />
+    <link href="../pause.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="card px">
+      <img class="foot" alt="" />
+      <div class="voice">
+        <img class="avatar" src="avatar.png" alt="" />
+        <div class="wave"></div>
+      </div>
+    </div>
+    <div class="tag px"></div>
+    <p class="subs"></p>
+    <div class="outro"><span class="title"></span><span class="cursor"></span></div>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const lang = params.get('lang') === 'en' ? 'en' : 'ru';
+      const FPS = 30;
+      const END = 60.4; // last take ends; then the outro
+
+      const TOPICS = {
+        ru: [
+          'Главная',
+          'Данные карты',
+          'Подключение кешбэка',
+          'Выбор категорий',
+          'Первое впечатление',
+        ],
+        en: [
+          'Home screen',
+          'Card details',
+          'Cashback setup',
+          'Picking categories',
+          'First impression',
+        ],
+      };
+      const TITLE = { ru: 'Интервью', en: 'Interviews' };
+      // Takes of the original cut: t0–t1 on the timeline, c0–c1 the clean footage (each take
+      // morphs in and fades to dark a few frames before the cut, so those frames are held)
+      const SEGS = [
+        { kind: 'audio', topic: 0, t0: 0, t1: 6.97 },
+        { kind: 'h', topic: 0, t0: 6.97, t1: 12.2, c0: 7.13, c1: 11.97 },
+        { kind: 'v', topic: 1, t0: 12.2, t1: 19.4, c0: 12.37, c1: 19.17 },
+        { kind: 'audio', topic: 1, t0: 19.4, t1: 26.57 },
+        { kind: 'h', topic: 2, t0: 26.57, t1: 34.8, c0: 26.73, c1: 34.57 },
+        { kind: 'audio', topic: 2, t0: 34.8, t1: 44.2 },
+        { kind: 'v', topic: 3, t0: 44.2, t1: 53.97, c0: 44.37, c1: 53.77 },
+        { kind: 'h', topic: 4, t0: 53.97, t1: END, c0: 54.17, c1: 60.37 },
+      ];
+      const H = 658;
+      const SIZE = { h: [1240, H], v: [546, H], audio: [H, H] };
+      const MORPH = 0.3;
+      const BARS = 31;
+      const BLOCK = 8;
+
+      const card = document.querySelector('.card');
+      const foot = document.querySelector('.foot');
+      const voice = document.querySelector('.voice');
+      const wave = document.querySelector('.wave');
+      const tag = document.querySelector('.tag');
+      const subs = document.querySelector('.subs');
+      const outro = document.querySelector('.outro');
+      const title = document.querySelector('.title');
+      for (let i = 0; i < BARS; i++) wave.append(document.createElement('i'));
+      const bars = [...wave.children];
+
+      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+      let cues = [];
+      let level = [];
+      const ready = Promise.all([
+        fetch('cues.json').then((r) => r.json()),
+        fetch('frames/level.json').then((r) => r.json()),
+        // Load every face up front, so no frame renders in a fallback font
+        ...['600 48px "Golos Text"', '700 40px Handjet', '700 160px Handjet'].map((f) =>
+          document.fonts.load(f, 'Ая Az'),
+        ),
+      ]).then(([c, l]) => {
+        cues = c;
+        level = l;
+      });
+
+      function cueAt(t) {
+        for (let i = cues.length - 1; i >= 0; i--) {
+          const c = cues[i];
+          const next = cues[i + 1];
+          const out = Math.min(c.end + 0.8, next ? next.start - 0.15 : Infinity);
+          if (t >= c.start - 0.15 && t < out) return c;
+          if (t >= c.start) return null;
+        }
+        return null;
+      }
+
+      // Russian words light up with the speech; the English line lights up word by word
+      // across the same span, weighted by length.
+      function subsHtml(c, t) {
+        const lines = lang === 'ru' ? c.ru : c.en.map((l) => l.map((w) => ({ w })));
+        if (lang === 'en') {
+          const all = lines.flat();
+          const total = all.reduce((n, x) => n + x.w.length + 1, 0);
+          let acc = 0;
+          for (const x of all) {
+            x.s = c.start + ((c.end - c.start) * acc) / total;
+            acc += x.w.length + 1;
+          }
+        }
+        return lines
+          .map((l) => l.map((x) => `<span class="${t >= x.s ? 'on' : ''}">${x.w}</span>`).join(' '))
+          .join('<br>');
+      }
+
+      async function render(t) {
+        await ready;
+        const showOutro = t >= END + MORPH;
+        outro.style.display = showOutro ? 'flex' : 'none';
+
+        // Card size: morph across each cut, fold into the cursor at the end
+        let i = SEGS.findIndex((s) => t < s.t1);
+        if (i < 0) i = SEGS.length - 1;
+        const seg = SEGS[i];
+        let [w, h] = SIZE[seg.kind];
+        const prev = SEGS[i - 1];
+        const next = SEGS[i + 1];
+        if (prev && t < seg.t0 + MORPH / 2) {
+          const k = ease(0.5 + (t - seg.t0) / MORPH);
+          const [pw, ph] = SIZE[prev.kind];
+          w = pw + (w - pw) * k;
+          h = ph + (h - ph) * k;
+        } else if (next && t > seg.t1 - MORPH / 2) {
+          const k = ease((t - (seg.t1 - MORPH / 2)) / MORPH);
+          const [nw, nh] = SIZE[next.kind];
+          w = w + (nw - w) * k;
+          h = h + (nh - h) * k;
+        }
+        let tagOpacity = 1;
+        if (t >= END) {
+          const k = ease(clamp((t - END) / MORPH, 0, 1));
+          w = w + (40 - w) * k;
+          h = h + (112 - h) * k;
+          tagOpacity = 1 - k;
+        }
+        card.style.display = showOutro ? 'none' : 'block';
+        card.style.width = `${w}px`;
+        card.style.height = `${h}px`;
+        // Centre stays on the card row, and slides to the middle of the frame while folding
+        const fold = t >= END ? ease(clamp((t - END) / MORPH, 0, 1)) : 0;
+        card.style.top = `${64 + H / 2 + (540 - 64 - H / 2) * fold - h / 2}px`;
+        card.style.background = fold ? `rgb(233 196 106 / ${fold})` : '';
+
+        // Content of the take
+        const isVoice = seg.kind === 'audio';
+        voice.style.display = isVoice && t < END ? 'block' : 'none';
+        foot.style.display = !isVoice && t < END ? 'block' : 'none';
+        if (!isVoice && t < END) {
+          const f = Math.round(clamp(t, seg.c0, seg.c1) * FPS);
+          const src = `frames/${seg.kind}${String(f).padStart(4, '0')}.jpg`;
+          if (!foot.src.endsWith(src)) {
+            foot.src = src;
+            await foot.decode();
+          }
+        }
+        if (isVoice) {
+          // Mirrored waveform: the centre bar is now, the sides are the last moments
+          const f = Math.round(t * FPS);
+          bars.forEach((b, k) => {
+            const d = Math.abs(k - (BARS - 1) / 2);
+            const v = level[Math.max(0, f - Math.round(d * 1.5))] ?? 0;
+            const blocks = 1 + Math.round(v * 12);
+            b.style.height = `${blocks * BLOCK}px`;
+          });
+        }
+
+        // Topic label rides the bottom edge of the card
+        tag.textContent = TOPICS[lang][seg.topic];
+        tag.style.top = `${64 + H}px`;
+        tag.style.opacity = tagOpacity;
+        tag.style.display = showOutro ? 'none' : 'flex';
+
+        const c = t < END ? cueAt(t) : null;
+        subs.innerHTML = c ? subsHtml(c, t) : '';
+
+        // Outro: type the title behind the cursor, hold, then let the cursor blink
+        if (showOutro) {
+          const word = TITLE[lang];
+          const n = clamp(Math.floor((t - END - MORPH) / 0.07), 0, word.length);
+          title.textContent = word.slice(0, n);
+          const done = END + MORPH + word.length * 0.07;
+          outro.querySelector('.cursor').style.opacity =
+            t > done && Math.floor((t - done) / 0.45) % 2 === 1 ? 0 : 1;
+        }
+      }
+      window.render = render;
+      if (params.has('t')) render(Number(params.get('t')));
+      else render(3);
+    </script>
+  </body>
+</html>
