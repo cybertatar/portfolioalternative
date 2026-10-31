@@ -2330,7 +2330,7 @@
         p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
         p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
         p.rot = r() * 6.283;
-        p.spin = (0.6 + r() * 1.6) * (r() < 0.5 ? -1 : 1);
+        p.spin = (0.3 + r() * 0.7) * (r() < 0.5 ? -1 : 1);
         p.phase = r() * 6.283;
         p.tone = r();
         return p;
@@ -2342,14 +2342,15 @@
         fx.height = Math.ceil(innerHeight / cell);
         w = fx.width;
         h = fx.height;
-        const n = Math.round(Math.min(70, Math.max(18, (innerWidth * innerHeight) / 22000)));
+        // Few petals: a light drift at the edge of sight, not a flurry in front of the menu
+        const n = Math.round(Math.min(18, Math.max(8, (innerWidth * innerHeight) / 75000)));
         list = Array.from({ length: n }, () => spawn({}, true));
       };
       const draw = (t, dt) => {
         g.clearRect(0, 0, w, h);
         for (const p of list) {
-          p.x += (7 + 6 * p.z + Math.sin(t * 0.0011 + p.phase) * 6) * p.z * dt;
-          p.y += (5 + 7 * p.z) * p.z * dt;
+          p.x += (3 + 2.5 * p.z + Math.sin(t * 0.0007 + p.phase) * 3) * p.z * dt;
+          p.y += (2 + 3 * p.z) * p.z * dt;
           p.rot += p.spin * dt;
           if (p.x > w + 12 || p.y > h + 12) spawn(p, false);
           pxPetal(g, p, Math.cos(p.rot));
