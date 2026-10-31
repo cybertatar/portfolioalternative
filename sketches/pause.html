@@ -871,15 +871,46 @@
     width: 32px;
     height: 32px;
   }
-  /* The latest quest. Desktop: a quest card on its side — a 16:9 cover (its world with the
-     phone screen, melting right into its colour), then title, line, stats and the way in; it
-     closes the page at the bottom. Phone: one compact row with a square cover and a full-width
-     button, since the full card is one swipe away on «Квесты» */
+  /* Wide desktop: all five skills in one row, icon over label like inventory slots, so no slot
+     is left alone on a second row and the bottom row gets the height */
+  @media (min-width: 1200px) {
+    .gear {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .slot {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s2);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+  }
+  /* The latest quest: a cover (its world with the phone screen, melting into its colour), then
+     title, line, stats and the way in. Side by side when the card is wide, stacked when narrow
+     (see the container queries below) */
+  /* The bottom of the sheet: the latest quest and the wishlist side by side, taking whatever
+     height is left, so the sheet has no empty glass under the skills */
+  .foot {
+    flex: 1 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+  }
+  @media (min-width: 1200px) {
+    .foot {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .last,
+  .wish {
+    display: flex;
+    flex-direction: column;
+  }
   .last {
-    margin-top: auto;
     container: lq / inline-size;
   }
   .last button {
+    flex: 1;
     width: 100%;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
@@ -999,15 +1030,79 @@
     .lq-body {
       padding: var(--s2) var(--pad) var(--pad);
     }
-    .lq-stats {
-      display: none;
-    }
     .lq-go {
       align-self: stretch;
       margin-top: var(--s4);
       padding: var(--s3);
       text-align: center;
     }
+  }
+  /* A phone-wide card has no room for the stats; the full card is one swipe away on «Квесты» */
+  @container lq (max-width: 420px) {
+    .lq-stats {
+      display: none;
+    }
+  }
+  /* On a wide desktop the card shares the bottom row with the wishlist, so its cover is a window
+     that takes the height left over instead of a fixed 16:9 */
+  @media (min-width: 1200px) and (min-height: 600px) {
+    .last button {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .lq-cover {
+      min-height: 120px;
+    }
+    .lq-cover::before {
+      padding-top: 0;
+    }
+  }
+  /* A short laptop screen (1366×768): the groups step closer and the stats wait inside the case,
+     so the bottom row still fits without scrolling the pane */
+  @media (min-width: 1200px) and (max-height: 820px) {
+    .sheet {
+      gap: var(--s5);
+    }
+    .wish .wl {
+      gap: var(--s2);
+      padding: var(--s4) var(--pad);
+    }
+    .lq-stats {
+      display: none;
+    }
+  }
+  /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
+     a coin for one under way, empty boxes for the rest. The rows share the card's height */
+  .wl {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s3);
+    margin: 0;
+    padding: var(--pad);
+    border-radius: var(--r-in);
+    background: var(--fill);
+    list-style: none;
+  }
+  .wl li {
+    flex: 1 0 auto;
+    display: flex;
+    gap: var(--s3);
+    align-items: center;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .wl canvas {
+    flex: none;
+    width: 24px;
+    height: 24px;
+  }
+  .wl small {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .wl .main small {
+    color: var(--gold);
   }
 
   /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one,
@@ -1345,9 +1440,36 @@
           </div>
         </div>
       </div>
-      <div class="last">
-        <h3 class="label">Последний квест</h3>
-        <button id="last"></button>
+      <div class="foot">
+        <div class="last">
+          <h3 class="label">Последний квест</h3>
+          <button id="last"></button>
+        </div>
+        <div class="wish">
+          <h3 class="label">Вишлист</h3>
+          <ul class="wl">
+            <li class="main">
+              <canvas class="px" data-sprite="wish-star" data-scale="2"></canvas>
+              <span>Попасть в сильную продуктовую команду<small>Главная цель</small></span>
+            </li>
+            <li>
+              <canvas class="px" data-sprite="wish-wip" data-scale="2"></canvas>
+              <span>Выпустить свой плагин для Figma<small>На проверке у Figma</small></span>
+            </li>
+            <li>
+              <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
+              <span>Глубже разобраться в аналитике и экспериментах</span>
+            </li>
+            <li>
+              <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
+              <span>Выступить с докладом на дизайн-конференции</span>
+            </li>
+            <li>
+              <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
+              <span>Пройти Tears of the Kingdom на 100%</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -1720,6 +1842,50 @@
       '................',
       '................',
       '................',
+    ],
+    /* Wishlist markers: one 12x12 grid each — a star for the main goal, a box with a coin for one
+       under way, an empty box for the rest */
+    'wish-star': [
+      '.....OO.....',
+      '.....oO.....',
+      '....ooOO....',
+      '....oooO....',
+      'OOOOooooOOOO',
+      '.OqoooooooO.',
+      '..OoooooOO..',
+      '...ooooOO...',
+      '...ooOOoO...',
+      '..ooO..OoO..',
+      '..oO....OO..',
+      '............',
+    ],
+    'wish-wip': [
+      '............',
+      '.SSSSSSSSSS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkooOOkkS.',
+      '.SkkoqoOkkS.',
+      '.SkkooOOkkS.',
+      '.SkkOOOOkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SSSSSSSSSS.',
+      '............',
+    ],
+    'wish-box': [
+      '............',
+      '.SSSSSSSSSS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SkkkkkkkkS.',
+      '.SSSSSSSSSS.',
+      '............',
     ],
     frog: [
       '...aa.........',
