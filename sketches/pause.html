@@ -1049,17 +1049,18 @@
     display: inline-flex;
     align-items: center;
     gap: var(--s2);
-    padding: var(--s1) var(--s3) var(--s1) var(--s1);
+    padding: var(--s2) var(--s3) var(--s2) var(--s2);
     border-radius: var(--r-ctl);
     background: var(--fill);
     font-size: 15px;
     line-height: 1.2;
     white-space: nowrap;
   }
-  .chip canvas {
+  .chip svg {
     flex: none;
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
+    color: var(--ink-2);
   }
   /* The bottom of the sheet: the latest quest and the wishlist side by side, taking whatever
      height is left, so the sheet has no empty glass under the skills */
@@ -1629,14 +1630,15 @@
       </div>
       <div>
         <!-- Skills read at a glance: a pixel icon and the whole phrase, which never breaks; a chip
-             that does not fit moves to the next line whole -->
+             that does not fit moves to the next line whole. Icons: pixelarticons (MIT), one color,
+             24px so every cell of their grid is one screen pixel -->
         <h3 class="label">Умения</h3>
         <ul class="chips">
-          <li class="chip"><canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas>Интервью с пользователями</li>
-          <li class="chip"><canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas>Сценарии и интерфейсы</li>
-          <li class="chip"><canvas class="px" data-sprite="skill-code" data-scale="2"></canvas>Живые прототипы на коде</li>
-          <li class="chip"><canvas class="px" data-sprite="skill-test" data-scale="2"></canvas>Юзабилити-тесты</li>
-          <li class="chip"><canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas>Передача в разработку</li>
+          <li class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H2v20h2V4h16v12H6v2H4v2h2v-2h16V2h-2z" fill="currentColor"/></svg>Интервью с пользователями</li>
+          <li class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6V3zm10 16V5h-2v2h-4V5H8v14h8zm-5-4h2v2h-2v-2z" fill="currentColor"/></svg>Сценарии и интерфейсы</li>
+          <li class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h2v2H8V5zM6 7h2v2H6V7zM4 9h2v2H4V9zm-2 2h2v2H2v-2zm2 2h2v2H4v-2zm2 2h2v2H6v-2zm2 2h2v2H8v-2zm8-12h-2v2h2V5zm2 2h-2v2h2V7zm2 2h-2v2h2V9zm2 2h-2v2h2v-2zm-2 2h-2v2h2v-2zm-2 2h-2v2h2v-2zm-2 2h-2v2h2v-2z" fill="currentColor"/></svg>Живые прототипы на коде</li>
+          <li class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h8v2H8V6zm-4 4V8h4v2H4zm-2 2v-2h2v2H2zm0 2v-2H0v2h2zm2 2H2v-2h2v2zm4 2H4v-2h4v2zm8 0v2H8v-2h8zm4-2v2h-4v-2h4zm2-2v2h-2v-2h2zm0-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm0 0V8h-4v2h4zm-10 1h4v4h-4v-4z" fill="currentColor"/></svg>Юзабилити-тесты</li>
+          <li class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 2h8v8H7v12H5V10H2V2zm2 2v4h4V4H4zm8 1h7.09v9H22v8h-8v-8h3.09V7H12V5zm4 11v4h4v-4h-4z" fill="currentColor"/></svg>Передача в разработку</li>
         </ul>
       </div>
       <div class="foot">
@@ -1968,97 +1970,6 @@
       'PppppppppppppppP',
       'PpqqqppppppppppP',
       '.PPPPPPPPPPPPPP.',
-    ],
-    /* Skill icons: one 16x16 grid each, so every one sits in the same 32px box */
-    'skill-screens': [
-      '....SSSSSSSS....',
-      '...SkkkkkkkkS...',
-      '...SkppppppkS...',
-      '...SkpwwwwpkS...',
-      '...SkpwwwwpkS...',
-      '...SkppppppkS...',
-      '...SkpwwwppkS...',
-      '...SkppppppkS...',
-      '...SkpwwwwpkS...',
-      '...SkppppppkS...',
-      '...SkpoooopkS...',
-      '...SkppppppkS...',
-      '...SkkkkkkkkS...',
-      '...SkkksskkkS...',
-      '....SSSSSSSS....',
-      '................',
-    ],
-    'skill-talk': [
-      '................',
-      '.wwwwwwwww......',
-      'wwwwwwwwwwv.....',
-      'wwkkwkkkwwv.....',
-      'wwwwwwwwwwv.....',
-      'wwkkkwkkwwv.....',
-      '.wwwwwwwwv......',
-      '..wv..rrrrrrrr..',
-      '..v..rrrrrrrrrR.',
-      '.....rrqrrqrrqR.',
-      '.....rrrrrrrrrR.',
-      '......rRRRRRRR..',
-      '............RR..',
-      '.............R..',
-      '................',
-      '................',
-    ],
-    'skill-test': [
-      '................',
-      '................',
-      '....SSSSS.......',
-      '...SppqppS......',
-      '..SppppppaS.....',
-      '..SpppppaaS.....',
-      '..SapppaapS.....',
-      '..SaapaappS.....',
-      '..SpaaapppS.....',
-      '...SpppppSL.....',
-      '....SSSSSLLL....',
-      '..........LLL...',
-      '...........LLL..',
-      '............LL..',
-      '................',
-      '................',
-    ],
-    'skill-code': [
-      '................',
-      '................',
-      '.PPPPPPPPPPPPPP.',
-      '.PrPoPaPPPPPPPP.',
-      '.PPPPPPPPPPPPPP.',
-      '.gkkkkkkkkkkkkg.',
-      '.gkkkkkkkkkkkkg.',
-      '.gkkkokkakokkkg.',
-      '.gkkokkkakkokkg.',
-      '.gkokkkakkkkokg.',
-      '.gkkokkakkkokkg.',
-      '.gkkkoakkkokkkg.',
-      '.gkkkkkkkkkkkkg.',
-      '.gggggggggggggg.',
-      '................',
-      '................',
-    ],
-    'skill-ship': [
-      '................',
-      '................',
-      '................',
-      '......tttLLttt..',
-      '.....ttttLLtttt.',
-      '.....HHHHLLHHHH.',
-      '.....hhhhLLhhhh.',
-      '..o..hhhhLLhhhh.',
-      '...o.hhhhLLhhhh.',
-      'ooooohhhhLLhhhh.',
-      '...o.hhhhLLhhhh.',
-      '..o..hhhhLLhhhh.',
-      '.....HHHHHHHHHH.',
-      '................',
-      '................',
-      '................',
     ],
     /* Wishlist markers: one 12x12 grid each — a star for the main goal, a box with a coin for one
        under way, an empty box for the rest */
