@@ -249,10 +249,11 @@
   }
   .pane {
     background: linear-gradient(var(--tone, transparent), transparent 80%), var(--glass);
-    /* No strokes anywhere: surfaces are told apart by fill. No backdrop blur either: the world
-       under the glass is already blurred, and a backdrop filter over a moving layer is redone
-       every frame */
+    /* No strokes anywhere: surfaces are told apart by fill and blur. The blur is cheap only
+       because nothing moves under it (see the world below) */
     border-radius: var(--r);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
   @media (min-width: 861px) and (min-height: 600px) {
     .menu {
@@ -501,6 +502,8 @@
       padding: 0 0 var(--pad);
       border-radius: var(--r);
       background: var(--glass);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
     }
     .q:hover {
       background: linear-gradient(var(--fill), var(--fill)), var(--glass);
@@ -2969,6 +2972,16 @@
       }
     }
     // The fire itself, on the moving layer so it flickers: three tongues of flame and a few embers
+    // The fire held still in the scene itself, for when nothing moves on top
+    function campFlameStill(set, P) {
+      const c = document.createElement('canvas');
+      c.width = PW;
+      c.height = PH;
+      const g = c.getContext('2d');
+      campFlame(g, 0, 0, 0);
+      const d = g.getImageData(0, 0, PW, PH).data;
+      for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 0) set((i / 4) % PW, (i / 4 / PW) | 0, [d[i], d[i + 1], d[i + 2]]);
+    }
     function campFlame(g, t, ox, oy) {
       const [cx, by] = FIRE,
         cols = ['#d9532a', '#f29b38', '#ffd36b'];
@@ -3062,7 +3075,7 @@
         fall: { draw: pxGull, per: 300000, max: 5, min: 3, wind: 0.7, sink: 0, fly: true },
       },
       side: {
-        paint: [campSky, campForest, campGround, campTent, campBoard, campFire],
+        paint: [campSky, campForest, campGround, campTent, campBoard, campFire, campFlameStill],
         focus: '50% 50%',
         // A few butterflies over the grass; the fire flickers on top
         fall: { draw: pxButterfly, per: 160000, max: 8, min: 4, wind: 0.35, sink: 0, fly: true, band: [0.55, 0.85], over: campFlame },
@@ -3444,7 +3457,7 @@
   /* The world under the menu, baked once: scaled down to a few pixels per scene cell and back
      up with smoothing (a blur of about two and a half cells, enough that the dither never shows
      as stripes), then dulled and darkened pixel by pixel. The result is a still picture, so the
-     browser has nothing to recompute while petals move */
+     browser has nothing to recompute under the glass */
   const BAKE_STEPS = [[128, 72], [64, 36]],
     BAKE_OUT = [320, 180],
     DULL = 0.75, // saturation left
@@ -3482,7 +3495,12 @@
     w2 = document.getElementById('w2');
   let front = w1,
     shown = '';
-  const falling = biomes.fallLayer(document.getElementById('petals'));
+  /* The worlds hold still. Anything moving behind the glass makes the browser redo the panes'
+     backdrop blur on every frame (Safari on a MacBook ran hot at ~50% GPU, even at 20 fps), so
+     the falling petals, leaves, sparks and gulls are off. biomes.fallLayer still draws them,
+     should a lighter way to show them turn up */
+  const MOTION = false;
+  const falling = MOTION ? biomes.fallLayer(document.getElementById('petals')) : () => {};
   // The world of a tab or quest: baked and blurred under the menu, sharp once a case is open
   function showWorld(kind, sharp = false) {
     if (kind + sharp === shown) return;
