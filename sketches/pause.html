@@ -139,18 +139,17 @@
     transition:
       opacity 0.5s ease,
       filter 0.7s ease;
-    filter: blur(7px) saturate(0.75) brightness(0.42);
+    filter: blur(var(--world-blur, 7px)) saturate(0.75) brightness(0.42);
   }
   .world canvas.off {
     opacity: 0;
   }
-  /* Petals fly between the eye and the blurred world: almost sharp, a little dimmed */
+  /* Petals are part of the picture: the same blur and darkening as the world behind the glass
+     (from `.world canvas`), so they drift inside the scene rather than in front of the menu */
   .world canvas.petals {
     inset: 0;
     width: 100%;
     height: 100%;
-    filter: brightness(0.72);
-    opacity: 0.85;
   }
   .world canvas.petals.off {
     opacity: 0;
@@ -2626,6 +2625,15 @@
       'На рассмотрении в Figma',
     ],
   ];
+
+  /* The blur never finer than ~2.4 cells of a world (a cell on screen grows with the screen), or
+     the dither shows through it as stripes */
+  function worldBlur() {
+    const cell = Math.max(innerWidth / 320, innerHeight / 180) * 1.06;
+    document.documentElement.style.setProperty('--world-blur', Math.max(7, cell * 2.4).toFixed(1) + 'px');
+  }
+  worldBlur();
+  addEventListener('resize', worldBlur);
 
   /* ── World crossfade ── */
   const w1 = document.getElementById('w1'),
