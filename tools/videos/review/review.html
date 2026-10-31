@@ -1,0 +1,137 @@
+<!doctype html>
+<!--
+  Senior's review for the PSB case, 1920×1080 → sketches/img/psb/review.{ru,en}.mp4.
+  Built by render.mjs: it crops the reviewer out of the original portrait recording (selfie
+  video with burned-in subtitles and a name plate; the crop stops above both), then steps this
+  page frame by frame through window.render(t) and screenshots it.
+  Open it in a browser with ?t=12.5&lang=en to look at a single frame (footage needs
+  `node render.mjs <source> --frames-only` first).
+  Same look as the interviews: see ../pause.css.
+  Colours mirror src/styles/tokens/colors.css.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@600&family=Handjet:wght@700&display=block"
+      rel="stylesheet"
+    />
+    <link href="../pause.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="card px"><img class="foot" alt="" /></div>
+    <div class="tag px">Igor Plyusch, Senior Product Designer at DECTA</div>
+    <p class="subs"></p>
+    <div class="outro"><span class="title"></span><span class="cursor"></span></div>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const lang = params.get('lang') === 'en' ? 'en' : 'ru';
+      const FPS = 30;
+      const END = 125; // the recording ends; then the outro
+      const LAST_FRAME = 3748;
+      const TITLE = { ru: 'Ревью', en: 'Review' };
+      // One take: the crop is 720×715, so the card keeps that shape at the interviews' height
+      const H = 658;
+      const W = Math.round((H * 720) / 715);
+      const MORPH = 0.3;
+
+      const card = document.querySelector('.card');
+      const foot = document.querySelector('.foot');
+      const tag = document.querySelector('.tag');
+      const subs = document.querySelector('.subs');
+      const outro = document.querySelector('.outro');
+      const title = document.querySelector('.title');
+
+      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+      const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+      let cues = [];
+      const ready = Promise.all([
+        fetch('cues.json').then((r) => r.json()),
+        // Load every face up front, so no frame renders in a fallback font
+        ...['600 48px "Golos Text"', '700 40px Handjet', '700 160px Handjet'].map((f) =>
+          document.fonts.load(f, 'Ая Az'),
+        ),
+      ]).then(([c]) => {
+        cues = c;
+      });
+
+      function cueAt(t) {
+        for (let i = cues.length - 1; i >= 0; i--) {
+          const c = cues[i];
+          const next = cues[i + 1];
+          const out = Math.min(c.end + 0.8, next ? next.start - 0.15 : Infinity);
+          if (t >= c.start - 0.15 && t < out) return c;
+          if (t >= c.start) return null;
+        }
+        return null;
+      }
+
+      // Russian words light up with the speech; the English line lights up word by word
+      // across the same span, weighted by length.
+      function subsHtml(c, t) {
+        const lines = lang === 'ru' ? c.ru : c.en.map((l) => l.map((w) => ({ w })));
+        if (lang === 'en') {
+          const all = lines.flat();
+          const total = all.reduce((n, x) => n + x.w.length + 1, 0);
+          let acc = 0;
+          for (const x of all) {
+            x.s = c.start + ((c.end - c.start) * acc) / total;
+            acc += x.w.length + 1;
+          }
+        }
+        return lines
+          .map((l) => l.map((x) => `<span class="${t >= x.s ? 'on' : ''}">${x.w}</span>`).join(' '))
+          .join('<br>');
+      }
+
+      async function render(t) {
+        await ready;
+        const showOutro = t >= END + MORPH;
+        outro.style.display = showOutro ? 'flex' : 'none';
+
+        // The card folds into the cursor at the end, sliding to the middle of the frame
+        const fold = t >= END ? ease(clamp((t - END) / MORPH, 0, 1)) : 0;
+        const w = W + (40 - W) * fold;
+        const h = H + (112 - H) * fold;
+        card.style.display = showOutro ? 'none' : 'block';
+        card.style.width = `${w}px`;
+        card.style.height = `${h}px`;
+        card.style.top = `${64 + H / 2 + (540 - 64 - H / 2) * fold - h / 2}px`;
+        card.style.background = fold ? `rgb(233 196 106 / ${fold})` : '';
+
+        foot.style.display = t < END ? 'block' : 'none';
+        if (t < END) {
+          // The recording has 3749 frames, a hair short of END
+          const f = Math.min(Math.round(t * FPS), LAST_FRAME);
+          const src = `frames/f${String(f).padStart(4, '0')}.jpg`;
+          if (!foot.src.endsWith(src)) {
+            foot.src = src;
+            await foot.decode();
+          }
+        }
+
+        // Name label rides the bottom edge of the card
+        tag.style.top = `${64 + H}px`;
+        tag.style.opacity = 1 - fold;
+        tag.style.display = showOutro ? 'none' : 'flex';
+
+        const c = t < END ? cueAt(t) : null;
+        subs.innerHTML = c ? subsHtml(c, t) : '';
+
+        // Outro: type the title behind the cursor, hold, then let the cursor blink
+        if (showOutro) {
+          const word = TITLE[lang];
+          const n = clamp(Math.floor((t - END - MORPH) / 0.07), 0, word.length);
+          title.textContent = word.slice(0, n);
+          const done = END + MORPH + word.length * 0.07;
+          outro.querySelector('.cursor').style.opacity =
+            t > done && Math.floor((t - done) / 0.45) % 2 === 1 ? 0 : 1;
+        }
+      }
+      window.render = render;
+      render(params.has('t') ? Number(params.get('t')) : 10);
+    </script>
+  </body>
+</html>
