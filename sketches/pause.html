@@ -1036,128 +1036,41 @@
     letter-spacing: -0.01em;
     text-wrap: pretty;
   }
-  /* Skills, two variants under comparison (see the switch next to the label) */
+  /* Skills and tools: two hotbars side by side (stacked when there is no room). Square slots,
+     at most 64px, the chosen one lit; its name stands over the bar, on the label's line */
+  .kit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s5) var(--s6);
+  }
+  /* The bars share a row while their slots can stay 48px or wider; narrower, they stack */
+  .hotbar {
+    flex: 1 1 calc(var(--n) * 48px + (var(--n) - 1) * var(--s2));
+    max-width: calc(var(--n) * 64px + (var(--n) - 1) * var(--s2));
+    --n: 5;
+    min-width: 0;
+  }
+  #sk-tools {
+    --n: 6;
+  }
   .label-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     gap: var(--s3);
     margin-bottom: var(--s3);
   }
   .label-row .label {
     margin: 0;
   }
-  .variant {
-    display: flex;
-    gap: var(--s1);
-  }
-  .variant button {
-    padding: var(--s1) var(--s2);
-    border-radius: var(--r-ctl);
-    font-size: 13px;
-    color: var(--ink-3);
-  }
-  .variant button:hover {
-    color: var(--ink);
-  }
-  .variant button[aria-pressed='true'] {
-    background: var(--fill-2);
-    color: var(--ink);
-  }
-  [hidden].path,
-  [hidden].hotbar {
-    display: none;
-  }
-  /* The path: five waypoints in a row, a dotted pixel trail from one to the next */
-  .path {
-    --wp: 48px;
-    --dots: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--s3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .path li {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  .hb-name {
     font-size: 15px;
-    line-height: 1.3;
-  }
-  .path .wp {
-    display: grid;
-    place-items: center;
-    width: var(--wp);
-    height: var(--wp);
-    margin-bottom: var(--s3);
-    border-radius: var(--r-ctl);
-    background: var(--fill);
-  }
-  .path .wp canvas {
-    width: 32px;
-    height: 32px;
-  }
-  .path b {
     font-weight: 500;
-  }
-  .path small {
-    font-size: 13px;
-    color: var(--ink-2);
-  }
-  /* The trail starts a step after this waypoint and ends a step before the next one */
-  .path li:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: calc(var(--wp) / 2 - 2px);
-    left: calc(var(--wp) + var(--s2));
-    right: calc(var(--s2) - var(--s3));
-    height: 4px;
-    background: var(--dots);
-    opacity: 0.6;
-  }
-  /* Too narrow for five in a row: the trail runs down, the words stand beside their waypoints */
-  @media (max-width: 1199px) {
-    .path {
-      grid-template-columns: 1fr;
-      gap: var(--s4);
-    }
-    .path li {
-      display: grid;
-      grid-template-columns: var(--wp) minmax(0, 1fr);
-      column-gap: var(--s4);
-      align-content: center;
-    }
-    .path .wp {
-      grid-row: span 2;
-      margin: 0;
-    }
-    .path b {
-      align-self: end;
-    }
-    .path small {
-      align-self: start;
-    }
-    .path li:not(:last-child)::after {
-      top: var(--wp);
-      left: calc(var(--wp) / 2 - 2px);
-      right: auto;
-      width: 4px;
-      height: var(--s4);
-      background: repeating-linear-gradient(var(--ink-3) 0 4px, transparent 4px 8px);
-    }
-  }
-  /* The hotbar: square slots with their keys, the chosen one lit and named beside the bar */
-  .hotbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s3) var(--s5);
+    line-height: 1;
+    text-align: right;
   }
   .hb-slots {
-    flex: 0 1 calc(5 * 64px + 4 * var(--s2));
     display: flex;
     gap: var(--s2);
   }
@@ -1184,7 +1097,7 @@
   .hb-k {
     position: absolute;
     top: var(--s1);
-    left: var(--s2);
+    left: var(--s1);
     font: 700 14px/1 var(--pixel);
     font-style: normal;
     color: var(--ink-3);
@@ -1192,23 +1105,9 @@
   .hb.on .hb-k {
     color: var(--gold);
   }
-  .hb-cap {
-    flex: 1 1 200px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s1);
-  }
-  .hb-cap b {
-    font-size: 18px;
-    font-weight: 500;
-    line-height: 1.25;
-  }
-  .hb-hint {
-    font-size: 13px;
-    color: var(--ink-3);
-  }
+  /* No keyboard on a phone, and no room for the number beside the icon */
   @media (max-width: 860px) {
-    .hb-hint {
+    .hb-k {
       display: none;
     }
   }
@@ -1390,13 +1289,6 @@
     }
     .lq-stats {
       display: none;
-    }
-    /* Smaller waypoints, so the path is no taller than a row of tiles */
-    .path {
-      --wp: 40px;
-    }
-    .path .wp {
-      margin-bottom: var(--s2);
     }
   }
   /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
@@ -1786,40 +1678,14 @@
         </p>
       </div>
       <div>
-        <div class="label-row">
-          <h3 class="label">Умения</h3>
-          <!-- Temporary: two ways to show the skills, for the owner to compare and pick one -->
-          <div class="variant" role="group" aria-label="Вариант блока">
-            <button data-v="path" aria-pressed="true">Путь</button>
-            <button data-v="hotbar" aria-pressed="false">Хотбар</button>
+        <!-- Two hotbars, like a game's: what I can do and what I do it with. The slot in hand is
+             lit and named over its bar; skills also answer to the keys 1–5 -->
+        <div class="kit">
+        <div class="hotbar" id="sk-skills">
+          <div class="label-row">
+            <h3 class="label">Умения</h3>
+            <b class="hb-name">Интервью с пользователями</b>
           </div>
-        </div>
-        <!-- The path: the skills in the order a project goes through them, waypoints on a dotted
-             trail, a short name and what it means under it -->
-        <ol class="path" id="sk-path">
-          <li>
-            <span class="wp"><canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas></span>
-            <b>Интервью</b><small>с пользователями</small>
-          </li>
-          <li>
-            <span class="wp"><canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas></span>
-            <b>Интерфейсы</b><small>и сценарии</small>
-          </li>
-          <li>
-            <span class="wp"><canvas class="px" data-sprite="skill-code" data-scale="2"></canvas></span>
-            <b>Прототипы</b><small>на коде</small>
-          </li>
-          <li>
-            <span class="wp"><canvas class="px" data-sprite="skill-test" data-scale="2"></canvas></span>
-            <b>Юзабилити</b><small>тесты</small>
-          </li>
-          <li>
-            <span class="wp"><canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas></span>
-            <b>Передача</b><small>в разработку</small>
-          </li>
-        </ol>
-        <!-- The hotbar: icons in slots with their keys, the chosen one named beside them -->
-        <div class="hotbar" id="sk-hotbar" hidden>
           <div class="hb-slots">
             <button class="hb on" aria-pressed="true" aria-label="Интервью с пользователями" data-name="Интервью с пользователями">
               <i class="hb-k" aria-hidden="true">1</i><canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas>
@@ -1837,9 +1703,33 @@
               <i class="hb-k" aria-hidden="true">5</i><canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas>
             </button>
           </div>
-          <p class="hb-cap" aria-live="polite">
-            <b id="hb-name">Интервью с пользователями</b><small class="hb-hint">Клавиши 1–5</small>
-          </p>
+        </div>
+        <div class="hotbar" id="sk-tools">
+          <div class="label-row">
+            <h3 class="label">Инструменты</h3>
+            <b class="hb-name">Figma</b>
+          </div>
+          <div class="hb-slots">
+            <button class="hb on" aria-pressed="true" aria-label="Figma" data-name="Figma">
+              <canvas class="px" data-sprite="tool-figma" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Claude Code" data-name="Claude Code">
+              <canvas class="px" data-sprite="tool-claude" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Codex" data-name="Codex">
+              <canvas class="px" data-sprite="tool-codex" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Adobe Creative Cloud" data-name="Adobe Creative Cloud">
+              <canvas class="px" data-sprite="tool-adobe" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Xcode" data-name="Xcode">
+              <canvas class="px" data-sprite="tool-xcode" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Rive" data-name="Rive">
+              <canvas class="px" data-sprite="tool-rive" data-scale="2"></canvas>
+            </button>
+          </div>
+        </div>
         </div>
       </div>
       <div class="foot">
@@ -2263,6 +2153,133 @@
       '................',
       '................',
     ],
+    /* Tools: the same 16x16 grid, each in its own brand colors */
+    'tool-figma': {
+      pal: { 1: '#f24e1e', 2: '#ff7262', 3: '#a259ff', 4: '#1abcfe', 5: '#0acf83' },
+      rows: [
+        '................',
+        '....11112222....',
+        '...1111122222...',
+        '...1111122222...',
+        '...1111122222...',
+        '....11112222....',
+        '....3333.444....',
+        '...3333344444...',
+        '...3333344444...',
+        '...3333344444...',
+        '....3333.444....',
+        '....5555........',
+        '...55555........',
+        '...55555........',
+        '...5555.........',
+        '....55..........',
+      ],
+    },
+    'tool-claude': {
+      pal: { 1: '#d97757', 2: '#1f1a17' },
+      rows: [
+        '................',
+        '................',
+        '................',
+        '...1111111111...',
+        '...1111111111...',
+        '...1121111211...',
+        '...1121111211...',
+        '.11111111111111.',
+        '.11111111111111.',
+        '...1111111111...',
+        '...1111111111...',
+        '...1.1....1.1...',
+        '...1.1....1.1...',
+        '................',
+        '................',
+        '................',
+      ],
+    },
+    'tool-codex': {
+      pal: { 1: '#f2f2f2', 2: '#202123' },
+      rows: [
+        '................',
+        '..111111111111..',
+        '.11111111111111.',
+        '.11111111111111.',
+        '.11211111111111.',
+        '.11122111111111.',
+        '.11111221111111.',
+        '.11111122111111.',
+        '.11111221111111.',
+        '.11122111111111.',
+        '.11211111111111.',
+        '.11111111111111.',
+        '.11111112222211.',
+        '.11111111111111.',
+        '..111111111111..',
+        '................',
+      ],
+    },
+    'tool-adobe': {
+      pal: { 1: '#fa0f00' },
+      rows: [
+        '................',
+        '................',
+        '................',
+        '.11111....11111.',
+        '.11111....11111.',
+        '.1111......1111.',
+        '.1111......1111.',
+        '.111...11...111.',
+        '.111..1111..111.',
+        '.11...1111...11.',
+        '.11..11..11..11.',
+        '.1...11..111..1.',
+        '.1..11....111.1.',
+        '................',
+        '................',
+        '................',
+      ],
+    },
+    'tool-xcode': {
+      pal: { 1: '#147efb', 2: '#ffffff', 3: '#b9d4f5' },
+      rows: [
+        '................',
+        '..111111111111..',
+        '.11111112211111.',
+        '.11111112221111.',
+        '.11111111222111.',
+        '.11111111122211.',
+        '.11111113312211.',
+        '.11111133111111.',
+        '.11111331111111.',
+        '.11113311111111.',
+        '.11133111111111.',
+        '.11331111111111.',
+        '.13311111111111.',
+        '.11111111111111.',
+        '..111111111111..',
+        '................',
+      ],
+    },
+    'tool-rive': {
+      pal: { 1: '#1d1d1d', 2: '#ffffff' },
+      rows: [
+        '................',
+        '..111111111111..',
+        '.11111111111111.',
+        '.11111111111111.',
+        '.11122222211111.',
+        '.11122111221111.',
+        '.11122111221111.',
+        '.11122222211111.',
+        '.11122122111111.',
+        '.11122112211111.',
+        '.11122111221111.',
+        '.11122111122111.',
+        '.11111111111111.',
+        '.11111111111111.',
+        '..111111111111..',
+        '................',
+      ],
+    },
     /* Wishlist markers: one 12x12 grid each — a star for the main goal, a box with a coin for one
        under way, an empty box for the rest */
     'wish-star': [
@@ -2322,16 +2339,19 @@
   };
 
   function sprite(c) {
-    const rows = SPR[c.dataset.sprite];
-    if (!rows) return c;
+    const def = SPR[c.dataset.sprite];
+    if (!def) return c;
+    // A sprite either uses the shared palette or brings its own colors (the tools' brand colors)
+    const rows = def.rows || def,
+      pal = def.pal ? { ...PAL, ...def.pal } : PAL;
     const s = +c.dataset.scale || 2;
     c.width = rows[0].length * s;
     c.height = rows.length * s;
     const x = c.getContext('2d');
     rows.forEach((r, j) =>
       [...r].forEach((ch, i) => {
-        if (PAL[ch]) {
-          x.fillStyle = PAL[ch];
+        if (pal[ch]) {
+          x.fillStyle = pal[ch];
           x.fillRect(i * s, j * s, s, s);
         }
       }),
@@ -2411,24 +2431,12 @@
       'Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в разработку.':
         'I design mobile apps and web services. I take projects from research through to developer handoff.',
       'Умения': 'Skills',
-      'Вариант блока': 'Block variant',
-      'Путь': 'Path',
-      'Хотбар': 'Hotbar',
-      'Интерфейсы': 'Interfaces',
-      'Юзабилити': 'Usability',
-      'Прототипы': 'Prototypes',
-      'Передача': 'Handoff',
-      'с пользователями': 'with users',
-      'и сценарии': 'and user flows',
-      'на коде': 'in code',
-      'тесты': 'testing',
-      'в разработку': 'to developers',
+      'Инструменты': 'Tools',
       'Интервью с пользователями': 'User interviews',
       'Сценарии и интерфейсы': 'User flows and interfaces',
       'Живые прототипы на коде': 'Live prototypes in code',
       'Юзабилити-тесты': 'Usability tests',
       'Передача в разработку': 'Developer handoff',
-      'Клавиши 1–5': 'Keys 1–5',
       'Последний квест': 'Latest quest',
       'Вишлист': 'Wishlist',
       'Попасть в сильную продуктовую команду': 'Join a strong product team',
@@ -4663,7 +4671,7 @@
       return;
     }
     const k = e.key.toLowerCase();
-    if (cur() === 0 && /^[1-5]$/.test(e.key) && !hotbar.hidden) skill(+e.key - 1);
+    if (cur() === 0 && /^[1-5]$/.test(e.key)) hotbars['sk-skills'](+e.key - 1);
     else if (k === 'q' || k === 'й') tab(cur() - 1);
     else if (k === 'e' || k === 'у') tab(cur() + 1);
     else if (cur() === 1 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
@@ -4695,38 +4703,25 @@
     if (phone.matches) tabs[cur()].scrollIntoView({ inline: 'nearest', block: 'nearest' });
   });
 
-  /* Skills, temporary: the switch between the two variants; ?skills=path|hotbar picks one */
-  const hotbar = document.getElementById('sk-hotbar');
-  const slots = [...hotbar.querySelectorAll('.hb')];
-  function skill(i) {
-    slots.forEach((b, j) => {
-      b.classList.toggle('on', i === j);
-      b.setAttribute('aria-pressed', i === j);
-    });
-    document.getElementById('hb-name').textContent = slots[i].dataset.name;
-  }
-  slots.forEach((b, i) => {
-    b.addEventListener('click', () => skill(i));
-    b.addEventListener('mouseenter', () => skill(i));
-    b.addEventListener('focus', () => skill(i));
-  });
-  (function () {
-    const views = { path: document.getElementById('sk-path'), hotbar };
-    const btns = document.querySelectorAll('.variant button');
-    const show = (v) => {
-      Object.entries(views).forEach(([k, el]) => (el.hidden = k !== v));
-      btns.forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v));
-      try {
-        localStorage.setItem('skills', v);
-      } catch (e) {}
+  /* Hotbars: pointing at a slot, focusing or tapping it puts it in hand and names it */
+  const hotbars = {};
+  document.querySelectorAll('.hotbar').forEach((bar) => {
+    const slots = [...bar.querySelectorAll('.hb')],
+      name = bar.querySelector('.hb-name');
+    const pick = (i) => {
+      slots.forEach((b, j) => {
+        b.classList.toggle('on', i === j);
+        b.setAttribute('aria-pressed', i === j);
+      });
+      name.textContent = slots[i].dataset.name;
     };
-    btns.forEach((b) => b.addEventListener('click', () => show(b.dataset.v)));
-    let v = (/[?&]skills=(path|hotbar)\b/.exec(location.search) || [])[1];
-    try {
-      v = v || localStorage.getItem('skills');
-    } catch (e) {}
-    show(views[v] ? v : 'path');
-  })();
+    slots.forEach((b, i) => {
+      b.addEventListener('click', () => pick(i));
+      b.addEventListener('mouseenter', () => pick(i));
+      b.addEventListener('focus', () => pick(i));
+    });
+    hotbars[bar.id] = pick;
+  });
 
   select(0);
   tab(0, false);
