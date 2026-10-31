@@ -2467,6 +2467,121 @@
     const psbMaple = (set, P) =>
       drawTree(set, P, MAPLE, blossomClusters(MAPLE, MAPLE_EXTRA, 37), ['#ffd27a', '#f29a3e', '#d4592a', '#8e2f2a'], 41);
 
+    /* ── BittVPN: night Earth from orbit, in the app's own look: near black and white, city lights
+       on a dot grid like the map of Japan on its banner, one red accent. Routes between
+       countries are dotted red arcs; pulses run along them on the moving layer ── */
+    const hash2 = (i, j) => {
+      let h = (Math.imul(i, 374761393) + Math.imul(j, 668265263)) | 0;
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+    };
+    const vnoise = (x, y) => {
+      const xi = Math.floor(x),
+        yi = Math.floor(y),
+        sx = (t) => t * t * (3 - 2 * t),
+        u = sx(x - xi),
+        v = sx(y - yi),
+        a = hash2(xi, yi),
+        b = hash2(xi + 1, yi),
+        c = hash2(xi, yi + 1),
+        d = hash2(xi + 1, yi + 1);
+      return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+    };
+    const fbm = (x, y) => vnoise(x, y) * 0.55 + vnoise(x * 2.1, y * 2.1) * 0.3 + vnoise(x * 4.3, y * 4.3) * 0.15;
+    const EARTH = { cx: 190, cy: 470, R: 370 };
+    // Countries the routes connect: the first is home, the red dot is where the app invites you
+    const CITY = { home: [150, 134], west: [62, 164], east: [238, 128], far: [292, 150], south: [196, 166] };
+    const arc = (a, b) => [a, [(a[0] + b[0]) / 2, Math.min(a[1], b[1]) - Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.35], b];
+    const ROUTES = [
+      arc(CITY.home, CITY.west),
+      arc(CITY.home, CITY.east),
+      arc(CITY.east, CITY.far),
+      arc(CITY.home, CITY.south),
+    ];
+
+    function vpnSpace(set, P) {
+      const r = rng(43),
+        dim = P('#7c8190'),
+        bright = P('#e8ecf5'),
+        band = P('#222632'),
+        top = P('#04060b'),
+        low = P('#070b16');
+      for (let y = 0; y < PH; y++)
+        for (let x = 0; x < PW; x++) {
+          set(x, y, dith(x, y, y / 110) ? low : top);
+          // A faint band of the Milky Way across the sky, thinning toward its edges
+          const off = Math.abs(y - (14 + x * 0.24)) / 14;
+          if (off < 1 && hash2(x, y) > 0.93 + off * 0.05) set(x, y, band);
+        }
+      for (let k = 0; k < 110; k++) set(r() * PW, r() * 130, r() < 0.2 ? bright : dim);
+    }
+    function vpnEarth(set, P) {
+      const { cx, cy, R } = EARTH,
+        ocean = P('#070a12'),
+        land = P('#101624'),
+        air = P('#3b5a8c'),
+        airFar = P('#17243f'),
+        glow = P('#0c1426'),
+        lights = [P('#55534f'), P('#a9a59b'), P('#f4f1e8')];
+      for (let y = 0; y < PH; y++)
+        for (let x = 0; x < PW; x++) {
+          const dx = x - cx,
+            dy = y - cy,
+            dist = Math.hypot(dx, dy);
+          if (dist > R) {
+            // A thin blue line of atmosphere along the limb, fading out into space
+            if (dist < R + 1.5) set(x, y, air);
+            else if (dist < R + 6 && dith(x, y, (1 - (dist - R - 1.5) / 4.5) * 0.6)) set(x, y, airFar);
+            else if (dist < R + 18 && dith(x, y, (1 - (dist - R - 6) / 12) * 0.5)) set(x, y, glow);
+            continue;
+          }
+          // Surface coordinates: features squeeze toward the limb, as on a sphere
+          const rr = R - dist,
+            u = Math.atan2(dx, -dy) * R * 0.022,
+            v = Math.sqrt(2 * R * rr) * 0.022,
+            isLand = fbm(u + 3.1, v + 7.7) > 0.5;
+          set(x, y, isLand ? land : ocean);
+          // City lights only on land, only on a 3px dot grid
+          if (!isLand || x % 3 || y % 3 || rr < 2) continue;
+          // Cities gather in clusters (coarse noise) and scatter inside them (fine noise)
+          const c = fbm(u * 2.2 + 11, v * 2.2 + 5) + (hash2(x, y) - 0.5) * 0.22;
+          if (c > 0.5) set(x, y, lights[c > 0.68 ? 2 : c > 0.58 ? 1 : 0]);
+        }
+    }
+    function vpnRoutes(set, P) {
+      const line = P('#5a1a1e'),
+        white = P('#ffffff'),
+        grey = P('#a9a59b'),
+        red = P('#e5483b');
+      for (const [p0, c, p1] of ROUTES)
+        for (let t = 0; t <= 1; t += 0.008) {
+          const [x, y] = qpt(p0, c, p1, t);
+          if (Math.round(t * 125) % 3 === 0) set(x, y, line);
+        }
+      for (const [name, [x, y]] of Object.entries(CITY)) {
+        const gx = Math.round(x / 3) * 3,
+          gy = Math.round(y / 3) * 3;
+        for (const [ox, oy] of [[3, 0], [-3, 0], [0, 3], [0, -3]]) set(gx + ox, gy + oy, grey);
+        set(gx, gy, name === 'far' ? red : white);
+      }
+    }
+    // Pulses: a red head with a short fading tail, each route at its own pace
+    function drawPulses(g, t, ox, oy) {
+      ROUTES.forEach(([p0, c, p1], i) => {
+        const dur = 7 + i * 1.6,
+          at = (t / 1000 / dur + i * 0.37) % 1;
+        for (let k = 5; k >= 0; k--) {
+          const tt = at - k * 0.014;
+          if (tt < 0) continue;
+          const [x, y] = qpt(p0, c, p1, tt);
+          g.globalAlpha = 1 - k / 6;
+          g.fillStyle = k ? '#c0392f' : '#ff5a4a';
+          g.fillRect(Math.round(x + ox), Math.round(y + oy), k ? 1 : 2, k ? 1 : 2);
+        }
+        g.globalAlpha = 1;
+      });
+    }
+
     /* What falls in each world, in scene pixels: sakura petals, maple leaves */
     function pxPetal(g, p, flip) {
       const x = Math.round(p.x),
@@ -2505,6 +2620,12 @@
         // Leaves are heavier than petals: fewer, sinking a little faster, drifting less
         fall: { draw: pxLeaf, per: 95000, max: 14, min: 6, wind: 0.6, sink: 1.3 },
       },
+      vpn: {
+        paint: [vpnSpace, vpnEarth, vpnRoutes],
+        focus: '60% 50%',
+        // Nothing falls in orbit: pulses run along the routes instead
+        fall: { pulses: true },
+      },
     };
     const art = {};
     // Each scene is drawn once and kept: the menu returns to it on every visit
@@ -2518,8 +2639,11 @@
         reduce = matchMedia('(prefers-reduced-motion: reduce)');
       let w = 0,
         h = 0,
+        ox = 0,
+        oy = 0,
         list = [],
         cfg = null,
+        focusOf = '50% 50%',
         on = false,
         last = 0;
       const spawn = (p, first) => {
@@ -2539,7 +2663,12 @@
         fx.height = Math.ceil(innerHeight / cell);
         w = fx.width;
         h = fx.height;
-        if (!cfg) return (list = []);
+        // Where the scene's own pixel (0, 0) lands here: the world canvas is 106% of the screen,
+        // set 3% off its corner, and covers it from its focus point
+        const [fx0, fy0] = focusOf.split(' ').map((v) => parseFloat(v) / 100);
+        ox = (-0.03 * innerWidth + (1.06 * innerWidth - PW * cell) * fx0) / cell;
+        oy = (-0.03 * innerHeight + (1.06 * innerHeight - PH * cell) * fy0) / cell;
+        if (!cfg || cfg.pulses) return (list = []);
         // Few of them: a light drift at the edge of sight, not a flurry in front of the menu
         const n = Math.round(Math.min(cfg.max, Math.max(cfg.min, (innerWidth * innerHeight) / cfg.per)));
         list = Array.from({ length: n }, () => spawn({}, true));
@@ -2547,6 +2676,7 @@
       const draw = (t, dt) => {
         g.clearRect(0, 0, w, h);
         if (!cfg) return;
+        if (cfg.pulses) return drawPulses(g, t, ox, oy);
         for (const p of list) {
           p.x += (3 + 2.5 * p.z + Math.sin(t * 0.0007 + p.phase) * 3) * p.z * cfg.wind * dt;
           p.y += (2 + 3 * p.z) * p.z * cfg.sink * dt;
@@ -2566,13 +2696,14 @@
         resize();
         draw(0, 0);
       });
-      // Shows what falls in this world (nothing in a world without it); runs only while shown,
-      // and with reduced motion it hangs still
+      // Shows what falls or moves in this world (nothing in a world without it); runs only while
+      // shown, and with reduced motion it hangs still
       return (kind) => {
         const next = KINDS[kind] ? KINDS[kind].fall : null;
         fx.classList.toggle('off', !next);
         if (next !== cfg) {
           cfg = next;
+          focusOf = KINDS[kind] ? KINDS[kind].focus : '50% 50%';
           resize();
           draw(0, 0);
         }
