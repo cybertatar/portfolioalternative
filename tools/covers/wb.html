@@ -1,0 +1,186 @@
+<!doctype html>
+<!--
+  Cover for WB Bank moneybox concept, 1920×1080, rendered by tools/render-covers.js (which also
+  sets the graphite background and fades the pattern, as for the other covers).
+  The case has no screens yet, so the cover is the moneybox itself: a big pixel piggy bank in
+  Wildberries magenta with a coin dropping into its slot, over the faint pattern of piggy banks
+  and banknotes from the old cover (cybertatar/Portfolio, tools/case-covers/wb.html).
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+      }
+      .pattern {
+        position: absolute;
+        inset: 0;
+        background-size: 96px 96px;
+        mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35), #000 85%);
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        filter: drop-shadow(0 32px 48px rgb(0 0 0 / 0.55));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pattern"></div>
+    <canvas width="1920" height="1080"></canvas>
+    <script>
+      /* Pattern tile, as on the old cover: a piggy bank and a banknote on 32×32 game pixels */
+      const PIG = [
+        '..........#...',
+        '....####.##...',
+        '..##########..',
+        '.########.####',
+        '##############',
+        '.############.',
+        '..##########..',
+        '..##......##..',
+        '..##......##..',
+      ];
+      const NOTE = [
+        '#############',
+        '#...........#',
+        '#....###....#',
+        '#.#.#...#.#.#',
+        '#....###....#',
+        '#...........#',
+        '#############',
+      ];
+      const tile = [
+        [4, 5, PIG],
+        [18, 21, NOTE],
+      ]
+        .flatMap(([ox, oy, rows]) =>
+          rows.flatMap((line, y) =>
+            [...line].flatMap((c, x) => (c === '#' ? [`M${ox + x} ${oy + y}h1v1h-1z`] : [])),
+          ),
+        )
+        .join('');
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' shape-rendering='crispEdges'><path fill='#cfc6b2' d='${tile}'/></svg>`;
+      document.querySelector('.pattern').style.backgroundImage =
+        `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+
+      /* The piggy bank: an ellipse body lit from the top left, ear, snout, legs, tail, slot */
+      const P = 22; // one sprite pixel on the cover
+      const W = 40,
+        H = 30;
+      const C = {
+        o: '#2a0b2e', // outline
+        s: '#7d1d78', // shade
+        b: '#b5309f', // body
+        h: '#de63c4', // light
+        w: '#f6a6e4', // shine
+        k: '#1a0620', // eye, slot, nostrils
+        n: '#c9459f', // snout
+        g: '#f2c14e', // coin
+        G: '#ffe7a0', // coin light
+        d: '#a8701a', // coin shade
+      };
+      const px = Array.from({ length: H }, () => Array(W).fill(''));
+      const set = (x, y, c) => {
+        if (x >= 0 && y >= 0 && x < W && y < H) px[y][x] = c;
+      };
+      const rect = (x0, y0, w, h, c) => {
+        for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) set(x, y, c);
+      };
+      const cx = 18,
+        cy = 17,
+        rx = 13.5,
+        ry = 9.5;
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          const dx = (x + 0.5 - cx) / rx,
+            dy = (y + 0.5 - cy) / ry;
+          if (dx * dx + dy * dy > 1) continue;
+          const lit = -dx * 0.55 - dy * 0.85;
+          set(x, y, lit > 0.55 ? 'h' : lit > -0.35 ? 'b' : 's');
+        }
+      [
+        [23, 6],
+        [24, 5],
+        [25, 4],
+        [26, 5],
+        [26, 6],
+        [26, 7],
+        [25, 7],
+      ].forEach(([x, y]) => set(x, y, 'b'));
+      set(25, 5, 'h');
+      set(25, 6, 'h');
+      rect(9, 24, 3, 3, 's');
+      rect(14, 25, 3, 3, 'b');
+      rect(21, 25, 3, 3, 'b');
+      rect(26, 24, 3, 3, 's');
+      rect(30, 14, 4, 5, 'n');
+      rect(31, 14, 2, 1, 'h');
+      set(31, 16, 'k');
+      set(33, 16, 'k');
+      [
+        [4, 14],
+        [3, 13],
+        [2, 13],
+        [2, 14],
+        [3, 15],
+      ].forEach(([x, y]) => set(x, y, 's'));
+      set(26, 11, 'k');
+      set(26, 12, 'k');
+      rect(10, 11, 3, 1, 'w');
+      rect(9, 12, 2, 1, 'w');
+      rect(14, 8, 7, 1, 'k');
+      // Outline: every empty pixel touching the pig
+      const edge = [];
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          if (px[y][x]) continue;
+          if (
+            [
+              [1, 0],
+              [-1, 0],
+              [0, 1],
+              [0, -1],
+            ].some(([a, b]) => px[y + b]?.[x + a])
+          )
+            edge.push([x, y]);
+        }
+      edge.forEach(([x, y]) => set(x, y, 'o'));
+
+      // A coin above the slot, on its way in
+      const coin = [];
+      const r = 3,
+        x0 = 17,
+        y0 = 3;
+      for (let y = -r; y <= r; y++)
+        for (let x = -r; x <= r; x++) {
+          const d = (x * x + y * y) / (r * r);
+          if (d > 1.05) continue;
+          coin.push([x0 + x, y0 + y, d > 0.72 ? (x + y > 0 ? 'd' : 'g') : x + y < -r * 0.6 ? 'G' : 'g']);
+        }
+      coin.push([x0, y0 - 1, 'd'], [x0, y0, 'd'], [x0, y0 + 1, 'd']);
+
+      const g = document.querySelector('canvas').getContext('2d');
+      const ox = Math.round(960 - (W * P) / 2),
+        oy = Math.round((1080 - H * P) / 2) + 40;
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++)
+          if (px[y][x]) {
+            g.fillStyle = C[px[y][x]];
+            g.fillRect(ox + x * P, oy + y * P, P, P);
+          }
+      coin.forEach(([x, y, c]) => {
+        g.fillStyle = C[c];
+        g.fillRect(ox + x * P, oy + y * P, P, P);
+      });
+    </script>
+  </body>
+</html>
