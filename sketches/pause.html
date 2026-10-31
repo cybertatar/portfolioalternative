@@ -157,6 +157,20 @@
   .world canvas.off {
     opacity: 0;
   }
+  /* Petals fly between the eye and the blurred world: almost sharp, a little dimmed */
+  .world canvas.petals {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: brightness(0.72);
+    opacity: 0.85;
+  }
+  .world canvas.petals.off {
+    opacity: 0;
+  }
+  body.playing .world canvas.petals {
+    opacity: 0;
+  }
   body.playing .world canvas {
     filter: none;
   }
@@ -1357,7 +1371,7 @@
 </style>
 
 <div class="world" aria-hidden="true">
-  <canvas class="px" id="w1"></canvas><canvas class="px off" id="w2"></canvas>
+  <canvas class="px" id="w1"></canvas><canvas class="px off" id="w2"></canvas><canvas class="px petals off" id="petals"></canvas>
 </div>
 
 <div class="menu">
@@ -2014,8 +2028,352 @@
     document.getElementById('age').textContent = a + ' ' + y;
   })();
 
+  /* ── The character's world: Mount Fuji at dawn behind a sakura branch, 320×180 pixel art with
+     ordered dithering. Petals fall on their own layer over the blurred world, almost sharp, so
+     they read as nearer to the eye than the mountain. ── */
+  const fuji = (() => {
+    const rng = (seed) => () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const hash = (n) => (((n * 2654435761) >>> 0) % 1000) / 1000;
+    const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const qpt = (p0, c, p1, t) => [
+      (1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p1[0],
+      (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p1[1],
+    ];
+
+    // The scene on a 320×180 grid, drawn 4× into the world canvas
+    const PW = 320,
+      PH = 180;
+    const SKY = ['#1d2652', '#29326a', '#3b3f7a', '#554b8a', '#755896', '#98699c', '#bb7e9f', '#d8969f', '#e9b1a4', '#f4c9aa'];
+    const FUJI = { cx: 196, top: 50, base: 134 };
+    // Half-width of the cone at depth d (0 summit, 1 foot): steep shoulders, a wide concave foot
+    const hwAt = (d) => 7 + 128 * (0.3 * d + 0.7 * d * d);
+    const snowLine = (x) => {
+      const f = (x >> 1) % 5 === 0 ? 4 + hash(x >> 1) * 9 : 0;
+      return FUJI.top + 22 + 3 * Math.sin(x * 0.7) + f;
+    };
+    const shadowSide = (x, y, hw) => (x - FUJI.cx) / hw > 0.08 + 0.06 * Math.sin(y * 0.25);
+    const farHill = (x) => 128 + 5 * Math.sin(x * 0.035 + 1) + 2.5 * Math.sin(x * 0.11 + 0.4);
+    const nearHill = (x) => 152 - 18 * Math.exp(-(((x - 112) / 46) ** 2)) + 3 * Math.sin(x * 0.09);
+    const slope = (x) => 153 + x * 0.075 + 2.5 * Math.sin(x * 0.05);
+    const SUN = [98, 106];
+    const PAGODA = [112, nearHill(112) + 1];
+    // Sakura branches: start, bend, end, width at start and at end
+    const BRANCHES = [
+      [[12, 184], [24, 140], [30, 112], 7, 5],
+      [[30, 112], [36, 88], [46, 70], 5, 4],
+      [[44, 74], [90, 40], [152, 22], 3, 1],
+      [[36, 96], [70, 80], [118, 58], 3, 1.2],
+      [[46, 72], [34, 40], [16, 8], 3, 1.5],
+      [[30, 116], [50, 112], [66, 118], 2.4, 1],
+      [[96, 40], [112, 22], [124, 2], 2, 1],
+    ];
+    function blossomClusters() {
+      const r = rng(7),
+        out = [];
+      BRANCHES.slice(2).forEach(([p0, c, p1]) => {
+        for (let t = 0.3; t <= 1.01; t += 0.15) {
+          const [x, y] = qpt(p0, c, p1, t);
+          out.push([x + (r() - 0.5) * 8, y + (r() - 0.5) * 8, lerp(10, 5, t) + r() * 3]);
+        }
+      });
+      [[6, 28, 11], [20, 52, 9], [0, 6, 13], [60, 16, 10], [36, 8, 11], [52, 60, 8], [84, 4, 9], [2, 70, 8]].forEach((c) =>
+        out.push(c),
+      );
+      return out;
+    }
+    const CLUSTERS = blossomClusters();
+
+    /* ── Pixel art: drawn into the 320×180 bitmap, gradients by a 4×4 ordered dither ── */
+    const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    const dith = (x, y, a) => a > (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
+
+    function pixelScene() {
+      const c = document.createElement('canvas');
+      c.width = PW;
+      c.height = PH;
+      const g = c.getContext('2d'),
+        img = g.createImageData(PW, PH),
+        d = img.data;
+      const set = (x, y, col) => {
+        x |= 0;
+        y |= 0;
+        if (x < 0 || y < 0 || x >= PW || y >= PH) return;
+        const i = (y * PW + x) * 4;
+        d[i] = col[0];
+        d[i + 1] = col[1];
+        d[i + 2] = col[2];
+        d[i + 3] = 255;
+      };
+      const P = (h) => rgb(h);
+      pxSky(set, P);
+      pxFuji(set, P);
+      pxMist(set, P);
+      pxHills(set, P);
+      pxPagoda(set, P);
+      pxSlope(set, P);
+      pxTree(set, P);
+      g.putImageData(img, 0, 0);
+      return c;
+    }
+
+    function pxSky(set, P) {
+      const cols = SKY.map(P),
+        r = rng(3);
+      for (let y = 0; y < PH; y++) {
+        const f = Math.min((y / 140) * (cols.length - 1), cols.length - 1.001),
+          i = f | 0;
+        for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+      }
+      for (let k = 0; k < 60; k++) {
+        const x = r() * PW,
+          y = r() * 48;
+        if (r() > y / 60) set(x, y, P('#d9dcff'));
+      }
+      const glow = P('#fbd6b2'),
+        sun = P('#fff2dc');
+      for (let y = SUN[1] - 30; y < SUN[1] + 30; y++)
+        for (let x = SUN[0] - 40; x < SUN[0] + 40; x++) {
+          const dd = Math.hypot((x - SUN[0]) * 0.8, y - SUN[1]);
+          if (dd < 6) set(x, y, sun);
+          else if (dd < 30 && dith(x, y, ((1 - dd / 30) ** 2) * 0.9)) set(x, y, glow);
+        }
+      const lit = P('#f2b3ae'),
+        dark = P('#94709f');
+      for (let k = 0; k < 11; k++) {
+        const y = 66 + r() * 44,
+          x0 = r() * PW,
+          len = 18 + r() * 60;
+        for (let x = x0; x < x0 + len; x++) {
+          set(x, y, lit);
+          if (x > x0 + 3 && x < x0 + len - 4) set(x, y + 1, dark);
+        }
+      }
+    }
+
+    function pxFuji(set, P) {
+      const lit = [P('#9a8fc2'), P('#6f6da6')],
+        sh = [P('#555790'), P('#3d4176')],
+        gully = P('#46457c'),
+        snow = P('#fdebef'),
+        snowSh = P('#b7b0d9');
+      for (let y = FUJI.top; y < FUJI.base + 4; y++) {
+        const t = (y - FUJI.top) / (FUJI.base - FUJI.top),
+          hw = hwAt(t) + (hash(y) - 0.5) * 1.5;
+        for (let x = Math.round(FUJI.cx - hw); x <= FUJI.cx + hw; x++) {
+          if (y === FUJI.top && hash(x) < 0.4) continue; // a ragged crater rim
+          const s = shadowSide(x, y, hw),
+            pair = s ? sh : lit;
+          let col = dith(x, y, t) ? pair[1] : pair[0];
+          const fan = (x - FUJI.cx) / (y - FUJI.top + 10);
+          if (t > 0.25 && t < 0.62 && Math.sin(fan * 26 + hash(y >> 3)) > 0.93 && dith(x, y, 0.62 - t)) col = s ? sh[1] : gully;
+          if (y < snowLine(x)) col = s ? snowSh : y > snowLine(x) - 2 && dith(x, y, 0.5) ? pair[0] : snow;
+          set(x, y, col);
+        }
+      }
+    }
+
+    function pxMist(set, P) {
+      const m = P('#c7a6c4');
+      for (let y = 110; y < 140; y++) {
+        const a = 1 - Math.abs(y - 124) / 15;
+        for (let x = 0; x < PW; x++) if (dith(x, y, a * 0.75)) set(x, y, m);
+      }
+    }
+
+    function pxHills(set, P) {
+      const far = P('#4a4677'),
+        near = P('#2f2a55'),
+        tuft = P('#252147'),
+        bloom = P('#b06e90'),
+        r = rng(5);
+      for (let x = 0; x < PW; x++) {
+        for (let y = farHill(x) | 0; y < PH; y++) set(x, y, far);
+        for (let y = nearHill(x) | 0; y < PH; y++) set(x, y, near);
+      }
+      for (let k = 0; k < 70; k++) {
+        const x = r() * PW,
+          y = nearHill(x) - 1,
+          col = r() < 0.25 ? bloom : tuft,
+          w = 2 + r() * 3;
+        for (let i = 0; i < w; i++) {
+          set(x + i, y, col);
+          if (i > 0 && i < w - 1) set(x + i, y - 1, col);
+        }
+      }
+    }
+
+    function pxPagoda(set, P) {
+      const roof = P('#b04c5e'),
+        body = P('#5a2c45'),
+        spire = P('#3a2238'),
+        lamp = P('#ffcf8a');
+      let y = PAGODA[1];
+      const cx = PAGODA[0];
+      for (let i = 0; i < 5; i++) {
+        const w = 7 - i * 1.1;
+        for (let yy = y - 3; yy < y; yy++) for (let x = cx - w + 1; x <= cx + w - 1; x++) set(x, yy, body);
+        if (i < 2) set(cx, y - 2, lamp);
+        y -= 3;
+        for (let x = cx - w - 1.5; x <= cx + w + 1.5; x++) set(x, y, roof);
+        set(cx - w - 2, y - 1, roof);
+        set(cx + w + 2, y - 1, roof);
+        y -= 1;
+      }
+      for (let k = 0; k < 5; k++) set(cx, y - k, spire);
+    }
+
+    function pxSlope(set, P) {
+      const ground = P('#221d3a'),
+        edge = P('#3b3157'),
+        petal = P('#e7a0bd'),
+        r = rng(9);
+      for (let x = 0; x < PW; x++) {
+        const top = slope(x) | 0;
+        for (let y = top; y < PH; y++) set(x, y, ground);
+        set(x, top, edge);
+        if (dith(x, top + 1, 0.4)) set(x, top + 1, edge);
+      }
+      for (let k = 0; k < 90; k++) {
+        const x = r() * PW;
+        if (r() < 1 - x / PW) set(x, slope(x) + 1 + r() * 20, petal);
+      }
+    }
+
+    function pxTree(set, P) {
+      const bark = P('#2a1d30'),
+        barkLit = P('#4c3448');
+      for (const [p0, c, p1, w0, w1] of BRANCHES)
+        for (let t = 0; t <= 1; t += 1 / 220) {
+          const [x, y] = qpt(p0, c, p1, t),
+            rr = lerp(w0, w1, t) / 2;
+          for (let dy = -rr; dy <= rr; dy++)
+            for (let dx = -rr; dx <= rr; dx++)
+              if (dx * dx + dy * dy <= rr * rr + 0.3) set(x + dx, y + dy, dx < -rr + 1.2 ? barkLit : bark);
+        }
+      const tones = ['#fff0f4', '#f7b8cf', '#e48aae', '#b0618c'].map(P),
+        r = rng(11);
+      const puffs = [];
+      for (const [cx, cy, rad] of CLUSTERS)
+        for (let k = 0; k < 6; k++) {
+          const a = r() * 6.283,
+            d = r() * rad * 0.6;
+          puffs.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.8, rad * (0.32 + r() * 0.22), cx, cy, rad]);
+        }
+      puffs.sort((a, b) => b[1] - a[1]); // lower puffs first, so the lit tops overlap them
+      for (const [px, py, pr, cx, cy, rad] of puffs)
+        for (let y = py - pr - 2; y <= py + pr + 2; y++)
+          for (let x = px - pr - 2; x <= px + pr + 2; x++) {
+            const dd = Math.hypot(x - px, y - py);
+            if (dd > pr - r() * 1.6) continue;
+            // Light from the upper left, mostly per puff, a little per cluster
+            const dx = (x - px) / pr + (x - cx) / rad * 0.5,
+              dy = (y - py) / pr + (y - cy) / rad * 0.5,
+              v = (-dx * 0.6 - dy * 0.8) / 1.5;
+            const lv = v > 0.55 ? 0 : v > 0.1 ? 1 : v > -0.45 ? 2 : 3;
+            const f = v > 0.55 ? 0 : v > 0.1 ? (0.55 - v) / 0.45 : v > -0.45 ? (0.1 - v) / 0.55 : 0;
+            set(x, y, tones[Math.min(3, lv + (dith(x, y, f * 0.5) ? 1 : 0))]);
+          }
+    }
+
+    function pxPetal(g, p, flip) {
+      const x = Math.round(p.x),
+        y = Math.round(p.y);
+      g.fillStyle = p.tone < 0.6 ? '#f7b9cf' : '#ffe2ea';
+      const big = p.z > 1.05;
+      if (Math.abs(flip) < 0.35) g.fillRect(x, y, 1, big ? 2 : 1);
+      else g.fillRect(x, y, big ? 3 : 2, Math.abs(flip) > 0.8 && big ? 2 : 1);
+      if (big && flip > 0.5) {
+        g.fillStyle = '#d986a8';
+        g.fillRect(x + 2, y + 1, 1, 1);
+      }
+    }
+
+    let art = null;
+    // The scene is drawn once and kept: the menu returns to it on every visit to the tab
+    const scene = () => (art = art || pixelScene());
+
+    function petalsLayer(fx) {
+      const g = fx.getContext('2d'),
+        r = rng(31),
+        reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      let w = 0,
+        h = 0,
+        list = [],
+        on = false,
+        last = 0;
+      const spawn = (p, first) => {
+        p.z = 0.5 + r() * 0.9; // nearer petals are bigger and faster
+        p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
+        p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
+        p.rot = r() * 6.283;
+        p.spin = (0.6 + r() * 1.6) * (r() < 0.5 ? -1 : 1);
+        p.phase = r() * 6.283;
+        p.tone = r();
+        return p;
+      };
+      // One petal pixel is one pixel of the scene on screen (the world is drawn with object-fit: cover)
+      const resize = () => {
+        const cell = Math.max(innerWidth / PW, innerHeight / PH) * 1.06;
+        fx.width = Math.ceil(innerWidth / cell);
+        fx.height = Math.ceil(innerHeight / cell);
+        w = fx.width;
+        h = fx.height;
+        const n = Math.round(Math.min(70, Math.max(18, (innerWidth * innerHeight) / 22000)));
+        list = Array.from({ length: n }, () => spawn({}, true));
+      };
+      const draw = (t, dt) => {
+        g.clearRect(0, 0, w, h);
+        for (const p of list) {
+          p.x += (7 + 6 * p.z + Math.sin(t * 0.0011 + p.phase) * 6) * p.z * dt;
+          p.y += (5 + 7 * p.z) * p.z * dt;
+          p.rot += p.spin * dt;
+          if (p.x > w + 12 || p.y > h + 12) spawn(p, false);
+          pxPetal(g, p, Math.cos(p.rot));
+        }
+      };
+      const tick = (now) => {
+        if (!on) return;
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        if (!document.hidden) draw(now, dt);
+        requestAnimationFrame(tick);
+      };
+      resize();
+      draw(0, 0);
+      addEventListener('resize', () => {
+        resize();
+        draw(0, 0);
+      });
+      // Runs only while the character's world is shown; with reduced motion the petals hang still
+      return (show) => {
+        fx.classList.toggle('off', !show);
+        if (show === on) return;
+        on = show && !reduce.matches;
+        if (on) {
+          last = performance.now();
+          requestAnimationFrame(tick);
+        }
+      };
+    }
+    return { scene, petalsLayer };
+  })();
+
   /* ── Worlds: one small top-down place per quest, in 8px tiles ── */
   function world(c, kind) {
+    if (kind === 'char') {
+      c.width = 1280;
+      c.height = 720;
+      const g = c.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(fuji.scene(), 0, 0, c.width, c.height);
+      return c;
+    }
     const T = 8,
       W = 160,
       H = 90;
@@ -2267,11 +2625,15 @@
     w2 = document.getElementById('w2');
   let front = w1,
     shown = '';
+  const petals = fuji.petalsLayer(document.getElementById('petals'));
   function showWorld(kind) {
     if (kind === shown) return;
     shown = kind;
     const back = front === w1 ? w2 : w1;
     world(back, kind);
+    // On a tall phone screen the crop keeps Fuji in view rather than the empty middle of the sky
+    back.style.objectPosition = kind === 'char' ? '62% 50%' : '';
+    petals(kind === 'char');
     back.classList.remove('off');
     front.classList.add('off');
     front = back;
