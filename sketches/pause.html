@@ -885,6 +885,13 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
   }
+  /* A narrow laptop: the wishlist gets a little more of the row, so its longest wish keeps to
+     two lines (every row is as tall as the tallest, see .wl); the card has no stats here anyway */
+  @media (min-width: 1200px) and (max-width: 1399px) {
+    .foot {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    }
+  }
   .last,
   .wish {
     display: flex;
@@ -1051,9 +1058,11 @@
     .sheet {
       gap: var(--s5);
     }
+    .wish .wl-card {
+      padding: var(--s4) var(--pad);
+    }
     .wish .wl {
       gap: var(--s2);
-      padding: var(--s4) var(--pad);
     }
     .lq-stats {
       display: none;
@@ -1061,29 +1070,35 @@
   }
   /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
      a coin for one under way, empty boxes for the rest. A plain list from the top of the card,
-     one step between rows, so a new wish is just one more row */
-  .wl {
+     one step between rows, so a new wish is just one more row. Every row is as tall as the
+     tallest one (a caption or a wrapped line), so the boxes stand at one even pitch */
+  .wl-card {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s4);
-    margin: 0;
     padding: var(--pad);
     border-radius: var(--r-in);
     background: var(--fill);
+  }
+  .wl {
+    display: grid;
+    grid-auto-rows: 1fr;
+    gap: var(--s4);
+    margin: 0;
+    padding: 0;
     list-style: none;
   }
   .wl li {
     display: flex;
     gap: var(--s3);
-    align-items: center;
+    align-items: flex-start;
     font-size: 15px;
     line-height: 1.35;
   }
+  /* The box sits on the first line of its wish, centred on it */
   .wl canvas {
     flex: none;
     width: 24px;
     height: 24px;
+    margin-top: calc((1.35em - 24px) / 2);
   }
   .wl small {
     display: block;
@@ -1436,6 +1451,7 @@
         </div>
         <div class="wish">
           <h3 class="label">Вишлист</h3>
+          <div class="wl-card">
           <ul class="wl">
             <li class="main">
               <canvas class="px" data-sprite="wish-star" data-scale="2"></canvas>
@@ -1458,6 +1474,7 @@
               <span>Пройти Tears of the Kingdom на 100%</span>
             </li>
           </ul>
+          </div>
         </div>
       </div>
     </div>
