@@ -25,6 +25,10 @@
     /* A picture melting into its pane: the mask eases out along a smooth curve over the lower
        part, so the graphite never meets the glass in a visible band */
     --melt: rgb(0 0 0 / 1) 50%, rgb(0 0 0 / 0.97) 55%, rgb(0 0 0 / 0.9) 60%, rgb(0 0 0 / 0.78) 65%, rgb(0 0 0 / 0.65) 70%, rgb(0 0 0 / 0.5) 75%, rgb(0 0 0 / 0.35) 80%, rgb(0 0 0 / 0.22) 85%, rgb(0 0 0 / 0.1) 90%, rgb(0 0 0 / 0.03) 95%, rgb(0 0 0 / 0) 100%;
+    /* Under a melting cover its card keeps the cover's graphite, which then eases out into the
+       glass: the melt shows no lighter band between them */
+    --under: linear-gradient(rgb(23 25 29 / 1) 45%, rgb(23 25 29 / 0.97) 50%, rgb(23 25 29 / 0.9) 54%, rgb(23 25 29 / 0.78) 58%, rgb(23 25 29 / 0.65) 63%, rgb(23 25 29 / 0.5) 68%, rgb(23 25 29 / 0.35) 72%, rgb(23 25 29 / 0.22) 76%, rgb(23 25 29 / 0.1) 81%, rgb(23 25 29 / 0.03) 86%, rgb(23 25 29 / 0) 90%);
+    --under-side: linear-gradient(90deg, rgb(23 25 29 / 1) 45%, rgb(23 25 29 / 0.97) 50%, rgb(23 25 29 / 0.9) 54%, rgb(23 25 29 / 0.78) 58%, rgb(23 25 29 / 0.65) 63%, rgb(23 25 29 / 0.5) 68%, rgb(23 25 29 / 0.35) 72%, rgb(23 25 29 / 0.22) 76%, rgb(23 25 29 / 0.1) 81%, rgb(23 25 29 / 0.03) 86%, rgb(23 25 29 / 0) 90%);
     --melt-short: rgb(0 0 0 / 1) 55%, rgb(0 0 0 / 0.97) 60%, rgb(0 0 0 / 0.9) 64%, rgb(0 0 0 / 0.78) 68%, rgb(0 0 0 / 0.65) 73%, rgb(0 0 0 / 0.5) 78%, rgb(0 0 0 / 0.35) 82%, rgb(0 0 0 / 0.22) 86%, rgb(0 0 0 / 0.1) 91%, rgb(0 0 0 / 0.03) 96%, rgb(0 0 0 / 0) 100%;
     --bg: #0b1117;
     --glass: rgba(11, 17, 24, 0.74);
@@ -529,12 +533,12 @@
       overflow: hidden;
       padding: 0 0 var(--pad);
       border-radius: var(--r);
-      background: var(--glass);
+      background: var(--under), var(--glass);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
     }
     .q:hover {
-      background: linear-gradient(var(--fill), var(--fill)), var(--glass);
+      background: var(--under), linear-gradient(var(--fill), var(--fill)), var(--glass);
     }
     /* Covers are 16:9, like video and link previews; the world's thumbnail is for the desktop list */
     .q .glimpse {
@@ -635,6 +639,7 @@
     }
   }
   .qd {
+    background: var(--under), var(--glass);
     padding: 0;
     display: grid;
     grid-template-rows: minmax(260px, 1fr) auto;
@@ -949,7 +954,7 @@
     padding: 0;
     border-radius: var(--r-in);
     overflow: hidden;
-    background: linear-gradient(var(--tone, transparent), transparent 70%), var(--fill);
+    background: var(--under), var(--fill);
     text-align: left;
   }
   .last button:hover .lq-go {
@@ -1044,7 +1049,7 @@
       .last button {
         grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
         gap: var(--s5);
-        background: linear-gradient(90deg, var(--tone, transparent), transparent 75%), var(--fill);
+        background: var(--under-side), var(--fill);
       }
       .lq-cover {
         -webkit-mask-image: linear-gradient(90deg, var(--melt-short));
@@ -3387,16 +3392,11 @@
     return c;
   }
 
-  /* ── Covers: the objects image over its background (see .cover-art); a pane is tinted with the
-     background, so the tint stays as calm as the graphite ── */
+  /* ── Covers: the objects image over its background (see .cover-art); under it the card keeps
+     the same graphite (--under) ── */
   const coverArt = (id, cls = '') =>
     `<img class="${cls} cover-art" src="img/cover-${id}.webp" ` +
     `style="background-image:url(img/cover-${id}-bg.webp)" alt="">`;
-  const coverBg = (id) => {
-    const im = new Image();
-    im.src = `img/cover-${id}-bg.webp`;
-    return im;
-  };
 
   /* ── Data ── */
   const QUESTS = [
@@ -3638,7 +3638,6 @@
         ? factsHTML(q.facts)
         : '') +
       `</div>`;
-    tint(qd, coverBg(q.id));
     if (q.facts) {
       const r = qd.querySelector('.role');
       r.append(mk('spark', 2));
@@ -3680,7 +3679,6 @@
     `<small class="lq-line">${tags(lastQ)}<i>${lastQ.st}</i></small>` +
     `<p class="lq-stats">${lastQ.stats.map(([n, l]) => `<span><b>${n}</b>${l}</span>`).join('')}</p>` +
     `<span class="lq-go">Открыть кейс</span></div>`;
-  tint(last, coverBg(lastQ.id));
   // Into the case from here, by diving into the cover; back on pause, to this very card
   last.addEventListener('click', () => {
     sel = QUESTS.indexOf(lastQ);
