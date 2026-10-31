@@ -1,5 +1,8 @@
 /*
-  Renders the quest covers for sketches/pause.html (1920×1080 WebP).
+  Renders the quest covers for sketches/pause.html, each as two 1920×1080 WebP layers:
+  cover-<id>-bg.webp, the background alone, which fills a window of any shape and may be cropped
+  (it is a uniform pattern), and cover-<id>.webp, the objects alone on transparency, which the
+  page always fits whole (16:9 inside any window), so a very wide window never cuts them.
 
   PSB, BittVPN and Mouette are the cover scenes of the main site (cybertatar/Portfolio,
   tools/case-covers/*.html) restyled for this dark site: the beige parchment becomes a calm
@@ -12,7 +15,7 @@
   Usage:
     git clone --depth 1 https://github.com/cybertatar/Portfolio /path/to/Portfolio
     node tools/render-covers.js /path/to/Portfolio/tools/case-covers
-  Writes sketches/img/cover-{psb,vpn,wb,mou}.webp (needs python3 with Pillow for WebP).
+  Writes sketches/img/cover-{psb,vpn,wb,mou}{,-bg}.webp (needs python3 with Pillow for WebP).
 */
 const { chromium } = require('playwright');
 const { execFileSync } = require('child_process');
@@ -31,9 +34,14 @@ const out = path.join(root, 'sketches/img');
 // Background and pattern: graphite, the pattern a whisper lighter (white at low opacity keeps it
 // neutral whatever colour the pattern was drawn in); the old fade towards the top stays
 const BG = '#17191d';
-const BASE =
+// Background layer: everything but the pattern hidden
+const BG_ONLY =
   `html,body{background:${BG}!important}` +
-  '.pattern,body::before{filter:brightness(0) invert(1)!important;opacity:.05!important}';
+  '.pattern,body::before{filter:brightness(0) invert(1)!important;opacity:.05!important}' +
+  'body>*:not(.pattern){visibility:hidden!important}';
+// Objects layer: no background, no pattern
+const OBJECTS_ONLY =
+  'html,body{background:transparent!important}.pattern,body::before{display:none!important}';
 const SHADOW = 'drop-shadow(0 32px 48px rgb(0 0 0 / 0.55))';
 const COVERS = [
   { id: 'psb', file: path.join(src, 'psb.html'), css: `.phone{filter:${SHADOW}!important}` },
@@ -41,10 +49,10 @@ const COVERS = [
   {
     id: 'mou',
     file: path.join(src, 'mouette.html'),
-    // The hole in the tag shows the background through it
+    // The hole in the tag is a real hole: the background shows through it
     css:
       `.shadow{filter:drop-shadow(0 2px 3px rgb(0 0 0/.3)) ${SHADOW}!important}` +
-      `.hole{background:${BG}!important}`,
+      '.hole{background:transparent!important}',
   },
   { id: 'wb', file: path.join(root, 'tools/covers/wb.html'), css: '' },
 ];
@@ -52,20 +60,26 @@ const COVERS = [
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-  for (const c of COVERS) {
+  const shot = async (c, css, name, alpha) => {
     await page.goto('file://' + c.file, { waitUntil: 'networkidle' });
-    await page.addStyleTag({ content: BASE + c.css });
+    await page.addStyleTag({ content: css });
     await page.evaluate(() => document.fonts.ready);
-    const png = path.join(os.tmpdir(), `cover-${c.id}.png`);
-    await page.screenshot({ path: png });
-    const webp = path.join(out, `cover-${c.id}.webp`);
+    const png = path.join(os.tmpdir(), name + '.png');
+    await page.screenshot({ path: png, omitBackground: alpha });
+    const webp = path.join(out, name + '.webp');
     execFileSync('python3', [
       '-c',
-      'import sys;from PIL import Image;Image.open(sys.argv[1]).convert("RGB").save(sys.argv[2],quality=86,method=6)',
+      'import sys;from PIL import Image;im=Image.open(sys.argv[1]);' +
+        '(im if sys.argv[3]=="1" else im.convert("RGB")).save(sys.argv[2],quality=86,method=6)',
       png,
       webp,
+      alpha ? '1' : '0',
     ]);
     console.log(webp, Math.round(fs.statSync(webp).size / 1024) + ' KB');
+  };
+  for (const c of COVERS) {
+    await shot(c, BG_ONLY, `cover-${c.id}-bg`, false);
+    await shot(c, OBJECTS_ONLY + c.css, `cover-${c.id}`, true);
   }
   await browser.close();
 })();
