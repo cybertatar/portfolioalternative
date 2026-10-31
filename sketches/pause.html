@@ -1223,7 +1223,7 @@
     container-type: size;
     background:
       radial-gradient(circle at 50% 55%, var(--tint) 0, transparent 60%),
-      repeating-conic-gradient(rgba(238, 242, 245, 0.035) 0 25%, transparent 0 50%) 0 0 / 16px 16px,
+      var(--pat) 0 0 / var(--pat-size) var(--pat-size),
       rgba(238, 242, 245, 0.03);
   }
   .sq img {
@@ -3702,9 +3702,37 @@
     dobro: 'rgba(250,150,60,.26)',
     figma: 'rgba(140,100,230,.28)',
   };
+  /* Behind each icon, a quiet pixel pattern about the project: a motif drawn twice per tile, the
+     second half a tile across and down, so the rows interleave like a brick wall */
+  const MOTIF = {
+    kegl: ['.#.#.', '#...#', '.###.', '.###.'], // the cat's paw
+    ytm: ['.####', '.#..#', '.#..#', '##.##', '##.##'], // beamed notes
+    vermis: ['###.#####.##', '', '##.####.###.', '', '#####.##'], // lines of a page
+    shaman: ['.#.', '###', '.#.', '', '', '....#'], // sparkles round the prophet
+    dobro: ['####', '', '####'], // the app's =signs=
+    figma: ['..###..', '#.#.#.#', '..###..'], // a vector point and its handles
+  };
+  const PAT_CELLS = 18;
+  const PAT_PX = 3;
+  const pattern = (rows) => {
+    const rects = [];
+    const half = PAT_CELLS / 2;
+    [[1, 1], [1 + half, 1 + half]].forEach(([ox, oy]) =>
+      rows.forEach((row, y) =>
+        [...row].forEach((c, x) => {
+          if (c === '#') rects.push(`<rect x="${ox + x}" y="${oy + y}" width="1" height="1"/>`);
+        }),
+      ),
+    );
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAT_CELLS} ${PAT_CELLS}" shape-rendering="crispEdges">` +
+      `<g fill="rgba(238,242,245,.06)">${rects.join('')}</g></svg>`;
+    // Single quotes: the url goes into a double-quoted style attribute
+    return `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
+  };
   document.getElementById('side').innerHTML = SIDE.map(
     ([ic, t, d, links, wait]) =>
-      `<div class="pane sq" style="--tone:${TINT[ic]}"><div class="art window" style="--tint:${TINT[ic]}"><img src="img/side-${ic}.webp" alt=""></div><b>${t}</b><span>${d}</span><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}${wait ? `<span class="btn wait">${wait}</span>` : ''}</div></div>`,
+      `<div class="pane sq" style="--tone:${TINT[ic]}"><div class="art window" style="--tint:${TINT[ic]};--pat:${pattern(MOTIF[ic])};--pat-size:${PAT_CELLS * PAT_PX}px"><img src="img/side-${ic}.webp" alt=""></div><b>${t}</b><span>${d}</span><div class="links">${links.map(([l, h, main]) => `<a class="btn ${main ? 'gold' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('')}${wait ? `<span class="btn wait">${wait}</span>` : ''}</div></div>`,
   ).join('');
 
   document.querySelectorAll('.sq').forEach((card) => tint(card, card.querySelector('img')));
