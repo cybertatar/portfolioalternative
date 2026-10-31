@@ -767,7 +767,9 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, auto));
       justify-content: space-between;
-      gap: var(--s2);
+      /* Never closer than 16px, the far end of «parts of one group»: past that a caption wraps
+         rather than the stats running into each other */
+      gap: var(--s4);
       align-items: start;
       min-height: var(--facts-h, 0px);
       margin-top: var(--s5);
