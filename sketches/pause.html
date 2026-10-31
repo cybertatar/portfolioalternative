@@ -22,6 +22,10 @@
    3. Proximity: 4–8 px inside one element (title and its caption), 12–16 px between parts of one
       group, 24–32 px between groups. */
   :root {
+    /* A picture melting into its pane: the mask eases out along a smooth curve over the lower
+       part, so the graphite never meets the glass in a visible band */
+    --melt: rgb(0 0 0 / 1) 50%, rgb(0 0 0 / 0.97) 55%, rgb(0 0 0 / 0.9) 60%, rgb(0 0 0 / 0.78) 65%, rgb(0 0 0 / 0.65) 70%, rgb(0 0 0 / 0.5) 75%, rgb(0 0 0 / 0.35) 80%, rgb(0 0 0 / 0.22) 85%, rgb(0 0 0 / 0.1) 90%, rgb(0 0 0 / 0.03) 95%, rgb(0 0 0 / 0) 100%;
+    --melt-short: rgb(0 0 0 / 1) 55%, rgb(0 0 0 / 0.97) 60%, rgb(0 0 0 / 0.9) 64%, rgb(0 0 0 / 0.78) 68%, rgb(0 0 0 / 0.65) 73%, rgb(0 0 0 / 0.5) 78%, rgb(0 0 0 / 0.35) 82%, rgb(0 0 0 / 0.22) 86%, rgb(0 0 0 / 0.1) 91%, rgb(0 0 0 / 0.03) 96%, rgb(0 0 0 / 0) 100%;
     --bg: #0b1117;
     --glass: rgba(11, 17, 24, 0.74);
     --glass-strong: rgba(11, 17, 24, 0.9);
@@ -296,8 +300,8 @@
   }
   /* A picture that runs to the pane's edge melts at the bottom into the pane's tint */
   .window {
-    -webkit-mask-image: linear-gradient(#000 75%, transparent);
-    mask-image: linear-gradient(#000 75%, transparent);
+    -webkit-mask-image: linear-gradient(var(--melt-short));
+    mask-image: linear-gradient(var(--melt-short));
     border-radius: var(--r) var(--r) 0 0;
   }
   /* On a desktop the pager adds nothing: one tab shows at a time. On a phone the tabs lie side by
@@ -542,8 +546,8 @@
       height: auto;
       aspect-ratio: 16 / 9;
       border-radius: 0;
-      -webkit-mask-image: linear-gradient(#000 60%, transparent);
-      mask-image: linear-gradient(#000 60%, transparent);
+      -webkit-mask-image: linear-gradient(var(--melt));
+      mask-image: linear-gradient(var(--melt));
     }
     /* A short phone (320×568): a wider, lower cover, so the next card still peeks in below the
        first one */
@@ -956,8 +960,8 @@
     position: relative;
     min-width: 0;
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(#000 70%, transparent);
-    mask-image: linear-gradient(#000 70%, transparent);
+    -webkit-mask-image: linear-gradient(var(--melt));
+    mask-image: linear-gradient(var(--melt));
   }
   .lq-cover::before {
     content: '';
@@ -1043,8 +1047,8 @@
         background: linear-gradient(90deg, var(--tone, transparent), transparent 75%), var(--fill);
       }
       .lq-cover {
-        -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
-        mask-image: linear-gradient(90deg, #000 75%, transparent);
+        -webkit-mask-image: linear-gradient(90deg, var(--melt-short));
+        mask-image: linear-gradient(90deg, var(--melt-short));
       }
       .lq-body {
         padding: var(--s5) var(--s5) var(--s5) 0;
@@ -1267,8 +1271,8 @@
   }
   .head-cover,
   .dive {
-    -webkit-mask-image: linear-gradient(#000 75%, transparent);
-    mask-image: linear-gradient(#000 75%, transparent);
+    -webkit-mask-image: linear-gradient(var(--melt-short));
+    mask-image: linear-gradient(var(--melt-short));
   }
   .stagefront .head-cover {
     display: block;
