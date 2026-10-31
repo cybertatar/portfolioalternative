@@ -1,6 +1,19 @@
 <title>Портфолио: меню паузы</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="claude:viewport-fit-sides" content="cover" />
+<!-- The language is decided before the first paint: ?lang=ru|en in the address, then the reader's
+     own earlier choice, then the browser (Russian for a Russian browser, English for any other).
+     No redirect: the page stays where it is and the switch in the top bar is always one tap away -->
+<script>
+  (function () {
+    var lang = (/[?&]lang=(ru|en)\b/.exec(location.search) || [])[1];
+    try {
+      lang = lang || localStorage.getItem('lang');
+    } catch (e) {}
+    var nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'ru';
+    document.documentElement.lang = lang === 'ru' || lang === 'en' ? lang : /^ru/i.test(nav) ? 'ru' : 'en';
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -204,7 +217,8 @@
     grid-template-rows: auto 1fr;
     /* The tabs carry their own 12px of padding, so the bar sits a full step from the panes */
     gap: var(--s3);
-    padding: var(--s3) var(--gap) var(--gap);
+    /* The top padding is the bar's own, so it stays above the tabs when the bar is pinned */
+    padding: 0 var(--gap) var(--gap);
     padding-left: max(var(--gap), env(safe-area-inset-left, 0px));
     padding-right: max(var(--gap), env(safe-area-inset-right, 0px));
     max-width: 1600px;
@@ -226,11 +240,72 @@
       transform 0.4s ease,
       visibility 0s 0.4s;
   }
+  /* The bar is pinned to the top of the screen: on a phone the page scrolls, and the tabs are
+     what pages through it. Over the world it is bare; once something scrolls under it, it gets
+     the glass, which melts away at the bottom instead of ending in a line */
   .top {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: var(--s4);
+    padding-top: calc(var(--s3) + env(safe-area-inset-top, 0px));
+  }
+  .top::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: calc(-1 * var(--s3));
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    -webkit-mask-image: linear-gradient(#000 calc(100% - var(--s3)), transparent);
+    mask-image: linear-gradient(#000 calc(100% - var(--s3)), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .top.stuck::before {
+    opacity: 1;
+  }
+  .top .end {
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+  }
+  /* «Персонаж» has the contacts right in it: the bar does not repeat them there. The button only
+     fades, so the language switch next to it keeps its place */
+  .top .write {
+    transition:
+      opacity 0.2s ease,
+      visibility 0s;
+  }
+  .top[data-tab='v-char'] .write {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s 0.2s;
+  }
+  /* The other language, named in its own words; a pixel globe says what kind of button it is */
+  .top .lang {
+    color: var(--ink-2);
+    background: var(--fill);
+  }
+  .top a.lang:hover {
+    color: var(--ink);
+    background: var(--fill-2);
+  }
+  .lang .code {
+    display: none;
   }
   .tabs {
     grid-column: 2;
@@ -275,9 +350,6 @@
     transition:
       transform 0.25s ease,
       width 0.25s ease;
-  }
-  .top .write {
-    justify-self: end;
   }
   .pane {
     background: linear-gradient(var(--tone, transparent), transparent 80%), var(--glass);
@@ -353,21 +425,56 @@
     display: none !important;
   }
   @media (max-width: 860px) {
+    /* Phone: the tabs and the language code share the row. The tabs' text lines up with the
+       panes' edge and the code's fill ends on it, so all three Russian tabs fit from 360px up;
+       narrower than that the tabs scroll sideways, the language stays put */
     .top {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--s1);
     }
-    /* Phone: tabs take the whole row; contacts are one tap away on «Персонаж» */
+    /* Contacts are one tap away on «Персонаж» */
     .top .write {
       display: none;
     }
+    .top .end {
+      grid-column: 2;
+    }
     .tabs {
       grid-column: 1;
+      gap: 0;
+      margin-left: calc(-1 * var(--s2));
       overflow-x: auto;
       scrollbar-width: none;
     }
     .tabs [role='tab'] {
-      padding-inline: var(--s3);
+      padding-inline: var(--s2);
       font-size: 15px;
+    }
+    /* Only the code shows; the name stays for screen readers, so the button is still «English» */
+    .top .lang {
+      padding: var(--s3) var(--s2);
+      font: 500 15px/1 var(--body);
+    }
+    .lang .px {
+      display: none;
+    }
+    /* iPhone mini and the common 360px Androids: a pixel smaller, and the Russian tabs still fit */
+    @media (max-width: 389px) {
+      .tabs [role='tab'],
+      .top .lang {
+        font-size: 14px;
+      }
+    }
+    .lang .code {
+      display: inline;
+    }
+    .lang .name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
     .tabs .key {
       display: none;
@@ -1461,9 +1568,17 @@
       </button>
       <span class="key" aria-hidden="true">E</span>
     </div>
-    <a class="btn write" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
-      >Написать</a
-    >
+    <div class="end">
+      <a class="btn write" href="https://t.me/everlastinghate" target="_blank" rel="noopener"
+        >Написать</a
+      >
+      <!-- Two languages, so one button that names the other one in its own words (USWDS). On a
+           phone it shows the short code, the full name stays for screen readers -->
+      <a class="btn lang" id="lang" href="?lang=en" hreflang="en" lang="en" translate="no"
+        ><canvas class="px" data-sprite="globe" data-scale="2" aria-hidden="true"></canvas
+        ><span class="code">EN</span><span class="name">English</span></a
+      >
+    </div>
   </div>
 
   <!-- The three tabs; on a phone they lie side by side and the finger pages through them -->
@@ -1842,6 +1957,8 @@
     ],
     quest: ['.oo.', 'oooo', 'oooo', 'oooo', '.oo.', '.oo.', '....', '.oo.', '.oo.'],
     spark: ['...o...', '...o...', '..ooo..', 'ooooooo', '..ooo..', '...o...', '...o...'],
+    // The language switch: a globe with its equator and a meridian
+    globe: ['..SSSSS..', '.S..S..S.', 'S..S.S..S', 'S..S.S..S', 'SSSSSSSSS', 'S..S.S..S', 'S..S.S..S', '.S..S..S.', '..SSSSS..'],
     card: [
       '.PPPPPPPPPPPPPP.',
       'PppppppppppppppP',
@@ -2069,6 +2186,173 @@
     else src.addEventListener('load', apply, { once: true });
   }
 
+  /* ── Language: the page is written in Russian, English is a dictionary over its text. Every
+   text node and label is looked up as it appears (scripts add many: quests, the case) and keeps
+   its Russian original, so the switch goes both ways at once, without a reload or losing the
+   tab. Keys are the text with its spaces collapsed; the typograph runs after, on either one ── */
+  const i18n = (() => {
+    const EN = {
+      // Top bar and tabs
+      'Меню': 'Menu',
+      'Персонаж': 'Character',
+      'Квесты': 'Quests',
+      'Побочные квесты': 'Side quests',
+      'Написать': 'Message me',
+      // Character
+      'Фото Даниила': 'Photo of Daniil',
+      'Даниил Тынчеров': 'Daniil Tyncherov',
+      'Продуктовый дизайнер': 'Product designer',
+      'Открыт к предложениям': 'Open to opportunities',
+      'Написать в Telegram': 'Message on Telegram',
+      'Написать на почту': 'Send an email',
+      'CV (скоро)': 'CV (soon)',
+      'О персонаже': 'About',
+      'Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в разработку.':
+        'I design mobile apps and web services. I take projects from research through to developer handoff.',
+      'Умения': 'Skills',
+      'Сценарии и интерфейсы': 'User flows and interfaces',
+      'Интервью с пользователями': 'User interviews',
+      'Юзабилити-тесты': 'Usability tests',
+      'Живые прототипы на коде': 'Live prototypes in code',
+      'Передача в разработку': 'Developer handoff',
+      'Последний квест': 'Latest quest',
+      'Вишлист': 'Wishlist',
+      'Попасть в сильную продуктовую команду': 'Join a strong product team',
+      'Главная цель': 'Main goal',
+      'Выпустить свой плагин для Figma': 'Ship my own Figma plugin',
+      'На проверке у Figma': 'In review at Figma',
+      'Глубже разобраться в аналитике и экспериментах': 'Dig deeper into analytics and experiments',
+      'Выступить с докладом на дизайн-конференции': 'Give a talk at a design conference',
+      'Пройти Tears of the Kingdom на 100%': 'Finish Tears of the Kingdom at 100%',
+      // Quests
+      'Финтех': 'Fintech',
+      'Кейс открыт': 'Case open',
+      'Кейс пишется': 'Being written',
+      'Кейс позже': 'Case later',
+      'Под NDA': 'Under NDA',
+      'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.':
+        'Together with a colleague, we rethought the core flows in a bank’s mobile app and checked them in a usability test with 30 customers.',
+      'В 4 раза': '4×',
+      'быстрее подключить кешбэк': 'faster to activate cashback',
+      'нашли путь с первого клика': 'found the way on the first click',
+      'клиентов банка в тесте': 'bank customers in the test',
+      'быстрее кешбэк': 'faster cashback',
+      'с первого клика': 'on the first click',
+      'клиентов в тесте': 'customers tested',
+      'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.':
+        'Role: product design as a pair — interviews, user flows, interface, a live prototype in code, a usability test.',
+      'Telegram Mini App для безопасного доступа в интернет через VPN.':
+        'A Telegram Mini App for secure internet access over VPN.',
+      'Кейс ещё пишется. Скоро здесь будет журнал этого квеста.':
+        'The case is still being written. This quest’s log will be here soon.',
+      'Переосмысление сценария копилки в банковском приложении.':
+        'Rethinking the savings-jar flow in a banking app.',
+      'Не хватает маны. Этот кейс откроется позже.': 'Not enough mana. This case unlocks later.',
+      'Интернет-магазин одежды для ателье.': 'An online clothing store for a tailoring studio.',
+      'В эти края пути нет. Кейс под NDA.': 'There is no road to these lands. This case is under NDA.',
+      'Открыть кейс': 'Open case',
+      'Пока закрыт': 'Locked for now',
+      'Переключать квесты': 'Switch quests',
+      // Side quests
+      'UX-тренажёр': 'UX Trainer',
+      'Тесты по UX и UI в Telegram, для дизайн-сообщества':
+        'UX and UI quizzes in Telegram, for the design community',
+      'Бот': 'Bot',
+      'Таймкоды YT Music': 'YT Music Timecodes',
+      'Расширение для браузера: треклист прямо в плеере':
+        'A browser extension: the tracklist right in the player',
+      'Читалка в Telegram: книги по одному слову': 'A Telegram reader: books one word at a time',
+      'Санбой Шаман': 'Sunboy Shaman',
+      'Приложение для Mac: пишешь как Пророк Санбой': 'A Mac app: type like Prophet Sunboy',
+      '=Добро и позитив=': '=Kindness and Positivity=',
+      'Приложение для Mac: =добро и позитив= в каждом сообщении':
+        'A Mac app: =kindness and positivity= in every message',
+      'Плагин для Figma': 'Figma plugin',
+      'Плагин для Figma. Описание будет позже': 'A Figma plugin. Description coming later',
+      'На рассмотрении в Figma': 'In review at Figma',
+      // The case
+      'Пауза': 'Pause',
+      'Квест:': 'Quest:',
+      'Главы': 'Chapters',
+      'Обзор': 'Overview',
+      'Финальные экраны': 'Final screens',
+      'Как мы работали': 'How we worked',
+      'Интервью': 'Interviews',
+      'Решения': 'Decisions',
+      'Тестирование': 'Testing',
+      'Ревью': 'Review',
+      'Выводы': 'Takeaways',
+      'Набросок: дальше идёт кейс целиком, как сейчас на сайте (забеги, сцены, живые прототипы), только в оформлении этой темы. Esc или кнопка «Пауза» возвращают в меню.':
+        'Sketch: the whole case follows here, as on the current site (races, scenes, live prototypes), only dressed in this theme. Esc or the “Pause” button takes you back to the menu.',
+    };
+    // Texts made of a number and a word
+    const RULES = [[/^(\d+) (?:год|года|лет)$/, (_, n) => `${n} years old`]];
+    const TITLE = { ru: 'Портфолио: меню паузы', en: 'Portfolio: pause menu' };
+    const ATTRS = ['alt', 'aria-label', 'title'];
+    const RUSSIAN = /[А-Яа-яЁё]/;
+    const ruText = new WeakMap(),
+      ruAttrs = new WeakMap();
+    const key = (s) => s.replace(/\s+/g, ' ').trim();
+    const isEn = () => document.documentElement.lang === 'en';
+    function english(s) {
+      const k = key(s);
+      if (!RUSSIAN.test(k)) return s;
+      let en = EN[k];
+      for (const [re, to] of RULES) if (en == null && re.test(k)) en = k.replace(re, to);
+      if (en == null) return s;
+      const [, lead, tail] = /^(\s*)[\s\S]*?(\s*)$/.exec(s);
+      return lead + en + tail;
+    }
+    // A text node's words in the current language, from the Russian it first came with
+    function text(n) {
+      if (!ruText.has(n)) ruText.set(n, n.data);
+      const ru = ruText.get(n);
+      return isEn() ? english(ru) : ru;
+    }
+    // The labels of an element and of everything in it
+    function labels(root) {
+      const els = root.querySelectorAll ? [root, ...root.querySelectorAll('[alt],[aria-label],[title]')] : [];
+      els.forEach((el) => {
+        if (!ruAttrs.has(el)) {
+          const own = {};
+          ATTRS.forEach((a) => el.hasAttribute && el.hasAttribute(a) && (own[a] = el.getAttribute(a)));
+          ruAttrs.set(el, own);
+        }
+        Object.entries(ruAttrs.get(el)).forEach(([a, ru]) => {
+          const v = isEn() ? english(ru) : ru;
+          if (el.getAttribute(a) !== v) el.setAttribute(a, v);
+        });
+      });
+    }
+    // The switch names the other language, in that language
+    function button() {
+      const b = document.getElementById('lang');
+      if (!b) return;
+      const to = isEn() ? 'ru' : 'en';
+      b.lang = b.hreflang = to;
+      const url = new URL(location.href);
+      url.searchParams.set('lang', to);
+      b.href = url.search + url.hash;
+      b.querySelector('.code').textContent = to.toUpperCase();
+      b.querySelector('.name').textContent = to === 'en' ? 'English' : 'Русский';
+    }
+    function set(lang) {
+      document.documentElement.lang = lang;
+      try {
+        localStorage.setItem('lang', lang);
+      } catch (e) {}
+      // The address says the language too, so a shared link opens in it
+      const url = new URL(location.href);
+      url.searchParams.set('lang', lang);
+      history.replaceState(history.state, '', url);
+    }
+    function head() {
+      document.title = TITLE[isEn() ? 'en' : 'ru'];
+      button();
+    }
+    return { text, labels, set, head, isEn };
+  })();
+
   /* ── Typograph: no hanging prepositions. Ported from the main site (src/typograph.ts): the
    space after a function word becomes non-breaking, numbers stay with what they count, a dash
    or a particle never starts a line. Here it runs on text nodes, including ones scripts add. ── */
@@ -2087,23 +2371,27 @@
         .replace(DASH, NB)
         .replace(PARTICLE, NB);
     const SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'CODE', 'PRE']);
+    const ok = (n) => /\S/.test(n.data) && n.parentNode && !SKIP.has(n.parentNode.nodeName);
+    // A node in the current language first, then set right
+    const fix = (n) => {
+      const t = text(i18n.text(n));
+      if (t !== n.data) n.data = t;
+    };
     const run = (root) => {
+      // A bare text node added by a script (textContent, append of a string) is a root of its own
+      if (root.nodeType === 3) return ok(root) && fix(root);
       const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-        acceptNode: (n) =>
-          /\S/.test(n.data) && !SKIP.has(n.parentNode.nodeName)
-            ? NodeFilter.FILTER_ACCEPT
-            : NodeFilter.FILTER_REJECT,
+        acceptNode: (n) => (ok(n) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
       });
-      for (let n; (n = w.nextNode()); ) {
-        const t = text(n.data);
-        if (t !== n.data) n.data = t;
-      }
+      for (let n; (n = w.nextNode()); ) fix(n);
+      i18n.labels(root);
     };
     new MutationObserver((ms) =>
       ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType !== 8 && run(n))),
     ).observe(document.body, { childList: true, subtree: true });
+    i18n.head();
     run(document.body);
-    return text;
+    return { text, run };
   })();
 
   /* Age from the birthday, like the level on the current site */
@@ -3782,6 +4070,8 @@
       views[i].hidden = i !== k;
     });
     const id = views[k].id;
+    // The bar knows the tab: «Персонаж» hides the «Написать» it already holds
+    document.querySelector('.top').dataset.tab = id;
     if (worldOf[id]) showWorld(worldOf[id]);
     else {
       select(sel);
@@ -3926,9 +4216,11 @@
     settleTimer = 0,
     followFrame = 0;
   const onQuests = () => phone.matches && cur() === 1 && !document.body.classList.contains('playing');
-  // The card nearest the middle of the screen: [card, index, its box]
+  // The middle of what the pinned bar leaves of the screen
+  const middle = () => (document.querySelector('.top').getBoundingClientRect().bottom + innerHeight) / 2;
+  // The card nearest that middle: [card, index, its box]
   function centred() {
-    const mid = innerHeight / 2;
+    const mid = middle();
     let best = null,
       bestD = Infinity;
     qlist.querySelectorAll('.q').forEach((card, i) => {
@@ -3947,7 +4239,7 @@
     const c = centred();
     if (!c) return;
     const [, i, b] = c;
-    const target = i === 0 ? 0 : scrollY + b.top + b.height / 2 - innerHeight / 2;
+    const target = i === 0 ? 0 : scrollY + b.top + b.height / 2 - middle();
     if (Math.abs(target - scrollY) > 4) scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   }
   const later = () => {
@@ -4032,7 +4324,8 @@
   }
 
   function fillCase(q) {
-    document.getElementById('where').textContent = 'Квест: ' + q.title.split(' ')[0];
+    // Two text nodes, so the word «Квест:» is translated on its own
+    document.getElementById('where').replaceChildren('Квест:', ' ' + q.title.split(' ')[0]);
     document.getElementById('pregion').innerHTML = tags(q);
     document.getElementById('ptitle').textContent = q.title;
     document.getElementById('plead').textContent = q.sub;
@@ -4151,6 +4444,26 @@
       open();
     }
   });
+  /* The pinned bar takes the glass once anything has scrolled under it */
+  const bar = document.querySelector('.top');
+  const stick = () => bar.classList.toggle('stuck', scrollY > 0);
+  addEventListener('scroll', stick, { passive: true });
+  stick();
+
+  /* The language switch: every text swaps in place, the tab and the scroll stay. The link still
+     works without the script (?lang=…) */
+  document.getElementById('lang').addEventListener('click', (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    e.preventDefault();
+    i18n.set(i18n.isEn() ? 'ru' : 'en');
+    i18n.head();
+    typo.run(document.body);
+    // Words of another length: the ink, the even cards and the pager follow
+    inkAt(cur());
+    evenCards();
+    if (phone.matches) tabs[cur()].scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  });
+
   select(0);
   tab(0, false);
   document.fonts.ready.then(() => inkAt(cur()));
