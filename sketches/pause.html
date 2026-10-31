@@ -4015,20 +4015,32 @@
       document.getElementById('back').focus({ preventScroll: true, focusVisible: false });
     });
   }
+  /* Back up to the head of the case before the cover leaves, so it never jumps into view: a
+     longer way takes a little longer, never more than UP_MAX */
+  const UP_MIN = 250,
+    UP_PER_PX = 0.15,
+    UP_MAX = 600;
+  const easeInOut = (k) => (k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2);
+  function scrollUp() {
+    const y0 = scrollY;
+    if (!y0) return Promise.resolve();
+    const ms = Math.min(UP_MAX, UP_MIN + y0 * UP_PER_PX),
+      t0 = performance.now();
+    return new Promise((done) => {
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / ms);
+        window.scrollTo(0, y0 * (1 - easeInOut(k)));
+        if (k < 1) requestAnimationFrame(step);
+        else done();
+      };
+      requestAnimationFrame(step);
+    });
+  }
   function pause() {
     const t = trip;
     if (!t || document.body.classList.contains('flying')) return;
     document.body.classList.add('flying', 'leaving');
     document.body.classList.remove('landed');
-    const back = () => {
-      document.body.classList.remove('playing', 'leaving');
-      window.scrollTo(0, t.scroll);
-      if (t.clone) t.clone.style.visibility = '';
-      if (t.veil) t.veil.style.visibility = '';
-      t.anims.forEach((a) => a.reverse());
-      Promise.all(t.anims.map((a) => a.finished)).then(done);
-    };
-    setTimeout(back, t.anims.length ? LEAVE_MS : 0);
     const done = () => {
       t.anims.forEach((a) => a.cancel());
       if (t.clone) t.clone.remove();
@@ -4038,6 +4050,17 @@
       trip = null;
       if (t.back && t.back.focus) t.back.focus({ preventScroll: true });
     };
+    const back = () => {
+      document.body.classList.remove('playing', 'leaving');
+      window.scrollTo(0, t.scroll);
+      if (t.clone) t.clone.style.visibility = '';
+      if (t.veil) t.veil.style.visibility = '';
+      t.anims.forEach((a) => a.reverse());
+      Promise.all(t.anims.map((a) => a.finished)).then(done);
+    };
+    // The case fades while the page rides up to its head; the cover goes back once both are done
+    if (t.anims.length) Promise.all([scrollUp(), new Promise((r) => setTimeout(r, LEAVE_MS))]).then(back);
+    else back();
   }
   document.getElementById('back').addEventListener('click', pause);
 
