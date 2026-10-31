@@ -1036,18 +1036,32 @@
     letter-spacing: -0.01em;
     text-wrap: pretty;
   }
-  /* Skills and tools: two hotbars side by side (stacked when there is no room). Square slots,
-     at most 64px, the chosen one lit; its name stands over the bar, on the label's line */
+  /* Skills and tools: two hotbars side by side (stacked when there is no room). Slots one height,
+     as wide as the row allows, the chosen one lit; its name stands over the bar, on the label's line */
   .kit {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: var(--s5) var(--s6);
   }
-  /* The bars share a row while their slots can stay 48px or wider; narrower, they stack */
+  /* The bars share a row while their slots can stay 48px or wider; narrower, they stack. They
+     grow by their number of slots, so every slot is as wide as the others and the two bars fill
+     the row edge to edge */
+  /* Wide desktop: the bars stand on the same two columns as the latest quest and the wishlist
+     below them (see .foot), so the sheet keeps one grid */
+  @media (min-width: 1200px) {
+    .kit {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--gap);
+    }
+  }
+  @media (min-width: 1200px) and (max-width: 1399px) {
+    .kit {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    }
+  }
   .hotbar {
-    flex: 1 1 calc(var(--n) * 48px + (var(--n) - 1) * var(--s2));
-    max-width: calc(var(--n) * 64px + (var(--n) - 1) * var(--s2));
+    flex: var(--n) 1 calc(var(--n) * 48px + (var(--n) - 1) * var(--s2));
     --n: 5;
     min-width: 0;
   }
@@ -1077,8 +1091,7 @@
   .hb {
     position: relative;
     flex: 1 1 0;
-    max-width: 64px;
-    aspect-ratio: 1;
+    height: 56px;
     display: grid;
     place-items: center;
     border-radius: var(--r-ctl);
@@ -2218,23 +2231,23 @@
       ],
     },
     'tool-adobe': {
-      pal: { 1: '#fa0f00' },
+      pal: { 1: '#fa0f00', 2: '#ffffff' },
       rows: [
         '................',
-        '................',
-        '................',
-        '.11111....11111.',
-        '.11111....11111.',
-        '.1111......1111.',
-        '.1111......1111.',
-        '.111...11...111.',
-        '.111..1111..111.',
-        '.11...1111...11.',
-        '.11..11..11..11.',
-        '.1...11..111..1.',
-        '.1..11....111.1.',
-        '................',
-        '................',
+        '..111111111111..',
+        '.11111111111111.',
+        '.11111111111111.',
+        '.11111122111111.',
+        '.11111222211111.',
+        '.11112211221111.',
+        '.11112211221111.',
+        '.11122111122111.',
+        '.11122222222111.',
+        '.11221111112211.',
+        '.11221111112211.',
+        '.11111111111111.',
+        '.11111111111111.',
+        '..111111111111..',
         '................',
       ],
     },
