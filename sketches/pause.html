@@ -633,8 +633,10 @@
   .q[aria-selected='true'] {
     background: var(--gold-soft);
   }
+  /* The title and its line are one element: a small step between them */
   .q b {
     display: block;
+    margin-bottom: var(--s1);
     font-weight: 500;
   }
   .q small {
@@ -675,9 +677,11 @@
     .qkeys {
       display: none;
     }
+    /* Every card is a pane: as far from the next one as panes are apart (its text sits 16px
+       from its edge) */
     .qlist {
       padding: 0;
-      gap: var(--s3);
+      gap: var(--gap);
       background: none;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
@@ -1037,10 +1041,11 @@
     text-wrap: pretty;
   }
   /* Skills as chips */
+  /* Chips are tiles: 12px between them, never less than the 12px inside */
   .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s2);
+    gap: var(--s3);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1493,7 +1498,7 @@
   }
   .reading {
     background: var(--bg);
-    padding-block: var(--s7) 96px;
+    padding-block: var(--s7) calc(2 * var(--s7));
     padding-left: max(var(--gap), env(safe-area-inset-left, 0px));
     padding-right: max(var(--gap), env(safe-area-inset-right, 0px));
   }
