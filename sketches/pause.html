@@ -171,6 +171,15 @@
     pointer-events: none;
     will-change: left, top, width, height;
   }
+  /* While the cover grows, the world behind it fades to the page's own color, so nothing
+     switches when the case comes in */
+  .veil {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    background: var(--bg);
+    pointer-events: none;
+  }
   /* In flight the menu shows and hides at once: its panes do the moving */
   body.flying .menu {
     transition: none;
@@ -1271,23 +1280,34 @@
     padding-left: max(var(--gap), env(safe-area-inset-left, 0px));
     padding-right: max(var(--gap), env(safe-area-inset-right, 0px));
   }
-  /* Once the camera has landed, the title comes up from below */
-  body.landed .stagefront .title {
-    animation: land 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  /* Once the cover has nearly settled, the case comes in quietly, one part after another: the
+     area and year, the title, the text, and last the buttons around it */
+  body.landed .title > *,
+  body.landed .reading .inner,
+  body.landed .hud > * {
+    animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
-  @keyframes land {
+  body.landed .title h1 {
+    animation-delay: 70ms;
+  }
+  body.landed .reading .inner {
+    animation-delay: 150ms;
+  }
+  body.landed .hud > * {
+    animation-delay: 240ms;
+  }
+  @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(32px);
+      transform: translateY(10px);
     }
   }
-  body.landed .reading {
-    animation: show 0.3s ease both;
-  }
-  @keyframes show {
-    from {
-      opacity: 0;
-    }
+  /* On pause the case fades first, then the cover goes back to its card */
+  body.leaving .headline,
+  body.leaving .reading .inner,
+  body.leaving .hud {
+    opacity: 0;
+    transition: opacity 0.18s ease;
   }
   .stagefront .title {
     max-width: 1240px;
@@ -3886,6 +3906,9 @@
     pcover = document.getElementById('pcover');
   const OUT_MS = 420, // the panes flying past the camera
     DIVE_MS = 600, // the cover growing into the head of the case
+    VEIL = [100, 450], // when and how long the world behind fades to the page's color
+    LAND_AT = 480, // the case starts coming in while the cover is still settling
+    LEAVE_MS = 180, // on pause, the case fades before the cover goes back (body.leaving)
     AWAY = 1.1, // how far a pane flies: its distance from the middle of the screen, times this
     AWAY_MIN = 0.15, // a pane in the middle still leaves, at least this share of the screen
     AWAY_SCALE = 1.3,
@@ -3950,6 +3973,12 @@
 
   /* src: the cover to dive into; on the desktop «Квесты» it is the cover of the open card. The
      dive starts from whichever tab holds the cover and comes back to it */
+  function veil() {
+    const v = document.createElement('div');
+    v.className = 'veil';
+    document.body.append(v);
+    return [v, v.animate([{ opacity: 0 }, { opacity: 1 }], { duration: VEIL[1], delay: VEIL[0], endDelay: DIVE_MS - VEIL[0] - VEIL[1], easing: 'ease', fill: 'both' })];
+  }
   function open(src) {
     if (!(src instanceof Element)) src = null;
     const q = QUESTS[sel];
@@ -3958,40 +3987,57 @@
     if (!src) return;
     fillCase(q);
     const card = src.closest('button');
-    trip = { scroll: scrollY, back: card || document.activeElement, src, clone: null, anims: [] };
+    trip = { scroll: scrollY, back: card || document.activeElement, src, clone: null, veil: null, anims: [] };
+    const t = trip;
     if (!reduceMotion.matches) {
-      const [clone, grow] = dive(src);
-      trip.clone = clone;
-      trip.anims = [grow, ...flyOut(panesOf(views[cur()], card), DIVE_MS)];
+      const [clone, grow] = dive(src),
+        [v, fade] = veil();
+      Object.assign(t, { clone, veil: v });
+      trip.anims = [grow, fade, ...flyOut(panesOf(views[cur()], card), DIVE_MS)];
       if (card)
         trip.anims.push(card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: OUT_MS / 2, endDelay: DIVE_MS - OUT_MS / 2, fill: 'both' }));
     }
     document.body.classList.add('flying');
-    Promise.all(trip.anims.map((a) => a.finished)).then(() => {
+    // The case page lies under the growing cover; the veil is no longer needed over it
+    setTimeout(
+      () => {
+        document.body.classList.add('playing', 'landed');
+        window.scrollTo(0, 0);
+        if (t.veil) t.veil.style.visibility = 'hidden';
+      },
+      t.anims.length ? LAND_AT : 0,
+    );
+    Promise.all(t.anims.map((a) => a.finished)).then(() => {
       document.body.classList.remove('flying');
-      document.body.classList.add('playing', 'landed');
-      window.scrollTo(0, 0);
       // The head now shows the very same cover: the lifted one can go out of sight
-      if (trip.clone) trip.clone.style.visibility = 'hidden';
-      document.getElementById('back').focus({ preventScroll: true });
+      if (t.clone) t.clone.style.visibility = 'hidden';
+      // Focus moves for the keyboard, without lighting the button up after a click
+      document.getElementById('back').focus({ preventScroll: true, focusVisible: false });
     });
   }
   function pause() {
     const t = trip;
     if (!t || document.body.classList.contains('flying')) return;
-    document.body.classList.add('flying');
-    document.body.classList.remove('playing', 'landed');
-    window.scrollTo(0, t.scroll);
-    if (t.clone) t.clone.style.visibility = '';
-    t.anims.forEach((a) => a.reverse());
-    Promise.all(t.anims.map((a) => a.finished)).then(() => {
+    document.body.classList.add('flying', 'leaving');
+    document.body.classList.remove('landed');
+    const back = () => {
+      document.body.classList.remove('playing', 'leaving');
+      window.scrollTo(0, t.scroll);
+      if (t.clone) t.clone.style.visibility = '';
+      if (t.veil) t.veil.style.visibility = '';
+      t.anims.forEach((a) => a.reverse());
+      Promise.all(t.anims.map((a) => a.finished)).then(done);
+    };
+    setTimeout(back, t.anims.length ? LEAVE_MS : 0);
+    const done = () => {
       t.anims.forEach((a) => a.cancel());
       if (t.clone) t.clone.remove();
+      if (t.veil) t.veil.remove();
       t.src.style.visibility = '';
       document.body.classList.remove('flying');
       trip = null;
       if (t.back && t.back.focus) t.back.focus({ preventScroll: true });
-    });
+    };
   }
   document.getElementById('back').addEventListener('click', pause);
 
