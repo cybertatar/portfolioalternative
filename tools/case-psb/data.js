@@ -265,8 +265,8 @@ module.exports = {
             'img/psb/iter/rejected-barrel.webp',
             t('Барабан карт', 'Card carousel'),
             t(
-              'Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.',
-              'The cards came one after another, so the account → card link read worse. With many cards, finding the right one was hard.',
+              'Мой вариант. Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.',
+              'My take. The cards came one after another, so the account → card link read worse. With many cards, finding the right one was hard.',
             ),
           ],
           [
