@@ -2644,17 +2644,17 @@
       }
     }
     function wbLight(set, P) {
-      // A shaft of pale light from the hole down to the chest
-      const beam = P('#8e6cc8'),
-        beam2 = P('#5e3f96');
+      // A faint shaft of light from the crack down to the chest: a hint, not a spotlight
+      const beam = P('#7a5ab0'),
+        beam2 = P('#3e2266');
       for (let y = 8; y < 156; y++) {
         const t = (y - 8) / 148,
           c = lerp(164, WB_CHEST[0], t),
-          half = lerp(10, 26, t);
+          half = lerp(8, 20, t);
         for (let x = c - half; x <= c + half; x++) {
           const edge = 1 - Math.abs(x - c) / half;
-          if (dith(x | 0, y, edge * 0.28 * (1 - t * 0.4))) set(x, y, beam);
-          else if (dith(x | 0, y, edge * 0.5)) set(x, y, beam2);
+          if (dith(x | 0, y, edge * edge * 0.12 * (1 - t * 0.5))) set(x, y, beam);
+          else if (dith(x | 0, y, edge * 0.3)) set(x, y, beam2);
         }
       }
     }
@@ -2712,12 +2712,12 @@
         gold = P('#e9c46a'),
         goldD = P('#b38f3d'),
         coin = P('#ffe08a'),
-        glow = P('#8a6a3a'),
+        glow = P('#5a4030'),
         r = rng(59);
-      for (let y = by - 22; y < by + 6; y++)
-        for (let x = cx - 26; x < cx + 26; x++) {
-          const d = Math.hypot((x - cx) / 26, (y - by + 6) / 16);
-          if (d < 1 && dith(x, y, (1 - d) * 0.5)) set(x, y, glow);
+      for (let y = by - 18; y < by + 4; y++)
+        for (let x = cx - 20; x < cx + 20; x++) {
+          const d = Math.hypot((x - cx) / 20, (y - by + 6) / 12);
+          if (d < 1 && dith(x, y, (1 - d) * 0.25)) set(x, y, glow);
         }
       // Body, lid thrown back, gold bands and a lock
       for (let y = by - 10; y < by; y++)
