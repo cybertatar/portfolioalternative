@@ -1545,18 +1545,59 @@
     font-size: var(--fs-ui);
     color: var(--ink-2);
   }
-  .toc span {
+  .toc a {
     padding: var(--s2) var(--s3);
     border-radius: var(--r-ctl);
+    color: inherit;
+    text-decoration: none;
   }
-  .toc span.on {
+  .toc a.sub {
+    padding-left: var(--s5);
+  }
+  .toc a:hover {
+    color: var(--ink);
+    background: var(--fill);
+  }
+  .toc a.on {
     color: var(--ink);
     background: var(--gold-soft);
+  }
+  .toc-group {
+    padding: var(--s3) var(--s3) var(--s1);
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--gold);
+  }
+
+  /* ── The case body: chapters one under another. Each opens with a gold pixel eyebrow, a
+     heading and a lead; inside, surfaces differ by fill only, as in the menu ── */
+  .cs {
+    min-width: 0;
+    max-width: 960px;
+  }
+  .ch {
+    scroll-margin-top: 80px;
+  }
+  .ch + .ch {
+    margin-top: calc(2 * var(--s7));
+  }
+  .ch .eyebrow {
+    margin-bottom: var(--s3);
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--gold);
   }
   .reading h2 {
     margin: 0 0 var(--s4);
     font: 600 var(--fs-h2)/1.15 var(--body);
     letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .reading h3 {
+    margin: var(--s7) 0 var(--s4);
+    font: 600 var(--fs-h3)/1.2 var(--body);
+  }
+  .reading h4 {
+    margin: 0;
+    font: 600 var(--fs-title)/1.3 var(--body);
   }
   .reading .lead {
     max-width: 60ch;
@@ -1564,17 +1605,597 @@
     font-size: var(--fs-title);
     color: var(--ink-2);
   }
-  .reading .facts {
-    max-width: 760px;
-  }
-  .note {
+  .prose {
+    display: grid;
+    gap: var(--s4);
     max-width: 64ch;
-    margin-top: var(--s7);
+    font-size: var(--fs-title);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .aside {
+    margin-top: var(--s4);
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  /* Small parts of a surface share its padding; pixel numbers mark the order */
+  .step-n,
+  .qc-n,
+  .shot-n {
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--gold);
+  }
+
+  /* Overview: role and format in a row, then the four quests and the results */
+  .facts-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
+    margin: var(--s6) 0 0;
+  }
+  .facts-row div {
+    padding: var(--s3) var(--s4);
+    border-radius: var(--r-ctl);
+    background: var(--fill);
+  }
+  .facts-row dt {
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .facts-row dd {
+    margin: var(--s1) 0 0;
+  }
+  .qcs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+  .qc {
+    display: grid;
+    align-content: start;
+    gap: var(--s1);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+    color: inherit;
+    text-decoration: none;
+  }
+  .qc:hover {
+    background: var(--fill-2);
+  }
+  .qc b {
+    margin: var(--s2) 0 var(--s3);
+    font: 600 var(--fs-title)/1.3 var(--body);
+  }
+  .qc-k {
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .qc-t {
+    color: var(--ink-2);
+  }
+  .qc-t + .qc-k {
+    margin-top: var(--s3);
+  }
+
+  /* Stats: the number first, then what it is; the big ones carry a gauge, before vs after */
+  .sts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--s3);
+  }
+  .sts.four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .st {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
     padding: var(--s4);
     border-radius: var(--r-ctl);
     background: var(--fill);
+  }
+  .st-n {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s1);
+  }
+  .st-n b {
+    font: 600 var(--fs-h3)/1 var(--body);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .st-n span {
+    color: var(--ink-2);
+  }
+  .st-what {
+    color: var(--ink-2);
+  }
+  .st.big .st-what {
+    order: -1;
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .st-more {
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .g {
+    position: relative;
+    display: block;
+    height: var(--s2);
+    margin: var(--s2) 0 var(--s1);
+    border-radius: var(--r-key);
+    background: var(--fill-2);
+    overflow: hidden;
+  }
+  .g i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: var(--r-key);
+    background: var(--fill-3);
+  }
+  .g i.now {
+    background: var(--gold);
+  }
+
+  /* Phone screens: a dark rounded window, the caption under it */
+  .shot {
+    margin: 0;
+    display: grid;
+    gap: var(--s2);
+    align-content: start;
+    font-size: var(--fs-cap);
+    color: var(--ink-2);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 19.5;
+    object-fit: cover;
+    object-position: top;
+    border-radius: var(--r);
+    background: #000;
+  }
+  .phones,
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+  }
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 260px));
+    justify-content: center;
+    margin-top: var(--s6);
+  }
+  .phones figcaption,
+  .pair figcaption {
+    text-align: center;
+    font-size: var(--fs-ui);
+  }
+  .pair .win figcaption {
+    color: var(--gold);
+  }
+  .kit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-top: var(--s4);
+    color: var(--ink-2);
+  }
+  .kit p {
+    max-width: 52ch;
+  }
+  .kit-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s3);
+  }
+
+  /* Process: four steps in two columns; the prototype step plays the walkthrough */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+  .step {
+    display: grid;
+    align-content: start;
+    gap: var(--s2);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+    color: var(--ink-2);
+  }
+  .step h4 {
+    margin-top: var(--s2);
+    color: var(--ink);
+  }
+  /* The walkthrough under the steps: a wide window, its caption below */
+  .walk {
+    margin: var(--s4) 0 0;
+    display: grid;
+    gap: var(--s2);
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .walk .loop {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--r);
+    background: #000;
+  }
+  .crit {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
+  }
+  .crit div {
+    padding: var(--s4);
+    border-radius: var(--r-ctl);
+    background: var(--fill);
+    color: var(--ink-2);
+  }
+  .crit b {
+    display: block;
+    margin-bottom: var(--s1);
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--gold);
+  }
+
+  /* Interviews and review: the film, then what it showed */
+  .film video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--r);
+    background: #000;
+  }
+  .finds {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s4);
+    margin: var(--s5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .finds li {
+    display: grid;
+    align-content: start;
+    gap: var(--s2);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+    color: var(--ink-2);
+  }
+  .finds h4 {
+    margin-top: var(--s2);
+    color: var(--ink);
+  }
+  .say {
+    margin: var(--s5) 0 0;
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--gold-soft);
+  }
+  .say-who {
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .say p {
+    margin-top: var(--s2);
+    font-size: var(--fs-title);
+  }
+
+  /* A solution: problem and solution side by side, the screens, the options tried, what
+     changed, and the result with its numbers */
+  .psr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+  .psr > div,
+  .result {
+    display: grid;
+    align-content: start;
+    gap: var(--s3);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+    color: var(--ink-2);
+  }
+  .psr-k {
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .result {
+    margin-top: var(--s4);
+    background: var(--gold-soft);
+    color: var(--ink);
+  }
+  .result .st {
+    background: var(--fill-2);
+  }
+  /* The race: the old path and the new one, screen by screen, side-scrolling */
+  .race {
+    display: grid;
+    gap: var(--s4);
+    margin-top: var(--s6);
+  }
+  .lane {
+    padding: var(--pad) 0 var(--pad) var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+  }
+  .lane.win {
+    background: var(--fill-2);
+  }
+  .lane-h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s4);
+    padding-right: var(--pad);
+    margin-bottom: var(--s4);
+    color: var(--ink-2);
+  }
+  .lane-h b {
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--ink);
+  }
+  .lane.win .lane-h b {
+    color: var(--gold);
+  }
+  .strip {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 132px;
+    gap: var(--s4);
+    overflow-x: auto;
+    padding-right: var(--pad);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+  .shot.sm {
+    scroll-snap-align: start;
+    grid-template-rows: auto auto auto;
+  }
+  .shot.sm img {
+    border-radius: var(--r-ctl);
+  }
+  .shot-n {
+    font-size: var(--fs-px);
+  }
+  /* Options tried: the list says why, the screen shows it */
+  .vars {
+    margin-top: var(--s6);
+  }
+  .vars h4 {
+    margin-bottom: var(--s4);
+  }
+  .vars-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 280px);
+    gap: var(--gap);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+  }
+  .vars-list {
+    display: grid;
+    align-content: start;
+    gap: var(--s3);
+  }
+  .vars-list button {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s1) var(--s3);
+    padding: var(--s4);
+    border-radius: var(--r-ctl);
+    background: var(--fill);
+    text-align: left;
+  }
+  .vars-list button:hover {
+    background: var(--fill-2);
+  }
+  .vars-list button[aria-selected='true'] {
+    background: var(--fill-3);
+  }
+  .vars-list b {
+    font-weight: 600;
+  }
+  .var-tag {
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--ink-3);
+  }
+  .var-tag.yes {
+    color: var(--gold);
+  }
+  .var-note {
+    grid-column: 1 / -1;
     font-size: var(--fs-ui);
     color: var(--ink-2);
+  }
+  .vars-view img[hidden] {
+    display: none;
+  }
+  .vars-view img {
+    display: block;
+    width: 100%;
+    border-radius: var(--r-in);
+    background: #000;
+  }
+  /* What changed, row by row: the old way faded, the new one in full ink */
+  .rows {
+    display: grid;
+    gap: var(--s2);
+    margin-top: var(--s6);
+  }
+  .rows-h,
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s4);
+    margin: 0;
+  }
+  .rows-h {
+    padding: 0 var(--s4);
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--ink-3);
+  }
+  .rows-h span:last-child {
+    color: var(--gold);
+  }
+  .row {
+    padding: var(--s3) var(--s4);
+    border-radius: var(--r-ctl);
+    background: var(--fill);
+  }
+  .row b {
+    font-weight: 600;
+  }
+  .row .was {
+    color: var(--ink-3);
+  }
+
+  /* Testing: time before and after on one scale, then the table */
+  .bars {
+    display: grid;
+    gap: var(--s4);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+  }
+  .bar {
+    display: grid;
+    grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s4);
+  }
+  .bar b {
+    font-weight: 500;
+  }
+  .bar-track {
+    display: grid;
+    gap: var(--s1);
+  }
+  .bar-track i {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 64px;
+    height: var(--s5);
+    padding: 0 var(--s2);
+    border-radius: var(--r-key);
+    background: var(--fill-3);
+    font: normal var(--fs-cap)/1 var(--body);
+    color: var(--ink-2);
+  }
+  .bar-track i.now {
+    background: var(--gold);
+    color: var(--gold-ink);
+    font-weight: 600;
+  }
+  .tbl {
+    width: 100%;
+    margin-top: var(--s4);
+    border-collapse: separate;
+    border-spacing: 0 var(--s2);
+    font-variant-numeric: tabular-nums;
+  }
+  .tbl th,
+  .tbl td {
+    padding: var(--s3) var(--s4);
+    text-align: left;
+    font-weight: 400;
+  }
+  .tbl thead th {
+    padding-block: 0;
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--ink-3);
+  }
+  .tbl tbody th,
+  .tbl tbody td {
+    background: var(--fill);
+  }
+  .tbl tbody th {
+    border-radius: var(--r-ctl) 0 0 var(--r-ctl);
+    font-weight: 500;
+  }
+  .tbl tbody td:last-child {
+    border-radius: 0 var(--r-ctl) var(--r-ctl) 0;
+  }
+  .next {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+  .next div {
+    display: grid;
+    align-content: start;
+    gap: var(--s2);
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+    color: var(--ink-2);
+  }
+  .next h4 {
+    color: var(--ink);
+  }
+  @media (max-width: 860px) {
+    .qcs,
+    .steps,
+    .psr,
+    .finds,
+    .next,
+    .crit,
+    .facts-row {
+      grid-template-columns: 1fr;
+    }
+    .sts.four {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .phones {
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      overflow-x: auto;
+    }
+    .vars-grid {
+      grid-template-columns: 1fr;
+    }
+    .vars-view {
+      max-width: 280px;
+    }
+    .row,
+    .rows-h {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .row b {
+      grid-column: 1 / -1;
+    }
+    .rows-h span:first-child {
+      display: none;
+    }
+    .bar {
+      grid-template-columns: 1fr;
+      gap: var(--s2);
+    }
+    .tbl {
+      font-size: var(--fs-cap);
+    }
+    .tbl th,
+    .tbl td {
+      padding: var(--s2);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -1741,20 +2362,132 @@
   </div>
   <div class="reading">
     <div class="inner">
-      <nav class="toc" aria-label="Главы">
-        <span class="on">Обзор</span><span>Финальные экраны</span><span>Как мы работали</span
-        ><span>Интервью</span><span>Решения</span><span>Тестирование</span><span>Ревью</span
-        ><span>Выводы</span>
-      </nav>
-      <div>
-        <h2>Обзор</h2>
-        <p class="lead" id="plead"></p>
-        <div id="pfacts"></div>
-        <p class="note">
-          Набросок: дальше идёт кейс целиком, как сейчас на сайте (забеги, сцены, живые прототипы),
-          только в оформлении этой темы. Esc или кнопка «Пауза» возвращают в меню.
-        </p>
-      </div>
+      <!-- The PSB case, the only open one. Built by tools/case-psb/build.js from its data.js:
+           edit those and run `node tools/case-psb/build.js`, not this block -->
+      <!-- case:psb -->
+<nav class="toc" aria-label="Главы"><a href="#c-overview">Обзор</a><a href="#c-screens">Финальные экраны</a><a href="#c-process">Как мы работали</a><a href="#c-interviews">Интервью</a><span class="toc-group">Решения</span><a href="#c-home" class="sub">Главная</a><a href="#c-card-data" class="sub">Данные карты</a><a href="#c-cashback" class="sub">Подключение кешбэка</a><a href="#c-categories" class="sub">Кешбэк после подключения</a><a href="#c-testing">Тестирование</a><a href="#c-review">Ревью</a><a href="#c-outcome">Выводы</a></nav>
+<div class="cs">
+<section class="ch" id="c-overview">
+  <p class="eyebrow">ПСБ Mobile, концепт-редизайн</p>
+  <h2>Упростил ежедневные действия, которые в приложении ощущались как поход в отделение</h2>
+  <div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div>
+  <dl class="facts-row"><div><dt>Роль</dt><dd>Продуктовый дизайнер, в паре</dd></div><div><dt>Формат</dt><dd>Концепт, 2026</dd></div><div><dt>Сфера</dt><dd>Банк, B2C, мобильное приложение</dd></div></dl>
+  <h3>Проблемы и решения</h3>
+  <div class="qcs"><a class="qc" href="#c-home"><span class="qc-n">1</span><b>Главная</b><span class="qc-k">Проблема</span><span class="qc-t">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</span><span class="qc-k">Решение</span><span class="qc-t">Баланс, частые действия и история наверху, а предложения банка можно закрыть</span></a><a class="qc" href="#c-card-data"><span class="qc-n">2</span><b>Данные карты</b><span class="qc-k">Проблема</span><span class="qc-t">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</span><span class="qc-k">Решение</span><span class="qc-t">Их можно посмотреть и скопировать на одном экране, без кода из СМС</span></a><a class="qc" href="#c-cashback"><span class="qc-n">3</span><b>Подключение кешбэка</b><span class="qc-k">Проблема</span><span class="qc-t">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</span><span class="qc-k">Решение</span><span class="qc-t">Одна кнопка рядом с условиями, и сразу выбор категорий</span></a><a class="qc" href="#c-categories"><span class="qc-n">4</span><b>Кешбэк после подключения</b><span class="qc-k">Проблема</span><span class="qc-t">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</span><span class="qc-k">Решение</span><span class="qc-t">Их можно выбрать на месяц вперёд и поменять до его начала</span></a></div>
+  <h3>Результаты</h3>
+  <div class="sts four"><div class="st big"><p class="st-what">Подключение кешбэка</p><p class="st-n"><b>23</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now" style="width:21.9%"></i></span><p class="st-more">вместо 105 с, 5 шагов вместо 12</p></div><div class="st big"><p class="st-what">Путь к данным карты</p><p class="st-n"><b>17</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now" style="width:40.5%"></i></span><p class="st-more">вместо 42 с, 4 шага вместо 7</p></div><div class="st big"><p class="st-what">Первый клик верный</p><p class="st-n"><b>89%</b></p><span class="g"><i class="now" style="width:89.0%"></i></span><p class="st-more">начали с правильного действия</p></div><div class="st big"><p class="st-what">Оценка лёгкости</p><p class="st-n"><b>6,4</b><span>из 7</span></p><span class="g"><i class="now" style="width:91.4%"></i></span><p class="st-more">SEQ, среднее по задачам</p></div></div>
+  <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
+</section>
+<section class="ch" id="c-screens">
+  <p class="eyebrow">Итог</p>
+  <h2>Финальные экраны</h2>
+  <p class="lead">Экраны рабочего прототипа, на котором проходил юзабилити-тест: каждый открывает свой сценарий, а внутри всё приложение целиком.</p>
+  <div class="phones"><figure class="shot"><img src="img/psb/main.webp" alt="Главная" loading="lazy" decoding="async" /><figcaption>Главная</figcaption></figure><figure class="shot"><img src="img/psb/race/card-data.webp" alt="Данные карты" loading="lazy" decoding="async" /><figcaption>Данные карты</figcaption></figure><figure class="shot"><img src="img/psb/cb-off.webp" alt="Подключение кешбэка" loading="lazy" decoding="async" /><figcaption>Подключение кешбэка</figcaption></figure></div>
+  <div class="kit"><p>Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.</p><div class="kit-links"><a class="btn" href="https://www.figma.com/design/CzUlWtfXzInfjatugJLjQ1/PSB-Bank-Redesign-Concept?node-id=0-1" target="_blank" rel="noopener">UI-кит в Figma</a><a class="btn" href="https://www.figma.com/design/CzUlWtfXzInfjatugJLjQ1/PSB-Bank-Redesign-Concept?node-id=25-284" target="_blank" rel="noopener">Проект в Figma</a></div></div>
+</section>
+<section class="ch" id="c-process">
+  <p class="eyebrow">Процесс</p>
+  <h2>Как мы работали</h2>
+  <div class="steps"><div class="step"><span class="step-n">1</span><h4>Дизайнили вдвоём, проверяли у сеньора</h4><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="step"><span class="step-n">2</span><h4>Выбрали четыре направления</h4><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="step"><span class="step-n">3</span><h4>Не только макеты</h4><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="step"><span class="step-n">4</span><h4>Видели путь, а не только финал</h4><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div>
+  <figure class="walk"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video><figcaption>Прохождение прототипа на телефоне</figcaption></figure>
+  <h3>Критерии успеха</h3>
+  <p class="lead">До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.</p>
+  <div class="crit"><div><b>Первый клик</b><p>Человек сразу начинает с правильного действия</p></div><div><b>Время</b><p>Новый путь занимает меньше времени, чем исходный</p></div><div><b>Лёгкость</b><p>Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
+</section>
+<section class="ch" id="c-interviews">
+  <p class="eyebrow">Исследование</p>
+  <h2>Что показали интервью</h2>
+  <p class="lead">Когда масштаб был выбран, мы поговорили с тремя клиентами ПСБ, чтобы сопоставить свои предположения с их опытом.</p>
+  <div class="film"><video class="talk" controls playsinline preload="none" data-src-ru="img/psb/interviews.ru.mp4" data-src-en="img/psb/interviews.en.mp4" data-poster-ru="img/psb/interviews-poster.ru.webp" data-poster-en="img/psb/interviews-poster.en.webp" src="img/psb/interviews.ru.mp4" poster="img/psb/interviews-poster.ru.webp" aria-label="Фрагменты интервью"></video></div>
+  <ol class="finds"><li><span class="step-n">1</span><h4>Похожие названия сбивали с толку</h4><p>Кешбэк подключался через «Бонусный счёт», а «Кешбэк и скидки» открывал список партнёров.</p></li><li><span class="step-n">2</span><h4>Данные карты искали вне приложения</h4><p>Лояльный клиент искал данные своей карты не в приложении: он достал её из кошелька.</p></li><li><span class="step-n">3</span><h4>Не сразу верилось, что это банк</h4><p>Экраны выглядели собранными по шаблону, и один участник при первом знакомстве засомневался, что перед ним настоящее приложение банка.</p></li></ol>
+  <blockquote class="say"><span class="say-who">Вывод</span><p>Одного сокращения пути было недостаточно. Нужно было сделать понятным весь процесс: где найти нужное, как выполнить действие и увидеть результат.</p></blockquote>
+</section>
+<section class="ch" id="c-home">
+  <p class="eyebrow">Решение 1 из 4</p>
+  <h2>Главная страница</h2>
+  <p class="lead">Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.</p>
+  <div class="psr">
+    <div><p class="psr-k">Проблема</p><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div>
+    <div><p class="psr-k">Решение</p><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div>
+  </div>
+  <div class="pair"><figure class="shot"><img src="img/psb/before/cb-01.webp" alt="Было" loading="lazy" decoding="async" /><figcaption>Было</figcaption></figure><figure class="shot win"><img src="img/psb/main.webp" alt="Стало" loading="lazy" decoding="async" /><figcaption>Стало</figcaption></figure></div>
+  <div class="vars" data-vars>
+    <h4>Варианты главной</h4>
+    <div class="vars-grid">
+      <div class="vars-list" role="tablist" aria-label="Варианты главной"><button role="tab" id="v-home-0" aria-controls="vp-home-0" aria-selected="false" tabindex="-1"><b>Барабан карт</b><span class="var-tag">Отказались</span><span class="var-note">Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.</span></button><button role="tab" id="v-home-1" aria-controls="vp-home-1" aria-selected="false" tabindex="-1"><b>Европейский стандарт</b><span class="var-tag">Отказались</span><span class="var-note">Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.</span></button><button role="tab" id="v-home-2" aria-controls="vp-home-2" aria-selected="true" tabindex="0"><b>Привычная иерархия</b><span class="var-tag yes">Выбрали</span><span class="var-note">Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.</span></button></div>
+      <div class="vars-view"><img role="tabpanel" id="vp-home-0" aria-labelledby="v-home-0" src="img/psb/iter/rejected-barrel.webp" alt="Барабан карт" loading="lazy" decoding="async" hidden /><img role="tabpanel" id="vp-home-1" aria-labelledby="v-home-1" src="img/psb/iter/home-iter-euro.webp" alt="Европейский стандарт" loading="lazy" decoding="async" hidden /><img role="tabpanel" id="vp-home-2" aria-labelledby="v-home-2" src="img/psb/main.webp" alt="Привычная иерархия" loading="lazy" decoding="async" /></div>
+    </div>
+  </div>
+  <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="row"><b>Баланс</b><span class="was">«Всего доступно средств» в отдельной карточке</span><span class="now">«Всего на счетах» наверху, рядом бейдж кешбэка</span></div><div class="row"><b>Карты и счета</b><span class="was">Два отдельных списка</span><span class="now">Карты внутри своих счетов</span></div><div class="row"><b>Частые действия</b><span class="was">Нет на главной</span><span class="now">QR, перевод, по номеру и пополнение под счетами</span></div><div class="row"><b>Предложения банка</b><span class="was">Вес как у продуктов, среди счетов и карт</span><span class="now">Баннеры сверху, их можно закрыть</span></div><div class="row"><b>Кешбэк</b><span class="was">«Бонусный счёт» в конце главной</span><span class="now">Бейдж у баланса и вкладка «Выгода»</span></div><div class="row"><b>История</b><span class="was">Отдельная вкладка, у каждой карты своя</span><span class="now">На главной, сразу под действиями</span></div></div>
+  <div class="result"><p class="psr-k">Результат</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="sts"><div class="st"><p class="st-n"><b>63%</b></p><p class="st-what">нашли кешбэк через вкладку «Выгода»</p></div><div class="st"><p class="st-n"><b>37%</b></p><p class="st-what">через бейдж у баланса: второй вход не остался незамеченным</p></div></div></div>
+</section>
+<section class="ch" id="c-card-data">
+  <p class="eyebrow">Решение 2 из 4</p>
+  <h2>Данные карты</h2>
+  <p class="lead">Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.</p>
+  <div class="psr">
+    <div><p class="psr-k">Проблема</p><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div>
+    <div><p class="psr-k">Решение</p><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div>
+  </div>
+  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>7 шагов</span><span>42 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/card-01.webp" alt="Главная, карта в «Картах»" loading="lazy" decoding="async" /><figcaption>Главная, карта в «Картах»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/card-02.webp" alt="«Настройки» карты" loading="lazy" decoding="async" /><figcaption>«Настройки» карты</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/card-03.webp" alt="Свайп, «История»" loading="lazy" decoding="async" /><figcaption>Свайп, «История»</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/card-04.webp" alt="Третья вкладка, «О карте»" loading="lazy" decoding="async" /><figcaption>Третья вкладка, «О карте»</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/card-05.webp" alt="Номер скрыт" loading="lazy" decoding="async" /><figcaption>Номер скрыт</figcaption></figure><figure class="shot sm"><span class="shot-n">6</span><img src="img/psb/before/card-07.webp" alt="Удержал поле, скопировано" loading="lazy" decoding="async" /><figcaption>Удержал поле, скопировано</figcaption></figure><figure class="shot sm"><span class="shot-n">7</span><img src="img/psb/before/card-08.webp" alt="CVV только по СМС" loading="lazy" decoding="async" /><figcaption>CVV только по СМС</figcaption></figure><figure class="shot sm"><span class="shot-n">8</span><img src="img/psb/before/card-09.webp" alt="Код не подставился" loading="lazy" decoding="async" /><figcaption>Код не подставился</figcaption></figure><figure class="shot sm"><span class="shot-n">9</span><img src="img/psb/before/card-10.webp" alt="Согласие подтверждено" loading="lazy" decoding="async" /><figcaption>Согласие подтверждено</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>4 шага</span><span>17 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/card-home.webp" alt="Главная, текущий счёт" loading="lazy" decoding="async" /><figcaption>Главная, текущий счёт</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/card-account.webp" alt="Карта внутри счёта" loading="lazy" decoding="async" /><figcaption>Карта внутри счёта</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/card-card.webp" alt="«Данные карты» на карте" loading="lazy" decoding="async" /><figcaption>«Данные карты» на карте</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/card-data.webp" alt="Номер, срок и CVV сразу" loading="lazy" decoding="async" /><figcaption>Номер, срок и CVV сразу</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/race/card-copied.webp" alt="Скопировано" loading="lazy" decoding="async" /><figcaption>Скопировано</figcaption></figure></div></div></div>
+  
+  <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="row"><b>Где найти</b><span class="was">Третья вкладка в карточке карты</span><span class="now">Карта внутри счёта, данные на ней</span></div><div class="row"><b>CVV</b><span class="was">Только по коду из СМС, даже после входа по биометрии</span><span class="now">Сразу, вместе с номером и сроком</span></div><div class="row"><b>Выход из приложения</b><span class="was">В сообщения за кодом: сам он не подставлялся</span><span class="now">Не нужен</span></div><div class="row"><b>Копирование</b><span class="was">Удержать поле, пока внизу не появится подсказка</span><span class="now">Кнопка у каждого поля и плашка «Скопировано»</span></div></div>
+  <div class="result"><p class="psr-k">Результат</p><p>Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.</p><div class="sts"><div class="st"><p class="st-n"><b>83%</b></p><p class="st-what">сразу начали с правильного действия</p></div><div class="st"><p class="st-n"><b>67%</b></p><p class="st-what">прошли без единой ошибки</p></div><div class="st"><p class="st-n"><b>6,0</b><span>из 7</span></p><p class="st-what">оценка лёгкости</p></div></div></div>
+</section>
+<section class="ch" id="c-cashback">
+  <p class="eyebrow">Решение 3 из 4</p>
+  <h2>Подключение кешбэка</h2>
+  <p class="lead">Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.</p>
+  <div class="psr">
+    <div><p class="psr-k">Проблема</p><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div>
+    <div><p class="psr-k">Решение</p><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div>
+  </div>
+  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>12 шагов</span><span>105 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/cb-01.webp" alt="Главная" loading="lazy" decoding="async" /><figcaption>Главная</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/cb-02.webp" alt="Внизу «Бонусный счёт»" loading="lazy" decoding="async" /><figcaption>Внизу «Бонусный счёт»</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/cb-03.webp" alt="Условия и «Подключить»" loading="lazy" decoding="async" /><figcaption>Условия и «Подключить»</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/cb-04.webp" alt="Почта и два согласия" loading="lazy" decoding="async" /><figcaption>Почта и два согласия</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/cb-05.webp" alt="Ждём письмо" loading="lazy" decoding="async" /><figcaption>Ждём письмо</figcaption></figure><figure class="shot sm"><span class="shot-n">6</span><img src="img/psb/before/cb-06.webp" alt="Не дождался, ошибка" loading="lazy" decoding="async" /><figcaption>Не дождался, ошибка</figcaption></figure><figure class="shot sm"><span class="shot-n">7</span><img src="img/psb/before/cb-07.webp" alt="Письмо в почте" loading="lazy" decoding="async" /><figcaption>Письмо в почте</figcaption></figure><figure class="shot sm"><span class="shot-n">8</span><img src="img/psb/before/cb-08.webp" alt="Ссылка в браузере" loading="lazy" decoding="async" /><figcaption>Ссылка в браузере</figcaption></figure><figure class="shot sm"><span class="shot-n">9</span><img src="img/psb/before/cb-09.webp" alt="Согласие не открыть" loading="lazy" decoding="async" /><figcaption>Согласие не открыть</figcaption></figure><figure class="shot sm"><span class="shot-n">10</span><img src="img/psb/before/cb-10.webp" alt="Готово" loading="lazy" decoding="async" /><figcaption>Готово</figcaption></figure><figure class="shot sm"><span class="shot-n">11</span><img src="img/psb/before/cb-01.webp" alt="А на главной кешбэка нет" loading="lazy" decoding="async" /><figcaption>А на главной кешбэка нет</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>5 шагов</span><span>23 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/start.webp" alt="«Хочу подключить» в «Выгоде»" loading="lazy" decoding="async" /><figcaption>«Хочу подключить» в «Выгоде»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/cats-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><figcaption>Выбор трёх категорий</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/cats-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><figcaption>Отметил три</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/success.webp" alt="Кешбэк подключён" loading="lazy" decoding="async" /><figcaption>Кешбэк подключён</figcaption></figure></div></div></div>
+  
+  <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="row"><b>Где найти</b><span class="was">«Бонусный счёт» внизу главной</span><span class="now">«Выгода» в таббаре и бейдж у баланса</span></div><div class="row"><b>Выход из приложения</b><span class="was">В почту за письмом, в браузер по ссылке</span><span class="now">Не нужен</span></div><div class="row"><b>Согласия</b><span class="was">Два переключателя и экран, который не открыть</span><span class="now">Одна кнопка рядом с условиями</span></div><div class="row"><b>Категории</b><span class="was">Отдельно, после подключения</span><span class="now">Сразу, кнопка считает выбранные</span></div><div class="row"><b>После подключения</b><span class="was">Главная как раньше, пока не перезайдёшь</span><span class="now">Кешбэк сразу виден у баланса</span></div></div>
+  <div class="result"><p class="psr-k">Результат</p><p>Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.</p><div class="sts"><div class="st"><p class="st-n"><b>83%</b></p><p class="st-what">сразу начали с правильного действия</p></div><div class="st"><p class="st-n"><b>63%</b></p><p class="st-what">прошли без единой ошибки</p></div><div class="st"><p class="st-n"><b>6,5</b><span>из 7</span></p><p class="st-what">оценка лёгкости</p></div></div></div>
+</section>
+<section class="ch" id="c-categories">
+  <p class="eyebrow">Решение 4 из 4</p>
+  <h2>Кешбэк после подключения</h2>
+  <p class="lead">Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.</p>
+  <div class="psr">
+    <div><p class="psr-k">Проблема</p><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div>
+    <div><p class="psr-k">Решение</p><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div>
+  </div>
+  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>7 шагов</span><span>28,7 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/card-01.webp" alt="Главная" loading="lazy" decoding="async" /><figcaption>Главная</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/cats-02.webp" alt="Ищет кешбэк, листая главную" loading="lazy" decoding="async" /><figcaption>Ищет кешбэк, листая главную</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/cats-03.webp" alt="«Бонусный счёт» внизу" loading="lazy" decoding="async" /><figcaption>«Бонусный счёт» внизу</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/cats-04.webp" alt="Выбрал, проверка данных" loading="lazy" decoding="async" /><figcaption>Выбрал, проверка данных</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/cats-05.webp" alt="Операция выполнена" loading="lazy" decoding="async" /><figcaption>Операция выполнена</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>6 шагов</span><span>14 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/next-home.webp" alt="Главная, вкладка «Выгода»" loading="lazy" decoding="async" /><figcaption>Главная, вкладка «Выгода»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/next-cashback.webp" alt="«Категории на октябрь»" loading="lazy" decoding="async" /><figcaption>«Категории на октябрь»</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/next-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><figcaption>Выбор трёх категорий</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/next-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><figcaption>Отметил три</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/race/next-success.webp" alt="Категории выбраны" loading="lazy" decoding="async" /><figcaption>Категории выбраны</figcaption></figure></div></div></div>
+  <div class="vars" data-vars>
+    <h4>Варианты блока статистики</h4>
+    <div class="vars-grid">
+      <div class="vars-list" role="tablist" aria-label="Варианты блока статистики"><button role="tab" id="v-categories-0" aria-controls="vp-categories-0" aria-selected="false" tabindex="-1"><b>График по месяцам</b><span class="var-tag">Отказались</span><span class="var-note">Выглядел красиво, но не объяснял, за что начислен кешбэк.</span></button><button role="tab" id="v-categories-1" aria-controls="vp-categories-1" aria-selected="false" tabindex="-1"><b>Категории картинками</b><span class="var-tag">Отказались</span><span class="var-note">Понятно, но занимает полэкрана, и выбору на следующий месяц не хватает места.</span></button><button role="tab" id="v-categories-2" aria-controls="vp-categories-2" aria-selected="true" tabindex="0"><b>Полоса по категориям</b><span class="var-tag yes">Выбрали</span><span class="var-note">Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.</span></button></div>
+      <div class="vars-view"><img role="tabpanel" id="vp-categories-0" aria-labelledby="v-categories-0" src="img/psb/iter/iter-benefit-2-line.webp" alt="График по месяцам" loading="lazy" decoding="async" hidden /><img role="tabpanel" id="vp-categories-1" aria-labelledby="v-categories-1" src="img/psb/iter/iter-benefit-3-pics.webp" alt="Категории картинками" loading="lazy" decoding="async" hidden /><img role="tabpanel" id="vp-categories-2" aria-labelledby="v-categories-2" src="img/psb/iter/iter-benefit-1-month.webp" alt="Полоса по категориям" loading="lazy" decoding="async" /></div>
+    </div>
+  </div>
+  <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="row"><b>Где найти</b><span class="was">«Бонусный счёт» в конце главной</span><span class="now">«Выгода» в таббаре</span></div><div class="row"><b>Напоминание</b><span class="was">Нет, о новом месяце нужно помнить самому</span><span class="now">Плашка «Категории на октябрь» с кнопкой «Выбрать»</span></div><div class="row"><b>Когда выбирать</b><span class="was">Каждый месяц, когда он уже начался</span><span class="now">Заранее, и поменять до начала месяца</span></div><div class="row"><b>Подтверждение</b><span class="was">Отдельный экран с юридическими формулировками</span><span class="now">Кнопка «Подключить» под категориями</span></div></div>
+  <div class="result"><p class="psr-k">Результат</p><p>Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.</p><div class="sts"><div class="st"><p class="st-n"><b>100%</b></p><p class="st-what">сразу начали с правильного действия</p></div><div class="st"><p class="st-n"><b>90%</b></p><p class="st-what">прошли без единой ошибки</p></div><div class="st"><p class="st-n"><b>6,7</b><span>из 7</span></p><p class="st-what">оценка лёгкости</p></div></div></div>
+</section>
+<section class="ch" id="c-testing">
+  <p class="eyebrow">Проверка</p>
+  <h2>Тестирование с 30 клиентами</h2>
+  <p class="lead">Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.</p>
+  <div class="bars"><div class="bar"><b>Подключение кешбэка</b><div class="bar-track"><i class="was" style="width:100.0%"><span>105 с</span></i><i class="now" style="width:21.9%"><span>23 с</span></i></div></div><div class="bar"><b>Данные карты</b><div class="bar-track"><i class="was" style="width:40.0%"><span>42 с</span></i><i class="now" style="width:16.2%"><span>17 с</span></i></div></div><div class="bar"><b>Выбор категорий</b><div class="bar-track"><i class="was" style="width:27.3%"><span>28,7 с</span></i><i class="now" style="width:13.3%"><span>14 с</span></i></div></div></div>
+  <table class="tbl"><thead><tr><th scope="col">Сценарий</th><th scope="col">Завершили</th><th scope="col">Первый клик</th><th scope="col">SEQ</th></tr></thead><tbody><tr><th scope="row">Подключить кешбэк</th><td>30/30</td><td>83%</td><td>6,5/7</td></tr><tr><th scope="row">Выбрать категории</th><td>30/30</td><td>100%</td><td>6,7/7</td></tr><tr><th scope="row">Скопировать данные карты</th><td>30/30</td><td>83%</td><td>6,0/7</td></tr></tbody></table>
+  <p class="aside">Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.</p>
+</section>
+<section class="ch" id="c-review">
+  <p class="eyebrow">Ревью</p>
+  <h2>Что сказал сеньор</h2>
+  <div class="film"><video class="talk" controls playsinline preload="none" data-src-ru="img/psb/review.ru.mp4" data-src-en="img/psb/review.en.mp4" data-poster-ru="img/psb/review-poster.ru.webp" data-poster-en="img/psb/review-poster.en.webp" src="img/psb/review.ru.mp4" poster="img/psb/review-poster.ru.webp" aria-label="Ревью кейса от сеньор-дизайнера"></video></div>
+</section>
+<section class="ch" id="c-outcome">
+  <p class="eyebrow">Выводы</p>
+  <h2>Опыт, который я получил</h2>
+  <div class="prose"><p>Проект стал для меня новым опытом во многих отношениях. Мы прекрасно сработались с коллегой и освоили вайбкодинг — отличный инструмент для проверки гипотез. Прототипы в Figma сильно ограничены и то и дело ломаются, а здесь можно собрать живой прототип и получить данные о том, как им пользуются люди. Это расширяет возможности для проверки гипотез и ускоряет итерации.</p><p>Пока я работал над дизайном и изучал конкурентов, вспомнил давний холивар: что важнее, UX или UI? На этом проекте я убедился, что они важны в равной степени. Без хорошего визуала человек может просто не дойти до самых продуманных решений. А с одним визуалом, без сопровождения на всём пути, он не доберётся до результата.</p><p>Отдельное спасибо Игорю Плющу: он делился опытом и ревьюил проект.</p></div>
+  <h3>Что бы я ещё протестировал</h3>
+  <div class="next"><div><h4>Вход в кешбэк</h4><p>В тесте кешбэк искали по заданию, а в жизни на него натыкаются случайно. Стоит проверить, заметят ли его сами, и, если подключение в приоритете, попробовать на главной баннер с выгодой.</p></div><div><h4>Данные карты</h4><p>Сравнить переворот карты с блоком данных под ней. Участникам старшей возрастной группы переворот, похоже, давался сложнее, особенно тем, у кого ПСБ единственный банк.</p></div><div><h4>Подключение кешбэка</h4><p>Часть участников по пути первым делом цепляла плитки предложений. Можно ослабить их визуальный вес и проверить это в следующих итерациях.</p></div></div>
+</section>
+</div>
+<!-- /case:psb -->
     </div>
   </div>
 </div>
@@ -2214,17 +2947,269 @@
       // The case
       'Пауза': 'Pause',
       'Квест:': 'Quest:',
-      'Главы': 'Chapters',
-      'Обзор': 'Overview',
-      'Финальные экраны': 'Final screens',
-      'Как мы работали': 'How we worked',
-      'Интервью': 'Interviews',
-      'Решения': 'Decisions',
-      'Тестирование': 'Testing',
-      'Ревью': 'Review',
-      'Выводы': 'Takeaways',
-      'Набросок: дальше идёт кейс целиком, как сейчас на сайте (забеги, сцены, живые прототипы), только в оформлении этой темы. Esc или кнопка «Пауза» возвращают в меню.':
-        'Sketch: the whole case follows here, as on the current site (races, scenes, live prototypes), only dressed in this theme. Esc or the “Pause” button takes you back to the menu.',
+      // The PSB case body, written by tools/case-psb/build.js
+      // case:psb
+      "Главы": "Chapters",
+      "Обзор": "Overview",
+      "Финальные экраны": "Final screens",
+      "Как мы работали": "How we worked",
+      "Интервью": "Interviews",
+      "Решения": "Solutions",
+      "Главная": "Home",
+      "Данные карты": "Card details",
+      "Подключение кешбэка": "Activating cashback",
+      "Кешбэк после подключения": "Cashback after activation",
+      "Тестирование": "Testing",
+      "Ревью": "Review",
+      "Выводы": "Takeaways",
+      "Проблема": "Problem",
+      "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
+      "Решение": "Solution",
+      "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
+      "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
+      "Их можно посмотреть и скопировать на одном экране, без кода из СМС": "They can be viewed and copied on one screen, with no text message code",
+      "12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение": "12 steps through email and a browser, and the activated cashback didn’t show up until you reopened the app",
+      "Одна кнопка рядом с условиями, и сразу выбор категорий": "One button next to the terms, and straight on to choosing categories",
+      "Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало": "Categories had to be chosen every month, and the app never reminded you",
+      "Их можно выбрать на месяц вперёд и поменять до его начала": "They can be chosen a month ahead and changed before it starts",
+      "с": "s",
+      "вместо 105 с, 5 шагов вместо 12": "instead of 105 s, 5 steps instead of 12",
+      "Путь к данным карты": "Getting to card details",
+      "вместо 42 с, 4 шага вместо 7": "instead of 42 s, 4 steps instead of 7",
+      "Первый клик верный": "First click success",
+      "начали с правильного действия": "started with the right action",
+      "Оценка лёгкости": "Ease score",
+      "6,4": "6.4",
+      "из 7": "of 7",
+      "SEQ, среднее по задачам": "SEQ, average across tasks",
+      "ПСБ Mobile, концепт-редизайн": "PSB Mobile, redesign concept",
+      "Упростил ежедневные действия, которые в приложении ощущались как поход в отделение": "I simplified everyday actions that felt like a trip to a bank branch",
+      "Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.": "I’m not a PSB customer, but I’ve heard from friends more than once that they gave up activating cashback halfway through. At some point curiosity got the better of me: what was confusing people so much? I studied the bank’s app and its terms.",
+      "Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.": "The cashback terms are good, but activation took 12 steps: jumps to a browser and a mail app, email confirmation, several consents, and at the end it still wasn’t clear whether it had worked.",
+      "Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.": "Other flows had their difficulties too: account details are buried deep in the menu, the history is split by card, and viewing the CVV takes a code from a text message even after biometric login.",
+      "Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.": "Each of these decisions makes sense on its own, but together they make simple actions harder than they need to be. I set out to find where exactly the difficulties arise and how to make these flows easier.",
+      "Роль": "Role",
+      "Продуктовый дизайнер, в паре": "Product designer, in a team of two",
+      "Формат": "Format",
+      "Концепт, 2026": "Concept, 2026",
+      "Сфера": "Industry",
+      "Банк, B2C, мобильное приложение": "Banking, B2C, mobile app",
+      "Проблемы и решения": "Problems and solutions",
+      "Результаты": "Results",
+      "Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.": "A usability test with 30 of the bank’s customers: everyone got to the end of every task.",
+      "Итог": "Outcome",
+      "Экраны рабочего прототипа, на котором проходил юзабилити-тест: каждый открывает свой сценарий, а внутри всё приложение целиком.": "Screens of the working prototype we ran the usability test on: each opens its own flow, and the whole app is inside.",
+      "Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.": "The screens are built from a UI kit: every component has a spec with its variants, sizes and states.",
+      "UI-кит в Figma": "UI kit in Figma",
+      "Проект в Figma": "Figma file",
+      "Дизайнили вдвоём, проверяли у сеньора": "Designed as a pair, reviewed by a senior designer",
+      "Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.": "While one of us proposed a concept, the other looked for its weak spots, then we swapped roles. We showed the result to a senior designer and, when needed, reworked it based on the feedback.",
+      "Выбрали четыре направления": "Picked four focus areas",
+      "Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.": "We broke down the original flows and compared them across five banks. We took the best from each and focused on the home screen, card details, activating cashback and choosing categories.",
+      "Не только макеты": "More than mockups",
+      "Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.": "We vibe-coded a prototype for quick testing: it lets you go through the flows on a phone, activate cashback, choose categories and open card details.",
+      "Видели путь, а не только финал": "We saw the path, not just the finish",
+      "Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.": "The prototype logged what participants did: taps, scrolling, screen transitions, the start and the end of each task.",
+      "Процесс": "Process",
+      "Прохождение прототипа на телефоне": "Going through the prototype on a phone",
+      "Критерии успеха": "Success criteria",
+      "До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.": "Before the redesign we gave five of the bank’s customers a clickable copy of the original screens and watched where they went wrong and how long the tasks took. Activating cashback caused the most trouble. We measured the new design by three signs.",
+      "Первый клик": "First click",
+      "Человек сразу начинает с правильного действия": "People start with the right action",
+      "Время": "Time",
+      "Новый путь занимает меньше времени, чем исходный": "The new path takes less time than the original one",
+      "Лёгкость": "Ease",
+      "Путь кажется простым и понятным, оценка по шкале SEQ": "The path feels simple and clear, rated on the SEQ scale",
+      "Исследование": "Research",
+      "Что показали интервью": "What the interviews showed",
+      "Когда масштаб был выбран, мы поговорили с тремя клиентами ПСБ, чтобы сопоставить свои предположения с их опытом.": "Once the scope was set, we talked to three PSB customers to check our assumptions against their experience.",
+      "Фрагменты интервью": "Interview excerpts",
+      "Похожие названия сбивали с толку": "Similar names were confusing",
+      "Кешбэк подключался через «Бонусный счёт», а «Кешбэк и скидки» открывал список партнёров.": "Cashback was activated through the “Bonus account”, while “Cashback and discounts” opened a list of partners.",
+      "Данные карты искали вне приложения": "Card details came from the physical card",
+      "Лояльный клиент искал данные своей карты не в приложении: он достал её из кошелька.": "A loyal customer didn’t look for their card details in the app: they took the card out of their wallet.",
+      "Не сразу верилось, что это банк": "Hard to believe it was a real bank",
+      "Экраны выглядели собранными по шаблону, и один участник при первом знакомстве засомневался, что перед ним настоящее приложение банка.": "The screens looked put together from a template, and at first sight one participant doubted it was a real banking app.",
+      "Вывод": "Takeaway",
+      "Одного сокращения пути было недостаточно. Нужно было сделать понятным весь процесс: где найти нужное, как выполнить действие и увидеть результат.": "Shortening the path alone wasn’t enough. The whole process had to make sense: where to find what you need, how to do it and how to see the result.",
+      "Было": "Before",
+      "Стало": "After",
+      "Решение 1 из 4": "Solution 1 of 4",
+      "Главная страница": "Home screen",
+      "Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.": "Everyday tasks and bank offers should be visible at the same time without competing with each other.",
+      "Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.": "Everyday actions, promos and other bank products carried almost the same weight. The history was hard to find: each card had its own, on a separate tab.",
+      "В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.": "Cashback was hard to get to: the “Bonus account” sat at the very bottom of the home screen.",
+      "Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.": "We kept the familiar home screen model: grouped the balance, actions and history, and showed the cards inside their accounts.",
+      "На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.": "We planned a separate cashback block on the home screen, but with the tab and the badge that made three ways in. We dropped the block and kept the badge, to see whether people would notice it.",
+      "Варианты главной": "Home screen options",
+      "Барабан карт": "Card carousel",
+      "Отказались": "Dropped",
+      "Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.": "The cards came one after another, so the account → card link read worse. With many cards, finding the right one was hard.",
+      "Европейский стандарт": "European standard",
+      "Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.": "A master account and quick actions on a gradient, as in European neobanks. Unfamiliar to PSB customers.",
+      "Привычная иерархия": "Familiar hierarchy",
+      "Выбрали": "Chosen",
+      "Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.": "Balance, accounts with their cards, actions and history: all on the first screen, in the usual order.",
+      "Баланс": "Balance",
+      "«Всего доступно средств» в отдельной карточке": "“Total available funds” in a separate card",
+      "«Всего на счетах» наверху, рядом бейдж кешбэка": "“Total in accounts” at the top, with a cashback badge next to it",
+      "Карты и счета": "Cards and accounts",
+      "Два отдельных списка": "Two separate lists",
+      "Карты внутри своих счетов": "Cards inside their accounts",
+      "Частые действия": "Frequent actions",
+      "Нет на главной": "Not on the home screen",
+      "QR, перевод, по номеру и пополнение под счетами": "QR, transfers, by phone number and top-ups under the accounts",
+      "Предложения банка": "Bank offers",
+      "Вес как у продуктов, среди счетов и карт": "As prominent as products, among the accounts and cards",
+      "Баннеры сверху, их можно закрыть": "Banners at the top that can be closed",
+      "Кешбэк": "Cashback",
+      "«Бонусный счёт» в конце главной": "“Bonus account” at the very bottom",
+      "Бейдж у баланса и вкладка «Выгода»": "A badge by the balance and the “Benefits” tab",
+      "История": "History",
+      "Отдельная вкладка, у каждой карты своя": "A separate tab, split by card",
+      "На главной, сразу под действиями": "On the home screen, right under the actions",
+      "Результат": "Result",
+      "История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.": "The history is shared now and always on the first screen. All 30 participants found cashback. The badge got noticed; it’s worth an A/B test.",
+      "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
+      "через бейдж у баланса: второй вход не остался незамеченным": "through the badge by the balance: the second way in got noticed",
+      "7 шагов": "7 steps",
+      "42 с": "42 s",
+      "Главная, карта в «Картах»": "Home, the card under “Cards”",
+      "«Настройки» карты": "The card’s “Settings”",
+      "Свайп, «История»": "Swipe, “History”",
+      "Третья вкладка, «О карте»": "Third tab, “About the card”",
+      "Номер скрыт": "Number hidden",
+      "Удержал поле, скопировано": "Held the field, copied",
+      "CVV только по СМС": "CVV only via text message",
+      "Код не подставился": "The code didn’t autofill",
+      "Согласие подтверждено": "Consent confirmed",
+      "4 шага": "4 steps",
+      "17 с": "17 s",
+      "Главная, текущий счёт": "Home, current account",
+      "Карта внутри счёта": "The card inside the account",
+      "«Данные карты» на карте": "“Card details” on the card",
+      "Номер, срок и CVV сразу": "Number, expiry and CVV at once",
+      "Скопировано": "Copied",
+      "Решение 2 из 4": "Solution 2 of 4",
+      "Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.": "Viewing and copying card details should be a simple, clear action right after opening the app.",
+      "Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.": "The details were on the card’s third tab, and the CVV only opened with a code from a text message, even after logging in with biometrics or a PIN.",
+      "Один участник из-за долгого поиска достал физическую карту и списал данные с неё.": "Because the search took so long, one participant took out the physical card and copied the details from it.",
+      "Связали счета и их карты и собрали просмотр и копирование на одном экране.": "We linked accounts with their cards and put viewing and copying on one screen.",
+      "Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.": "We dropped the text message code before the CVV: the customer has already logged in with a PIN or biometrics, which is enough for competitors while the session is active. PSB itself does this now.",
+      "Где найти": "Where to find",
+      "Третья вкладка в карточке карты": "The third tab on the card’s page",
+      "Карта внутри счёта, данные на ней": "The card inside its account, the details on the card",
+      "Только по коду из СМС, даже после входа по биометрии": "Only with a text message code, even after biometric login",
+      "Сразу, вместе с номером и сроком": "Right away, with the number and the expiry date",
+      "Выход из приложения": "Leaving the app",
+      "В сообщения за кодом: сам он не подставлялся": "Off to Messages for the code, which didn’t autofill",
+      "Не нужен": "Not needed",
+      "Копирование": "Copying",
+      "Удержать поле, пока внизу не появится подсказка": "Hold the field until a hint pops up",
+      "Кнопка у каждого поля и плашка «Скопировано»": "A button by every field and a “Copied” toast",
+      "Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.": "Most people found the details right away. But for those whose only bank is PSB, cards inside an account felt unfamiliar, and flipping the card wasn’t the most obvious way to show the details. The ease score, the lowest in the test, shows it.",
+      "сразу начали с правильного действия": "started with the right action",
+      "прошли без единой ошибки": "finished without a single error",
+      "6,0": "6.0",
+      "оценка лёгкости": "ease score",
+      "12 шагов": "12 steps",
+      "105 с": "105 s",
+      "Внизу «Бонусный счёт»": "“Bonus account” at the bottom",
+      "Условия и «Подключить»": "Terms and “Activate”",
+      "Почта и два согласия": "Email and two consents",
+      "Ждём письмо": "Waiting for the email",
+      "Не дождался, ошибка": "Gave up waiting, an error",
+      "Письмо в почте": "The email in the mail app",
+      "Ссылка в браузере": "The link in a browser",
+      "Согласие не открыть": "The consent won’t open",
+      "Готово": "Done",
+      "А на главной кешбэка нет": "Still no cashback on the home screen",
+      "5 шагов": "5 steps",
+      "23 с": "23 s",
+      "«Хочу подключить» в «Выгоде»": "“I want to activate” in “Benefits”",
+      "Выбор трёх категорий": "Choosing three categories",
+      "Отметил три": "Ticked three",
+      "Кешбэк подключён": "Cashback activated",
+      "Решение 3 из 4": "Solution 3 of 4",
+      "Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.": "Cashback is the most popular loyalty program at Russian banks, and activating it should be no harder than reading the terms.",
+      "Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».": "One person in the test of the old app gave up searching: “Cashback and discounts” held only a list of partners, and the cashback itself hid in the “Bonus account”.",
+      "Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.": "Those who made it to the end hit a dead end: nothing changed after activation until you reopened the app.",
+      "Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.": "We left the program itself alone and simplified the path: no more trips to mail and a browser, and activation merged with the first choice of categories.",
+      "Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.": "Instead of several consents there is one “Activate cashback” button with the terms under it, as at other banks.",
+      "«Бонусный счёт» внизу главной": "“Bonus account” at the bottom of home",
+      "«Выгода» в таббаре и бейдж у баланса": "“Benefits” in the tab bar and a badge by the balance",
+      "В почту за письмом, в браузер по ссылке": "To mail for an email, to a browser for a link",
+      "Согласия": "Consents",
+      "Два переключателя и экран, который не открыть": "Two toggles and a screen that won’t open",
+      "Одна кнопка рядом с условиями": "One button next to the terms",
+      "Категории": "Categories",
+      "Отдельно, после подключения": "Separately, after activation",
+      "Сразу, кнопка считает выбранные": "Right away, the button counts them",
+      "После подключения": "After activation",
+      "Главная как раньше, пока не перезайдёшь": "Home stays the same until you reopen the app",
+      "Кешбэк сразу виден у баланса": "Cashback shows by the balance right away",
+      "Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.": "Every participant activated cashback, and most started with the right action. Not everyone got through without errors: the offer tiles drew attention along the way, and their weight is worth toning down next.",
+      "6,5": "6.5",
+      "28,7 с": "28.7 s",
+      "Ищет кешбэк, листая главную": "Scrolling home for cashback",
+      "«Бонусный счёт» внизу": "“Bonus account” at the bottom",
+      "Выбрал, проверка данных": "Chosen, checking the details",
+      "Операция выполнена": "Operation completed",
+      "6 шагов": "6 steps",
+      "14 с": "14 s",
+      "Главная, вкладка «Выгода»": "Home, the “Benefits” tab",
+      "«Категории на октябрь»": "“Categories for October”",
+      "Категории выбраны": "Categories chosen",
+      "Решение 4 из 4": "Solution 4 of 4",
+      "Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.": "Cashback should pay off every month, not only after the first activation.",
+      "В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.": "In an interview someone told us they forget to choose categories at the start of the month, and sometimes can’t find cashback at all. The app never reminded them, and the choose button was easy to miss.",
+      "Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.": "The benefit wasn’t visible at a glance, so there was no reason to come back.",
+      "Категории на следующий месяц можно выбрать заранее и поменять до его начала.": "Categories for next month can be chosen in advance and changed before it starts.",
+      "Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.": "A stats block shows how many points each category brought in: a reason to keep using cashback.",
+      "Варианты блока статистики": "Stats block options",
+      "График по месяцам": "Monthly chart",
+      "Выглядел красиво, но не объяснял, за что начислен кешбэк.": "Looked nice, but didn’t explain what the cashback was for.",
+      "Категории картинками": "Categories as pictures",
+      "Понятно, но занимает полэкрана, и выбору на следующий месяц не хватает места.": "Clear, but takes half the screen, leaving no room to choose next month.",
+      "Полоса по категориям": "Bar by category",
+      "Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.": "You see what each category brought in, and “Whole year” shows the year’s benefit in one tap.",
+      "«Выгода» в таббаре": "“Benefits” in the tab bar",
+      "Напоминание": "Reminder",
+      "Нет, о новом месяце нужно помнить самому": "None, you remember the new month yourself",
+      "Плашка «Категории на октябрь» с кнопкой «Выбрать»": "A “Categories for October” banner with a “Choose” button",
+      "Когда выбирать": "When to choose",
+      "Каждый месяц, когда он уже начался": "Every month, once it has started",
+      "Заранее, и поменять до начала месяца": "In advance, changeable before the month starts",
+      "Подтверждение": "Confirmation",
+      "Отдельный экран с юридическими формулировками": "A separate screen of legal wording",
+      "Кнопка «Подключить» под категориями": "An “Activate” button under the categories",
+      "Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.": "The choice works the same as on first activation, so nobody had to figure it out again. The ease score here is the highest in the test.",
+      "6,7": "6.7",
+      "Выбор категорий": "Choosing categories",
+      "Проверка": "Validation",
+      "Тестирование с 30 клиентами": "Testing with 30 customers",
+      "Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.": "Thirty PSB customers took the test in the working prototype, some on their own, some on a call. We looked at task success, the first action and ease. Everyone managed without help.",
+      "Сценарий": "Flow",
+      "Завершили": "Completed",
+      "Подключить кешбэк": "Activate cashback",
+      "6,5/7": "6.5/7",
+      "Выбрать категории": "Choose categories",
+      "6,7/7": "6.7/7",
+      "Скопировать данные карты": "Copy card details",
+      "6,0/7": "6.0/7",
+      "Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.": "Median times. “Before” is five of the bank’s customers on a clickable copy of the original screens, the median of those who finished.",
+      "Что сказал сеньор": "What the senior designer said",
+      "Ревью кейса от сеньор-дизайнера": "Case review by a senior designer",
+      "Опыт, который я получил": "The experience I gained",
+      "Проект стал для меня новым опытом во многих отношениях. Мы прекрасно сработались с коллегой и освоили вайбкодинг — отличный инструмент для проверки гипотез. Прототипы в Figma сильно ограничены и то и дело ломаются, а здесь можно собрать живой прототип и получить данные о том, как им пользуются люди. Это расширяет возможности для проверки гипотез и ускоряет итерации.": "The project was a new experience for me in many ways. My colleague and I worked together wonderfully and got the hang of vibe coding, a great tool for testing hypotheses. Figma prototypes are very limited and keep breaking, whereas here you can build a live prototype and get data on how people use it. That opens up more ways to test hypotheses and speeds up iterations.",
+      "Пока я работал над дизайном и изучал конкурентов, вспомнил давний холивар: что важнее, UX или UI? На этом проекте я убедился, что они важны в равной степени. Без хорошего визуала человек может просто не дойти до самых продуманных решений. А с одним визуалом, без сопровождения на всём пути, он не доберётся до результата.": "While working on the design and studying competitors, I recalled an old holy war: which matters more, UX or UI? This project convinced me they matter equally. Without good visuals, a person may never reach the most carefully thought-out solutions. And with visuals alone, without guidance all the way through, they won’t get to the result.",
+      "Отдельное спасибо Игорю Плющу: он делился опытом и ревьюил проект.": "Special thanks to Igor Plyusch: he shared his experience and reviewed the project.",
+      "Что бы я ещё протестировал": "What I’d test next",
+      "Вход в кешбэк": "The way into cashback",
+      "В тесте кешбэк искали по заданию, а в жизни на него натыкаются случайно. Стоит проверить, заметят ли его сами, и, если подключение в приоритете, попробовать на главной баннер с выгодой.": "In the test people looked for cashback because the task said so; in real life they come across it by chance. It’s worth checking whether they notice it on their own and, if activation is a priority, trying a banner on the home screen.",
+      "Сравнить переворот карты с блоком данных под ней. Участникам старшей возрастной группы переворот, похоже, давался сложнее, особенно тем, у кого ПСБ единственный банк.": "Compare flipping the card with a block of details under it. Older participants seemed to find the flip harder, especially those whose only bank is PSB.",
+      "Часть участников по пути первым делом цепляла плитки предложений. Можно ослабить их визуальный вес и проверить это в следующих итерациях.": "Along the way, some participants went for the offer tiles first. Their visual weight could be toned down and tested in the next iterations.",
+      // /case:psb
     };
     // Texts made of a number and a word
     const RULES = [[/^(\d+) (?:год|года|лет)$/, (_, n) => `${n} years old`]];
@@ -3990,7 +4975,8 @@
   });
 
   /* ── Tabs ── */
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  // The menu's own tabs only: the case has tab lists of its own (its options)
+  const tabs = [...document.querySelectorAll('.top .tabs [role="tab"]')];
   const worldOf = { 'v-char': 'char', 'v-side': 'side' };
   const pager = document.getElementById('pager');
   const views = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
@@ -4292,8 +5278,6 @@
     document.getElementById('where').replaceChildren('Квест:', ' ' + q.title.split(' ')[0]);
     document.getElementById('pregion').innerHTML = tags(q);
     document.getElementById('ptitle').textContent = q.title;
-    document.getElementById('plead').textContent = q.sub;
-    document.getElementById('pfacts').innerHTML = factsHTML(q.facts);
     pcover.src = `img/cover-${q.id}.webp`;
     pcover.style.backgroundImage = `url(img/cover-${q.id}-bg.webp)`;
   }
@@ -4330,6 +5314,7 @@
       () => {
         document.body.classList.add('playing', 'landed');
         window.scrollTo(0, 0);
+        caseBody.spy();
         if (t.veil) t.veil.style.visibility = 'hidden';
       },
       t.anims.length ? LAND_AT : 0,
@@ -4427,6 +5412,95 @@
     evenCards();
     if (phone.matches) tabs[cur()].scrollIntoView({ inline: 'nearest', block: 'nearest' });
   });
+
+  /* ── The case body: the chapter in view lit in the contents, options to flip through, films in
+     the page's language, the walkthrough playing only while it is on screen ── */
+  const caseBody = (() => {
+    const tocLinks = [...document.querySelectorAll('.toc a')];
+    const chapters = [...document.querySelectorAll('.cs .ch')];
+    const light = (id) => tocLinks.forEach((a) => a.classList.toggle('on', a.hash === '#' + id));
+    // The lit chapter is the last one whose top has passed a third of the screen
+    const spy = () => {
+      if (!document.body.classList.contains('playing')) return;
+      const line = innerHeight / 3;
+      let on = chapters[0];
+      for (const c of chapters) if (c.getBoundingClientRect().top <= line) on = c;
+      if (on) light(on.id);
+    };
+    addEventListener('scroll', spy, { passive: true });
+    tocLinks.forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }),
+    );
+    // Quests in the overview lead to their solution the same way
+    document.querySelectorAll('.qc').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }),
+    );
+
+    // Options: a tab list, arrows move between them
+    document.querySelectorAll('[data-vars]').forEach((box) => {
+      const tabsV = [...box.querySelectorAll('[role=tab]')];
+      const show = (i) => {
+        tabsV.forEach((b, k) => {
+          b.setAttribute('aria-selected', k === i);
+          b.tabIndex = k === i ? 0 : -1;
+          document.getElementById(b.getAttribute('aria-controls')).hidden = k !== i;
+        });
+      };
+      tabsV.forEach((b, i) => {
+        b.addEventListener('click', () => show(i));
+        b.addEventListener('keydown', (e) => {
+          const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const k = (i + d + tabsV.length) % tabsV.length;
+          show(k);
+          tabsV[k].focus();
+        });
+      });
+    });
+
+    // Films: the source follows the language; a playing one keeps its place
+    const films = [...document.querySelectorAll('video.talk')];
+    function filmsLang() {
+      const lang = i18n.isEn() ? 'en' : 'ru';
+      films.forEach((v) => {
+        const src = v.dataset['src' + (lang === 'en' ? 'En' : 'Ru')];
+        if (v.getAttribute('src') === src) return;
+        const at = v.currentTime,
+          playing = !v.paused;
+        v.poster = v.dataset['poster' + (lang === 'en' ? 'En' : 'Ru')];
+        v.src = src;
+        if (at) v.addEventListener('loadedmetadata', () => (v.currentTime = at), { once: true });
+        if (playing) v.play().catch(() => {});
+      });
+    }
+    filmsLang();
+
+    // The walkthrough loops only while it is seen
+    const loops = [...document.querySelectorAll('video.loop')];
+    const seen = new IntersectionObserver((es) =>
+      es.forEach((e) => {
+        if (e.isIntersecting && !reduceMotion.matches) e.target.play().catch(() => {});
+        else e.target.pause();
+      }),
+    );
+    loops.forEach((v) => seen.observe(v));
+
+    // On pause everything stops
+    function stop() {
+      [...films, ...loops].forEach((v) => v.pause());
+    }
+    return { spy, filmsLang, stop };
+  })();
+  document.getElementById('back').addEventListener('click', caseBody.stop);
+  addEventListener('keydown', (e) => e.key === 'Escape' && caseBody.stop());
+  document.getElementById('lang').addEventListener('click', () => caseBody.filmsLang());
 
   select(0);
   tab(0, false);
