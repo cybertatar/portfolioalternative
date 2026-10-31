@@ -5547,14 +5547,34 @@
   function loadLive() {
     if (liveLoaded) return;
     liveLoaded = true;
-    for (const name of ['style-data.js', 'app.js']) {
+    const add = (name, onload) => {
       const s = document.createElement('script');
       s.src = 'live/psb/' + name;
       // UTF-8 whatever the page says: the bundle's Russian text broke under another charset
       s.charset = 'utf-8';
-      s.async = false;
+      if (onload) s.onload = onload;
       document.body.append(s);
+    };
+    // The app is always drawn 402pt wide, but its CSS has rules for the real screen's width
+    // (width<=370px and the like): on a narrow phone they squeezed the quick actions to 60px and
+    // two labels wrapped, so their buttons jumped up. On a 402pt screen none of them hold
+    add('style-data.js', () => {
+      window.__psbPortfolioCss = dropWidthQueries(window.__psbPortfolioCss || '');
+      add('app.js');
+    });
+  }
+  function dropWidthQueries(css) {
+    let out = '',
+      i = 0;
+    const at = /@media\s*\((?:min-|max-)?width\s*[<>:=][^)]*\)\s*\{/g;
+    for (let m; (m = at.exec(css)); ) {
+      let depth = 1,
+        j = at.lastIndex;
+      for (; j < css.length && depth; j++) depth += css[j] === '{' ? 1 : css[j] === '}' ? -1 : 0;
+      out += css.slice(i, m.index);
+      i = at.lastIndex = j;
     }
+    return out + css.slice(i);
   }
 
   function buildFan() {
