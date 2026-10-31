@@ -138,7 +138,7 @@ function variants(v, id) {
 
 function rows(rs) {
   return `<div class="rows"><p class="rows-h"><span></span><span>${L(t('Было', 'Before'))}</span><span>${L(t('Стало', 'After'))}</span></p>${rs
-    .map(([k, a, b]) => `<div class="row"><b>${L(num(k))}</b><span class="was">${L(a)}</span><span class="now">${L(b)}</span></div>`)
+    .map(([k, a, b]) => `<div class="rows-r"><b>${L(num(k))}</b><span class="was">${L(a)}</span><span class="now">${L(b)}</span></div>`)
     .join('')}</div>`;
 }
 
