@@ -2045,10 +2045,11 @@
     document.getElementById('age').textContent = a + ' ' + y;
   })();
 
-  /* ── The character's world: Mount Fuji at dawn behind a sakura branch, 320×180 pixel art with
-     ordered dithering. Petals fall on their own layer over the blurred world, almost sharp, so
-     they read as nearer to the eye than the mountain. ── */
-  const fuji = (() => {
+  /* ── Biomes: a world per tab and per quest, 320×180 pixel art with ordered dithering, drawn 4×
+     into the world canvas. «Персонаж» is Mount Fuji at dawn behind a sakura branch; PSB is a
+     maple valley in autumn, a river bank at dusk. Each has its own falling things (petals,
+     leaves) on a layer blurred and darkened with the world, so they stay part of the picture. ── */
+  const biomes = (() => {
     const rng = (seed) => () => {
       seed = (seed + 0x6d2b79f5) | 0;
       let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
@@ -2090,27 +2091,27 @@
       [[30, 116], [50, 112], [66, 118], 2.4, 1],
       [[96, 40], [112, 22], [124, 2], 2, 1],
     ];
-    function blossomClusters() {
-      const r = rng(7),
+    function blossomClusters(branches = BRANCHES, extra = SAKURA_EXTRA, seed = 7) {
+      const r = rng(seed),
         out = [];
-      BRANCHES.slice(2).forEach(([p0, c, p1]) => {
+      branches.slice(2).forEach(([p0, c, p1]) => {
         for (let t = 0.3; t <= 1.01; t += 0.15) {
           const [x, y] = qpt(p0, c, p1, t);
           out.push([x + (r() - 0.5) * 8, y + (r() - 0.5) * 8, lerp(10, 5, t) + r() * 3]);
         }
       });
-      [[6, 28, 11], [20, 52, 9], [0, 6, 13], [60, 16, 10], [36, 8, 11], [52, 60, 8], [84, 4, 9], [2, 70, 8]].forEach((c) =>
-        out.push(c),
-      );
+      extra.forEach((c) => out.push(c));
       return out;
     }
+    // Blossom clusters off the branches, filling the top-left corner
+    const SAKURA_EXTRA = [[6, 28, 11], [20, 52, 9], [0, 6, 13], [60, 16, 10], [36, 8, 11], [52, 60, 8], [84, 4, 9], [2, 70, 8]];
     const CLUSTERS = blossomClusters();
 
     /* ── Pixel art: drawn into the 320×180 bitmap, gradients by a 4×4 ordered dither ── */
     const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
     const dith = (x, y, a) => a > (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
 
-    function pixelScene() {
+    function pixelScene(painters) {
       const c = document.createElement('canvas');
       c.width = PW;
       c.height = PH;
@@ -2128,13 +2129,7 @@
         d[i + 3] = 255;
       };
       const P = (h) => rgb(h);
-      pxSky(set, P);
-      pxFuji(set, P);
-      pxMist(set, P);
-      pxHills(set, P);
-      pxPagoda(set, P);
-      pxSlope(set, P);
-      pxTree(set, P);
+      painters.forEach((paint) => paint(set, P));
       g.putImageData(img, 0, 0);
       return c;
     }
@@ -2262,10 +2257,13 @@
       }
     }
 
-    function pxTree(set, P) {
+    const pxTree = (set, P) => drawTree(set, P, BRANCHES, CLUSTERS, ['#fff0f4', '#f7b8cf', '#e48aae', '#b0618c'], 11);
+    // A tree from branches (start, bend, end, widths) and clusters of foliage lit from the upper
+    // left; tones go from the lit side to the shadow
+    function drawTree(set, P, branches, clusters, tonesHex, seed, lightX = -0.6) {
       const bark = P('#2a1d30'),
         barkLit = P('#4c3448');
-      for (const [p0, c, p1, w0, w1] of BRANCHES)
+      for (const [p0, c, p1, w0, w1] of branches)
         for (let t = 0; t <= 1; t += 1 / 220) {
           const [x, y] = qpt(p0, c, p1, t),
             rr = lerp(w0, w1, t) / 2;
@@ -2273,10 +2271,10 @@
             for (let dx = -rr; dx <= rr; dx++)
               if (dx * dx + dy * dy <= rr * rr + 0.3) set(x + dx, y + dy, dx < -rr + 1.2 ? barkLit : bark);
         }
-      const tones = ['#fff0f4', '#f7b8cf', '#e48aae', '#b0618c'].map(P),
-        r = rng(11);
+      const tones = tonesHex.map(P),
+        r = rng(seed);
       const puffs = [];
-      for (const [cx, cy, rad] of CLUSTERS)
+      for (const [cx, cy, rad] of clusters)
         for (let k = 0; k < 6; k++) {
           const a = r() * 6.283,
             d = r() * rad * 0.6;
@@ -2291,13 +2289,185 @@
             // Light from the upper left, mostly per puff, a little per cluster
             const dx = (x - px) / pr + (x - cx) / rad * 0.5,
               dy = (y - py) / pr + (y - cy) / rad * 0.5,
-              v = (-dx * 0.6 - dy * 0.8) / 1.5;
+              v = (dx * lightX - dy * 0.8) / 1.5;
             const lv = v > 0.55 ? 0 : v > 0.1 ? 1 : v > -0.45 ? 2 : 3;
             const f = v > 0.55 ? 0 : v > 0.1 ? (0.55 - v) / 0.45 : v > -0.45 ? (0.1 - v) / 0.55 : 0;
             set(x, y, tones[Math.min(3, lv + (dith(x, y, f * 0.5) ? 1 : 0))]);
           }
     }
 
+    /* ── PSB: a maple valley in autumn at dusk. Navy sky and far ridges, the sun sinking into the
+       valley, orange and red forests down both slopes, a river (the bank's own bank) with a
+       small bridge, a maple on the right mirroring the sakura of «Персонаж» ── */
+    const PSB_SKY = ['#141c3d', '#1b2550', '#243063', '#33396f', '#4a4174', '#6b4a72', '#93566a', '#bd6a5c', '#de8650', '#f0a650', '#f7c46a'];
+    const smooth = (a, b, x) => {
+      const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    };
+    const psbRidge = (x) => 92 + 9 * Math.sin(x * 0.021 + 0.5) + 6 * Math.sin(x * 0.057 + 1.3) + 2.5 * Math.sin(x * 0.13);
+    const psbLeft = (x) => 96 + 44 * smooth(0, 175, x) + 3 * Math.sin(x * 0.15);
+    const psbRight = (x) => 92 + 46 * smooth(320, 150, x) + 3 * Math.sin(x * 0.13 + 1);
+    const river = (y) => [160 + 16 * Math.sin((y - 132) * 0.075), 1.5 + (y - 134) * 0.5];
+    const inRiver = (x, y) => {
+      if (y < 134) return false;
+      const [c, w] = river(y);
+      return Math.abs(x - c) <= w;
+    };
+    const PSB_SUN = [108, 101]; // half sunk in the lowest dip of the far ridge
+    const MAPLE = [
+      [[304, 184], [292, 146], [286, 112], 8, 5],
+      [[286, 112], [282, 90], [276, 72], 5, 4],
+      [[278, 78], [236, 46], [176, 28], 3, 1],
+      [[282, 98], [252, 86], [214, 70], 3, 1.2],
+      [[276, 74], [292, 42], [312, 10], 3, 1.5],
+      [[288, 120], [270, 116], [254, 124], 2.4, 1],
+      [[226, 44], [212, 24], [204, 2], 2, 1],
+    ];
+    const MAPLE_EXTRA = [[314, 28, 11], [300, 52, 9], [320, 6, 13], [262, 14, 10], [286, 8, 11], [268, 60, 8], [238, 4, 9], [318, 70, 8], [296, 30, 10], [250, 34, 8], [306, 88, 7], [276, 40, 9]];
+
+    function psbSky(set, P) {
+      const cols = PSB_SKY.map(P),
+        r = rng(13);
+      for (let y = 0; y < PH; y++) {
+        const f = Math.min((y / 128) * (cols.length - 1), cols.length - 1.001),
+          i = f | 0;
+        for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+      }
+      for (let k = 0; k < 40; k++) {
+        const x = r() * PW,
+          y = r() * 40;
+        if (r() > y / 46) set(x, y, P('#cfd6ff'));
+      }
+      const glow = P('#f9be62'),
+        sun = P('#ffe6a8');
+      for (let y = PSB_SUN[1] - 36; y < PSB_SUN[1] + 36; y++)
+        for (let x = PSB_SUN[0] - 50; x < PSB_SUN[0] + 50; x++) {
+          const dd = Math.hypot((x - PSB_SUN[0]) * 0.75, y - PSB_SUN[1]);
+          if (dd < 9) set(x, y, sun);
+          else if (dd < 36 && dith(x, y, ((1 - dd / 36) ** 2) * 0.95)) set(x, y, glow);
+        }
+      const lit = P('#f7b25e'),
+        dark = P('#6b4a72');
+      for (let k = 0; k < 7; k++) {
+        const y = 52 + r() * 40,
+          x0 = r() * PW,
+          len = 10 + r() * 30;
+        for (let x = x0; x < x0 + len; x++) {
+          set(x, y, lit);
+          if (x > x0 + 3 && x < x0 + len - 4) set(x, y + 1, dark);
+        }
+      }
+    }
+    function psbRidges(set, P) {
+      const ridge = P('#2a3266'),
+        haze = P('#5a4a7a');
+      for (let x = 0; x < PW; x++)
+        for (let y = psbRidge(x) | 0; y < PH; y++) {
+          const a = (y - psbRidge(x)) / 30;
+          set(x, y, dith(x, y, Math.min(0.8, a)) ? haze : ridge);
+        }
+    }
+    function psbRiver(set, P) {
+      const cols = ['#f7c46a', '#f0a650', '#de8650', '#93566a', '#4a4174'].map(P),
+        bank = P('#7a3a2e'),
+        r = rng(17);
+      for (let y = 134; y < PH; y++) {
+        const [c, w] = river(y);
+        const f = Math.min(cols.length - 1.001, ((y - 134) / 46) * (cols.length - 1)),
+          i = f | 0;
+        for (let x = Math.round(c - w); x <= c + w; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+        set(c - w - 1, y, bank);
+        set(c + w + 1, y, bank);
+      }
+      // Ripples: short light strokes across the water
+      for (let k = 0; k < 26; k++) {
+        const y = 138 + r() * 40,
+          [c, w] = river(y),
+          x0 = c - w * 0.8 + r() * w * 1.2,
+          len = 1 + r() * Math.min(6, w * 0.6);
+        for (let x = x0; x < x0 + len; x++) set(x, y, P('#ffe6a8'));
+      }
+    }
+    // A slope of maple crowns: a dark base, then many small crowns from the back to the front
+    function psbForest(set, P, top, side, seed) {
+      const base = P('#3a1f33'),
+        near = ['#e08a34', '#c8562a', '#9e3a2c', '#d06a2e', '#b8452a'].map(P),
+        far = ['#9a5446', '#7e3e44', '#6a3446', '#8a4a48', '#5a2e44'].map(P),
+        lit = P('#f7b25e'),
+        litFar = P('#c07a5a'),
+        shade = P('#4a2536'),
+        r = rng(seed);
+      for (let x = 0; x < PW; x++)
+        for (let y = top(x) | 0; y < PH; y++) if (side(x) && !inRiver(x, y)) set(x, y, base);
+      const pts = [];
+      for (let k = 0; k < 1100; k++) {
+        const x = r() * PW;
+        if (!side(x)) continue;
+        const y = top(x) + 1 + r() * (PH - top(x)),
+          // depth: 0 far up the slope, 1 at the front; far crowns are smaller, duller, darker
+          d = Math.max(0, Math.min(1, (y - 110) / 55)),
+          isNear = r() < d,
+          i = (r() * near.length) | 0;
+        pts.push([x, y, 1 + r() * 1.2 + d * 1.4, isNear ? near[i] : far[i], isNear ? lit : litFar]);
+      }
+      pts.sort((a, b) => a[1] - b[1]);
+      for (const [cx, cy, rad, col, hi] of pts)
+        for (let y = cy - rad; y <= cy + rad; y++)
+          for (let x = cx - rad; x <= cx + rad; x++) {
+            const dx = x - cx,
+              dy = y - cy;
+            if (dx * dx + dy * dy > rad * rad || inRiver(x, y) || y < top(x) - 1) continue;
+            const v = (-dx - dy) / rad;
+            set(x, y, v > 0.9 ? hi : v < -0.9 ? shade : col);
+          }
+    }
+    const psbSlopes = (set, P) => {
+      psbForest(set, P, psbRight, (x) => x > 150, 19);
+      psbForest(set, P, psbLeft, (x) => x < 175, 23);
+    };
+    function psbBridge(set, P) {
+      const yb = 150,
+        [c, w] = river(yb),
+        l = Math.round(c - w - 4),
+        rr = Math.round(c + w + 4),
+        deck = P('#2b2238'),
+        rail = P('#53304a'),
+        lamp = P('#ffcf8a');
+      for (let x = l; x <= rr; x++) {
+        const y = yb - Math.round(5 * Math.sin((Math.PI * (x - l)) / (rr - l)));
+        set(x, y, deck);
+        set(x, y + 1, deck);
+        set(x, y - 3, rail);
+        if ((x - l) % 3 === 0) {
+          set(x, y - 1, rail);
+          set(x, y - 2, rail);
+        }
+      }
+      for (const x of [l, rr]) {
+        for (let k = 1; k < 6; k++) set(x, yb - k, rail);
+        set(x, yb - 6, lamp);
+      }
+    }
+    function psbBank(set, P) {
+      const ground = P('#24172a'),
+        edge = P('#4a2a2e'),
+        leaf = ['#e08a34', '#c8562a', '#f7b25e'].map(P),
+        r = rng(29);
+      const fg = (x) => 172 - 12 * Math.exp(-(((x - 300) / 60) ** 2)) - 6 * Math.exp(-(((x - 20) / 50) ** 2));
+      for (let x = 0; x < PW; x++) {
+        const top = fg(x) | 0;
+        for (let y = top; y < PH; y++) set(x, y, ground);
+        set(x, top, edge);
+      }
+      for (let k = 0; k < 120; k++) {
+        const x = r() * PW;
+        set(x, fg(x) + 1 + r() * 10, leaf[(r() * leaf.length) | 0]);
+      }
+    }
+    const psbMaple = (set, P) =>
+      drawTree(set, P, MAPLE, blossomClusters(MAPLE, MAPLE_EXTRA, 37), ['#ffd27a', '#f29a3e', '#d4592a', '#8e2f2a'], 41);
+
+    /* What falls in each world, in scene pixels: sakura petals, maple leaves */
     function pxPetal(g, p, flip) {
       const x = Math.round(p.x),
         y = Math.round(p.y);
@@ -2310,22 +2480,50 @@
         g.fillRect(x + 2, y + 1, 1, 1);
       }
     }
+    function pxLeaf(g, p, flip) {
+      const x = Math.round(p.x),
+        y = Math.round(p.y);
+      g.fillStyle = p.tone < 0.4 ? '#f29a3e' : p.tone < 0.75 ? '#d4592a' : '#ffd27a';
+      if (Math.abs(flip) < 0.3) return g.fillRect(x, y, 1, 2); // edge-on while it turns
+      if (p.z > 1.05) {
+        // a near leaf: a small five-point maple shape
+        g.fillRect(x, y + 1, 3, 1);
+        g.fillRect(x + 1, y, 1, 3);
+        if (Math.abs(flip) > 0.7) g.fillRect(flip > 0 ? x : x + 2, y, 1, 1);
+      } else g.fillRect(x, y, 2, Math.abs(flip) > 0.7 ? 2 : 1);
+    }
 
-    let art = null;
-    // The scene is drawn once and kept: the menu returns to it on every visit to the tab
-    const scene = () => (art = art || pixelScene());
+    const KINDS = {
+      char: {
+        paint: [pxSky, pxFuji, pxMist, pxHills, pxPagoda, pxSlope, pxTree],
+        focus: '62% 50%', // on a tall phone the crop keeps Fuji in view, not the empty sky
+        fall: { draw: pxPetal, per: 75000, max: 18, min: 8, wind: 1, sink: 1 },
+      },
+      psb: {
+        paint: [psbSky, psbRidges, psbRiver, psbSlopes, psbBridge, psbBank, psbMaple],
+        focus: '50% 50%',
+        // Leaves are heavier than petals: fewer, sinking a little faster, drifting less
+        fall: { draw: pxLeaf, per: 95000, max: 14, min: 6, wind: 0.6, sink: 1.3 },
+      },
+    };
+    const art = {};
+    // Each scene is drawn once and kept: the menu returns to it on every visit
+    const scene = (kind) => (art[kind] = art[kind] || pixelScene(KINDS[kind].paint));
+    const has = (kind) => kind in KINDS;
+    const focus = (kind) => (KINDS[kind] ? KINDS[kind].focus : '');
 
-    function petalsLayer(fx) {
+    function fallLayer(fx) {
       const g = fx.getContext('2d'),
         r = rng(31),
         reduce = matchMedia('(prefers-reduced-motion: reduce)');
       let w = 0,
         h = 0,
         list = [],
+        cfg = null,
         on = false,
         last = 0;
       const spawn = (p, first) => {
-        p.z = 0.5 + r() * 0.9; // nearer petals are bigger and faster
+        p.z = 0.5 + r() * 0.9; // nearer ones are bigger and faster
         p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
         p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
         p.rot = r() * 6.283;
@@ -2334,25 +2532,27 @@
         p.tone = r();
         return p;
       };
-      // One petal pixel is one pixel of the scene on screen (the world is drawn with object-fit: cover)
+      // One pixel here is one pixel of the scene on screen (the world is drawn with object-fit: cover)
       const resize = () => {
         const cell = Math.max(innerWidth / PW, innerHeight / PH) * 1.06;
         fx.width = Math.ceil(innerWidth / cell);
         fx.height = Math.ceil(innerHeight / cell);
         w = fx.width;
         h = fx.height;
-        // Few petals: a light drift at the edge of sight, not a flurry in front of the menu
-        const n = Math.round(Math.min(18, Math.max(8, (innerWidth * innerHeight) / 75000)));
+        if (!cfg) return (list = []);
+        // Few of them: a light drift at the edge of sight, not a flurry in front of the menu
+        const n = Math.round(Math.min(cfg.max, Math.max(cfg.min, (innerWidth * innerHeight) / cfg.per)));
         list = Array.from({ length: n }, () => spawn({}, true));
       };
       const draw = (t, dt) => {
         g.clearRect(0, 0, w, h);
+        if (!cfg) return;
         for (const p of list) {
-          p.x += (3 + 2.5 * p.z + Math.sin(t * 0.0007 + p.phase) * 3) * p.z * dt;
-          p.y += (2 + 3 * p.z) * p.z * dt;
+          p.x += (3 + 2.5 * p.z + Math.sin(t * 0.0007 + p.phase) * 3) * p.z * cfg.wind * dt;
+          p.y += (2 + 3 * p.z) * p.z * cfg.sink * dt;
           p.rot += p.spin * dt;
           if (p.x > w + 12 || p.y > h + 12) spawn(p, false);
-          pxPetal(g, p, Math.cos(p.rot));
+          cfg.draw(g, p, Math.cos(p.rot));
         }
       };
       const tick = (now) => {
@@ -2362,34 +2562,40 @@
         if (!document.hidden) draw(now, dt);
         requestAnimationFrame(tick);
       };
-      resize();
-      draw(0, 0);
       addEventListener('resize', () => {
         resize();
         draw(0, 0);
       });
-      // Runs only while the character's world is shown; with reduced motion the petals hang still
-      return (show) => {
-        fx.classList.toggle('off', !show);
-        if (show === on) return;
-        on = show && !reduce.matches;
+      // Shows what falls in this world (nothing in a world without it); runs only while shown,
+      // and with reduced motion it hangs still
+      return (kind) => {
+        const next = KINDS[kind] ? KINDS[kind].fall : null;
+        fx.classList.toggle('off', !next);
+        if (next !== cfg) {
+          cfg = next;
+          resize();
+          draw(0, 0);
+        }
+        const run = !!cfg && !reduce.matches;
+        if (run === on) return;
+        on = run;
         if (on) {
           last = performance.now();
           requestAnimationFrame(tick);
         }
       };
     }
-    return { scene, petalsLayer };
+    return { scene, has, focus, fallLayer };
   })();
 
   /* ── Worlds: one small top-down place per quest, in 8px tiles ── */
   function world(c, kind) {
-    if (kind === 'char') {
+    if (biomes.has(kind)) {
       c.width = 1280;
       c.height = 720;
       const g = c.getContext('2d');
       g.imageSmoothingEnabled = false;
-      g.drawImage(fuji.scene(), 0, 0, c.width, c.height);
+      g.drawImage(biomes.scene(kind), 0, 0, c.width, c.height);
       return c;
     }
     const T = 8,
@@ -2640,15 +2846,14 @@
     w2 = document.getElementById('w2');
   let front = w1,
     shown = '';
-  const petals = fuji.petalsLayer(document.getElementById('petals'));
+  const falling = biomes.fallLayer(document.getElementById('petals'));
   function showWorld(kind) {
     if (kind === shown) return;
     shown = kind;
     const back = front === w1 ? w2 : w1;
     world(back, kind);
-    // On a tall phone screen the crop keeps Fuji in view rather than the empty middle of the sky
-    back.style.objectPosition = kind === 'char' ? '62% 50%' : '';
-    petals(kind === 'char');
+    back.style.objectPosition = biomes.focus(kind);
+    falling(kind);
     back.classList.remove('off');
     front.classList.add('off');
     front = back;
