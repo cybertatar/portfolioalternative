@@ -760,16 +760,22 @@
     /* Results as a row of stats, like the counters on a social profile: a big number and a word
        or two under it, no boxes. A closed quest puts a line of the same height in that place: its
        pixel sign and why it is closed */
+    /* Every stat as wide as its words, spread over the row, so each caption keeps to one line;
+       the columns may still give way (a caption wraps only when the row cannot hold it), or the
+       card, a button, would grow to fit them */
     .q-stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--s3);
+      grid-template-columns: repeat(3, minmax(0, auto));
+      justify-content: space-between;
+      gap: var(--s2);
       align-items: start;
       min-height: var(--facts-h, 0px);
       margin-top: var(--s5);
     }
+    /* The second size off the type scale: three captions share a phone's row only at 12px. It is
+       there to fit, not to rank */
     .q-stats span {
-      font-size: var(--fs-cap);
+      font-size: 12px;
       line-height: 1.3;
       color: var(--ink-2);
     }
