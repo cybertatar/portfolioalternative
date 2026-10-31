@@ -2886,9 +2886,9 @@
       g.fillRect(x + 5, y - (up ? 2 : 0), 1, 1);
     }
 
-    /* ── Side quests: a camp in a pine clearing at night, where an RPG hands out side quests.
-       A fire, a tent, a board with notes pinned to it, pines all round under the stars and a
-       moon; fireflies drift about and the fire flickers on the moving layer ── */
+    /* ── Side quests: a camp in a pine clearing on a sunny day, where an RPG hands out side
+       quests. A fire, a tent, a board with notes pinned to it, pines all round; butterflies
+       flutter over the grass and the fire flickers on the moving layer ── */
     const FIRE = [160, 142];
     const pine = (set, col, cx, base, h, w) => {
       // a conifer: tiers of jagged triangles, narrow at the top
@@ -2901,43 +2901,44 @@
       for (let y = base; y < base + 3; y++) set(cx, y, col);
     };
     function campSky(set, P) {
-      const cols = ['#08131a', '#0b1a22', '#0f222a', '#132b32', '#17343a'].map(P),
-        star = P('#cfe0dc'),
-        dim = P('#5f7c7a'),
-        moon = P('#f1ecd4'),
+      const cols = ['#5f9fd0', '#78b0d8', '#92c0e0', '#acd0e6', '#c6dfea', '#dceae8'].map(P),
+        sun = P('#fffbe8'),
+        glow = P('#e6f0f0'),
         r = rng(73);
       for (let y = 0; y < 110; y++) {
         const f = Math.min((y / 100) * (cols.length - 1), cols.length - 1.001),
           i = f | 0;
         for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
       }
-      for (let k = 0; k < 90; k++) set(r() * PW, r() * 80, r() < 0.25 ? star : dim);
-      // A crescent moon: a disc with a second disc taken out of it
-      for (let y = 14; y < 40; y++)
-        for (let x = 236; x < 262; x++)
-          if (Math.hypot(x - 249, y - 27) < 9 && Math.hypot(x - 253, y - 24) > 8) set(x, y, moon);
+      for (let y = 10; y < 44; y++)
+        for (let x = 238; x < 272; x++) {
+          const d = Math.hypot((x - 254) * 0.8, y - 26);
+          if (d < 7) set(x, y, sun);
+          else if (d < 12 && dith(x, y, (1 - (d - 7) / 5) * 0.9)) set(x, y, glow);
+        }
+      skyClouds(set, P, r, 5, 14, 60);
     }
     function campForest(set, P) {
-      const far = P('#163236'),
-        mid = P('#10262a'),
+      const far = P('#5a8a74'),
+        mid = P('#2f5e46'),
         r = rng(79);
       for (let x = -6; x < PW + 6; x += 5 + r() * 4) pine(set, far, x, 104 + r() * 6, 26 + r() * 16, 5 + r() * 3);
-      for (let y = 108; y < PH; y++) for (let x = 0; x < PW; x++) set(x, y, far);
+      for (let y = 101; y < PH; y++) for (let x = 0; x < PW; x++) set(x, y, far);
       for (let x = -6; x < PW + 6; x += 7 + r() * 6)
         if (Math.abs(x - 160) > 60 || r() < 0.3) pine(set, mid, x, 122 + r() * 6, 34 + r() * 18, 7 + r() * 3);
     }
     function campGround(set, P) {
-      const grass = P('#1a3324'),
-        grassD = P('#142a1e'),
-        lit = P('#4a4228'),
-        lit2 = P('#2e3622'),
+      const grass = P('#74a652'),
+        grassD = P('#5e8f42'),
+        lit = P('#a8865a'),
+        lit2 = P('#8a8a4e'),
         r = rng(83);
       for (let y = 124; y < PH; y++) {
         const edge = 124 + 3 * Math.sin(y);
         for (let x = 0; x < PW; x++) {
           if (y < edge + 2 * Math.sin(x * 0.12)) continue;
-          // firelight pooling on the grass round the fire
-          const d = Math.hypot((x - FIRE[0]) / 80, (y - FIRE[1]) / 30),
+          // bare trodden earth round the fire, thinning out into the grass
+          const d = Math.hypot((x - FIRE[0]) / 44, (y - FIRE[1]) / 16),
             a = d < 1 ? (1 - d) ** 2 : 0;
           set(x, y, dith(x, y, a * 0.9) ? lit : dith(x, y, a * 2) ? lit2 : dith(x, y, 0.25) ? grassD : grass);
         }
@@ -3020,12 +3021,18 @@
         if (life < 0.8) g.fillRect(Math.round(x + ox), Math.round(y + oy), 1, 1);
       }
     }
-    // Fireflies: a yellow-green point that slowly glows and fades
-    function pxFirefly(g, p, flip, t) {
-      const glow = Math.sin(t * 0.002 + p.phase * 4);
-      if (glow < -0.3) return;
-      g.fillStyle = glow > 0.6 ? '#e8f59a' : '#9fbf5a';
-      g.fillRect(Math.round(p.x + Math.sin(t * 0.0013 + p.phase) * 3), Math.round(p.y), 1, 1);
+    // Butterflies: a body with two wings that open and shut, on a wavering path
+    function pxButterfly(g, p, flip, t) {
+      const x = Math.round(p.x + Math.sin(t * 0.0013 + p.phase) * 4),
+        y = Math.round(p.y + Math.sin(t * 0.0021 + p.phase * 2) * 3),
+        open = Math.sin(t * 0.018 + p.phase * 7) > 0;
+      g.fillStyle = p.tone < 0.4 ? '#ffe27a' : p.tone < 0.75 ? '#ffffff' : '#9fd0ef';
+      if (open) {
+        g.fillRect(x - 1, y - 1, 1, 2);
+        g.fillRect(x + 1, y - 1, 1, 2);
+      } else g.fillRect(x, y - 1, 1, 1);
+      g.fillStyle = '#3a3a2a';
+      g.fillRect(x, y, 1, 1);
     }
 
     /* What falls in each world, in scene pixels: sakura petals, maple leaves */
@@ -3087,8 +3094,8 @@
       side: {
         paint: [campSky, campForest, campGround, campTent, campBoard, campFire],
         focus: '50% 50%',
-        // Fireflies wander up slowly; the fire flickers on top
-        fall: { draw: pxFirefly, per: 60000, max: 16, min: 6, wind: 0.12, sink: -0.1, rise: true, over: campFlame },
+        // A few butterflies over the grass; the fire flickers on top
+        fall: { draw: pxButterfly, per: 160000, max: 8, min: 4, wind: 0.35, sink: 0, fly: true, band: [0.55, 0.85], over: campFlame },
       },
     };
     const art = {};
@@ -3117,7 +3124,8 @@
           p.y = first ? r() * h : h + 4;
         } else if (cfg && cfg.fly) {
           p.x = first ? r() * w : -10;
-          p.y = h * (0.12 + r() * 0.4);
+          const [lo, hi] = cfg.band || [0.12, 0.52]; // the height band they keep to
+          p.y = h * (lo + r() * (hi - lo));
         } else {
           p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
           p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
