@@ -465,6 +465,14 @@
   .q small i.open {
     color: var(--green);
   }
+  /* A cover is two layers in one element: the background (graphite and the case's pattern) fills
+     a window of any shape, the objects are always fitted whole, 16:9, so a wide window never cuts
+     them */
+  .cover-art {
+    object-fit: contain;
+    background: #17191d center / cover no-repeat;
+  }
+  .q-cover,
   .q-sub,
   .q-stats,
   .q-go {
@@ -497,8 +505,11 @@
     .q:hover {
       background: linear-gradient(var(--fill), var(--fill)), var(--glass);
     }
-    /* Covers are 16:9, like video and link previews */
+    /* Covers are 16:9, like video and link previews; the world's thumbnail is for the desktop list */
     .q .glimpse {
+      display: none;
+    }
+    .q .q-cover {
       display: block;
       width: 100%;
       height: auto;
@@ -510,7 +521,7 @@
     /* A short phone (320×568): a wider, lower cover, so the next card still peeks in below the
        first one */
     @media (max-height: 700px) {
-      .q .glimpse {
+      .q .q-cover {
         aspect-ratio: 21 / 9;
       }
     }
@@ -607,13 +618,13 @@
     container-type: size;
     background: #0d141b;
   }
-  .scene canvas.ground {
+  /* The cover: the quest's objects on a calm graphite (tools/render-covers.js). Not the quest's
+     world: that is already behind the glass, and a sharp copy of it here was too loud */
+  .scene .cover {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    filter: brightness(0.7) saturate(0.9);
   }
   .scene::after {
     content: '';
@@ -621,16 +632,6 @@
     inset: 0;
     background: linear-gradient(transparent 55%, rgba(11, 17, 24, 0.55));
     pointer-events: none;
-  }
-  .scene .phone {
-    position: relative;
-    z-index: 1;
-    height: 88cqh;
-    width: auto;
-    margin-bottom: -6cqh;
-  }
-  .scene .phone:nth-child(odd) {
-    margin-bottom: -16cqh;
   }
   /* A closed quest is marked in the scene's corner, not over the screens */
   .scene .seal {
@@ -683,11 +684,11 @@
   .qd.can-open .scene {
     cursor: pointer;
   }
-  .qd.can-open .scene canvas.ground {
+  .qd.can-open .scene .cover {
     transition: filter 0.2s ease;
   }
-  .qd.can-open .scene:hover canvas.ground {
-    filter: brightness(0.85) saturate(1);
+  .qd.can-open .scene:hover .cover {
+    filter: brightness(1.12);
   }
   .qd .region,
   #pregion {
@@ -759,22 +760,6 @@
     margin-top: var(--s1);
     font-size: 13px;
     color: var(--ink-3);
-  }
-  .phone {
-    aspect-ratio: 402 / 874;
-    border-radius: 7cqh;
-    outline: 4px solid #1e2732;
-    background: #0d0e10;
-    overflow: hidden;
-    flex: none;
-    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9);
-  }
-  .phone img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
   }
 
   /* Character: who (photo, name, contacts) on the left, what I do on the right. Age and status
@@ -952,22 +937,11 @@
     display: block;
     padding-top: 56.25%;
   }
-  .lq-cover canvas {
+  .lq-cover img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    filter: brightness(0.8);
-  }
-  .lq-cover .phone {
-    position: absolute;
-    left: 50%;
-    bottom: -18%;
-    height: 96%;
-    border-radius: 13% / 6%;
-    transform: translateX(-50%);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
   }
   .lq-body {
     display: flex;
@@ -1044,11 +1018,6 @@
       .lq-cover {
         -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
         mask-image: linear-gradient(90deg, #000 75%, transparent);
-      }
-      .lq-cover .phone {
-        left: 46%;
-        bottom: -14%;
-        height: 92%;
       }
       .lq-body {
         padding: var(--s5) var(--s5) var(--s5) 0;
@@ -3353,6 +3322,17 @@
     return c;
   }
 
+  /* ── Covers: the objects image over its background (see .cover-art); a pane is tinted with the
+     background, so the tint stays as calm as the graphite ── */
+  const coverArt = (id, cls = '') =>
+    `<img class="${cls} cover-art" src="img/cover-${id}.webp" ` +
+    `style="background-image:url(img/cover-${id}-bg.webp)" alt="">`;
+  const coverBg = (id) => {
+    const im = new Image();
+    im.src = `img/cover-${id}-bg.webp`;
+    return im;
+  };
+
   /* ── Data ── */
   const QUESTS = [
     {
@@ -3375,7 +3355,6 @@
         ['30', 'клиентов в тесте'],
       ],
       role: 'Роль: продуктовый дизайн вдвоём — интервью, сценарии, интерфейс, живой прототип на коде, юзабилити-тест.',
-      phones: ['psb-main', 'psb-success'],
       open: true,
     },
     {
@@ -3387,7 +3366,6 @@
       icon: ['coin', 3],
       sub: 'Telegram Mini App для безопасного доступа в интернет через VPN.',
       lock: 'Кейс ещё пишется. Скоро здесь будет журнал этого квеста.',
-      phones: ['vpn-main'],
     },
     {
       id: 'wb',
@@ -3398,7 +3376,6 @@
       icon: ['chest', 2],
       sub: 'Переосмысление сценария копилки в банковском приложении.',
       lock: 'Не хватает маны. Этот кейс откроется позже.',
-      phones: [],
     },
     {
       id: 'mou',
@@ -3409,7 +3386,6 @@
       icon: ['heart', 3],
       sub: 'Интернет-магазин одежды для ателье.',
       lock: 'В эти края пути нет. Кейс под NDA.',
-      phones: [],
     },
   ];
   const SIDE = [
@@ -3552,7 +3528,10 @@
     b.className = 'q';
     b.setAttribute('role', 'option');
     b.id = 'q-' + q.id;
-    b.append(world(mk('', 1, 'glimpse'), q.id), mk(q.icon[0], q.icon[1], 'ic'));
+    // The cover before the icon: its mask makes it a layer of its own, which would cover the icon
+    b.append(world(mk('', 1, 'glimpse'), q.id));
+    b.insertAdjacentHTML('beforeend', coverArt(q.id, 'q-cover'));
+    b.append(mk(q.icon[0], q.icon[1], 'ic'));
     b.insertAdjacentHTML(
       'beforeend',
       `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
@@ -3579,12 +3558,9 @@
     qlist
       .querySelectorAll('.q')
       .forEach((b, k) => b.setAttribute('aria-selected', String(k === sel)));
-    const phones = q.phones
-      .map((p) => `<div class="phone"><img src="img/${p}.webp" alt=""></div>`)
-      .join('');
     const seal = q.open ? '' : `<div class="seal">${q.st}</div>`;
     qd.innerHTML =
-      `<div class="scene window">${phones}${seal}</div><div class="card"><div>` +
+      `<div class="scene window">${coverArt(q.id, 'cover')}${seal}</div><div class="card"><div>` +
       `<p class="region">${tags(q)}</p><h1>${q.title}</h1><p class="sub">${q.sub}</p>` +
       (q.facts ? `<p class="role"></p>` : `<p class="lockmsg"></p>`) +
       `<button class="cta" ${q.open ? '' : 'disabled'} id="cta">${q.open ? 'Открыть кейс' : 'Пока закрыт'}</button></div>` +
@@ -3592,9 +3568,7 @@
         ? factsHTML(q.facts)
         : '') +
       `</div>`;
-    const ground = world(mk('', 1, 'ground'), q.id);
-    qd.querySelector('.scene').prepend(ground);
-    tint(qd, ground);
+    tint(qd, coverBg(q.id));
     if (q.facts) {
       const r = qd.querySelector('.role');
       r.append(mk('spark', 2));
@@ -3631,14 +3605,12 @@
   const lastQ = QUESTS.find((q) => q.open);
   const last = document.getElementById('last');
   last.innerHTML =
-    `<div class="lq-cover"><div class="phone"><img src="img/${lastQ.phones[0]}.webp" alt=""></div></div>` +
+    `<div class="lq-cover">${coverArt(lastQ.id)}</div>` +
     `<div class="lq-body"><b>${lastQ.title}</b>` +
     `<small class="lq-line">${tags(lastQ)}<i>${lastQ.st}</i></small>` +
     `<p class="lq-stats">${lastQ.stats.map(([n, l]) => `<span><b>${n}</b>${l}</span>`).join('')}</p>` +
     `<span class="lq-go">Открыть кейс</span></div>`;
-  const lastWorld = world(mk('', 1), lastQ.id);
-  last.querySelector('.lq-cover').prepend(lastWorld);
-  tint(last, lastWorld);
+  tint(last, coverBg(lastQ.id));
   last.addEventListener('click', () => {
     tab(1);
     select(QUESTS.indexOf(lastQ));
