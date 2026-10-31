@@ -163,6 +163,41 @@
   body.playing .world canvas.petals {
     opacity: 0;
   }
+  /* The world in layers, for the flight into a case: placed exactly over the world canvas (same
+     crop), sharp pixels, moved by transform alone */
+  .world .deep {
+    position: absolute;
+    visibility: hidden;
+  }
+  .world .deep.on {
+    visibility: visible;
+  }
+  .world .deep canvas {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    transition: none;
+    will-change: transform, opacity;
+  }
+  .world .deep canvas.soft {
+    image-rendering: auto;
+  }
+  /* The cover the camera dives into, lifted out of its card */
+  .dive {
+    position: fixed;
+    z-index: 4;
+    margin: 0;
+    pointer-events: none;
+    will-change: left, top, width, height;
+  }
+  /* In flight the menu shows and hides at once: its panes do the moving */
+  body.flying .menu {
+    transition: none;
+  }
+  body.flying {
+    pointer-events: none;
+  }
 
   /* ── Pause menu ── */
   .menu {
@@ -1263,6 +1298,16 @@
       transform: translateX(42vw);
     }
   }
+  /* Once the camera has landed, the title comes up from below */
+  body.landed .stagefront .title {
+    animation: land 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  @keyframes land {
+    from {
+      opacity: 0;
+      transform: translateY(32px);
+    }
+  }
   .stagefront .title {
     max-width: 1240px;
     margin: 0 auto;
@@ -1355,6 +1400,7 @@
 
 <div class="world" aria-hidden="true">
   <canvas id="w1"></canvas><canvas class="off" id="w2"></canvas><canvas class="petals off" id="petals"></canvas>
+  <div class="deep" id="deep"></div>
 </div>
 
 <div class="menu">
@@ -3055,6 +3101,18 @@
         focus: '50% 50%',
         // Leaves are heavier than petals: fewer, sinking a little faster, drifting less
         fall: { draw: pxLeaf, per: 95000, max: 14, min: 6, wind: 0.6, sink: 1.3 },
+        /* Opening the case flies the camera down the valley: toward the gap between the slopes
+           (a scene point), each layer growing by its depth; the maple and the bank in front
+           pass the camera and are gone */
+        fly: {
+          at: [162, 128],
+          layers: [
+            [psbSky, 1.1],
+            [psbRidges, 1.3],
+            [[psbRiver, psbSlopes, psbBridge], 1.9],
+            [[psbBank, psbMaple], 3.6, true],
+          ],
+        },
       },
       vpn: {
         paint: [vpnSpace, vpnEarth, vpnRoutes],
@@ -3086,6 +3144,16 @@
     const scene = (kind) => (art[kind] = art[kind] || pixelScene(KINDS[kind].paint));
     const has = (kind) => kind in KINDS;
     const focus = (kind) => (KINDS[kind] ? KINDS[kind].focus : '');
+    /* The world cut into layers for the flight into a case: [canvas, depth, passes the camera].
+       Layers are drawn by the same painters as the whole scene, so stacked they are the scene */
+    const cut = {};
+    const layers = (kind) => {
+      const f = KINDS[kind] && KINDS[kind].fly;
+      if (!f) return null;
+      return (cut[kind] =
+        cut[kind] || f.layers.map(([paint, depth, past]) => [pixelScene([].concat(paint)), depth, !!past]));
+    };
+    const flyAt = (kind) => KINDS[kind].fly.at;
 
     const FRAME_MS = 50; // 20 frames a second: plenty for slow pixel motion, a third of the work
     const SOFT = 2; // the shown layer is half the scene's size; smooth upscaling softens it
@@ -3200,7 +3268,7 @@
         }
       };
     }
-    return { scene, has, focus, fallLayer };
+    return { scene, has, focus, fallLayer, layers, flyAt };
   })();
 
   /* ── Worlds: one small top-down place per quest, in 8px tiles ── */
@@ -3494,7 +3562,8 @@
   const w1 = document.getElementById('w1'),
     w2 = document.getElementById('w2');
   let front = w1,
-    shown = '';
+    shown = '',
+    shownKind = '';
   /* The worlds hold still. Anything moving behind the glass makes the browser redo the panes'
      backdrop blur on every frame (Safari on a MacBook ran hot at ~50% GPU, even at 20 fps), so
      the falling petals, leaves, sparks and gulls are off. biomes.fallLayer still draws them,
@@ -3505,6 +3574,7 @@
   function showWorld(kind, sharp = false) {
     if (kind + sharp === shown) return;
     shown = kind + sharp;
+    shownKind = kind;
     const back = front === w1 ? w2 : w1;
     if (sharp) world(back, kind);
     else bakeWorld(back, kind);
@@ -3565,7 +3635,7 @@
     if (lock) lock.prepend(mk(q.icon[0], q.icon[1]));
     b.addEventListener('click', () => {
       select(i);
-      if (phone.matches) open();
+      if (phone.matches) open(b.querySelector('.q-cover'));
     });
     b.addEventListener('dblclick', () => open());
     qlist.append(b);
@@ -3629,10 +3699,10 @@
     `<p class="lq-stats">${lastQ.stats.map(([n, l]) => `<span><b>${n}</b>${l}</span>`).join('')}</p>` +
     `<span class="lq-go">Открыть кейс</span></div>`;
   tint(last, coverBg(lastQ.id));
+  // Into the case from here, by diving into the cover; back on pause, to this very card
   last.addEventListener('click', () => {
-    tab(1);
-    select(QUESTS.indexOf(lastQ));
-    open();
+    sel = QUESTS.indexOf(lastQ);
+    open(last.querySelector('.cover-art'));
   });
 
   /* ── Tabs ── */
@@ -3851,11 +3921,147 @@
     addEventListener(ev, () => ((touching = false), onQuests() && later()), { passive: true });
 
 
-  /* ── Unpause into the case, pause back ── */
-  const play = document.getElementById('play');
-  function open() {
-    const q = QUESTS[sel];
-    if (!q.open || cur() !== 1) return;
+  /* ── Unpause into the case, pause back. Where a world is cut into layers, opening the case is a
+     flight: the panes fly past the camera, and the camera flies down into the world, each layer
+     growing by its depth, until the world is sharp and becomes the head of the case. From a cover
+     (the latest quest, a quest card on a phone) the camera dives into the cover first, and the
+     cover turns into the world. Pause plays the same flight backwards ── */
+  const play = document.getElementById('play'),
+    deep = document.getElementById('deep');
+  const OUT_MS = 420, // the panes flying past the camera
+    FLY_MS = 650, // the camera's flight into the world
+    DIVE_MS = 400, // a cover growing to the whole screen
+    DIVE_FLY_AT = 220, // in a dive, when the camera starts into the world
+    WORLD_IN = [100, 250], // in a dive, when and how long the world fades in under the cover
+    PAST_STEPS = [0.3, 0.75], // a near layer passes the camera: still opaque, then gone
+    BLUR_GONE = 0.55, // in the flight, when the blur of the paused world has cleared
+    AWAY = 1.1, // how far a pane flies: its distance from the middle of the screen, times this
+    AWAY_MIN = 0.15, // a pane in the middle still leaves, at least this share of the screen
+    AWAY_SCALE = 1.3;
+  const DOLLY = 'cubic-bezier(0.6, 0, 0.2, 1)',
+    GO = 'cubic-bezier(0.5, 0, 0.8, 0.4)',
+    GROW = 'cubic-bezier(0.5, 0, 0.2, 1)';
+  const WORLD_W = 320,
+    WORLD_H = 180,
+    WORLD_BOX = 1.06; // the world canvas is drawn 6% larger than the screen (see .world canvas)
+  let trip = null; // the flight into the open case, replayed backwards on pause
+  const canFly = (q) => !reduceMotion.matches && !!biomes.layers(q.id);
+
+  // The layers lie exactly over the world canvas: the same box, cover crop and focus point
+  function placeDeep(kind) {
+    const [fx, fy] = biomes.focus(kind).split(' ').map((v) => parseFloat(v) / 100);
+    const bw = innerWidth * WORLD_BOX,
+      bh = innerHeight * WORLD_BOX,
+      k = Math.max(bw / WORLD_W, bh / WORLD_H),
+      w = WORLD_W * k,
+      h = WORLD_H * k;
+    Object.assign(deep.style, {
+      left: (innerWidth - bw) / 2 + (bw - w) * fx + 'px',
+      top: (innerHeight - bh) / 2 + (bh - h) * fy + 'px',
+      width: w + 'px',
+      height: h + 'px',
+    });
+  }
+  addEventListener('resize', () => trip && placeDeep(trip.kind));
+  const baked = {};
+
+  // The camera's flight: every layer grows around the point it flies to, by its depth
+  function dolly(kind, at, end, withBlur) {
+    const [ax, ay] = biomes.flyAt(kind),
+      origin = `${(ax / WORLD_W) * 100}% ${(ay / WORLD_H) * 100}%`,
+      timing = { duration: FLY_MS, delay: at, endDelay: end - at - FLY_MS, easing: DOLLY, fill: 'both' };
+    const layers = biomes.layers(kind);
+    const shown = layers.map(([c]) => c);
+    if (withBlur) {
+      baked[kind] = baked[kind] || bakeWorld(document.createElement('canvas'), kind);
+      baked[kind].className = 'soft';
+      shown.push(baked[kind]);
+    }
+    deep.replaceChildren(...shown);
+    placeDeep(kind);
+    const anims = [];
+    layers.forEach(([c, depth, past]) => {
+      c.style.transformOrigin = origin;
+      anims.push(c.animate([{ transform: 'scale(1)' }, { transform: `scale(${depth})` }], timing));
+      if (past)
+        anims.push(
+          c.animate(
+            [{ opacity: 1 }, { opacity: 1, offset: PAST_STEPS[0] }, { opacity: 0, offset: PAST_STEPS[1] }, { opacity: 0 }],
+            timing,
+          ),
+        );
+    });
+    if (withBlur) {
+      // The paused world clears as the camera moves, growing with the valley it shows
+      const b = baked[kind],
+        mid = Math.max(...layers.filter(([, , past]) => !past).map(([, d]) => d));
+      b.style.transformOrigin = origin;
+      anims.push(
+        b.animate(
+          [
+            { transform: 'scale(1)', opacity: 1 },
+            { transform: `scale(${1 + (mid - 1) * BLUR_GONE})`, opacity: 0, offset: BLUR_GONE },
+            { transform: `scale(${mid})`, opacity: 0 },
+          ],
+          timing,
+        ),
+      );
+    }
+    return anims;
+  }
+
+  // The panes fly off past the camera, each away from the middle of the screen
+  function flyOut(els, end) {
+    const z = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--z')) || 1,
+      cx = innerWidth / 2,
+      cy = innerHeight / 2;
+    return els.map((el) => {
+      const b = el.getBoundingClientRect();
+      let dx = b.left + b.width / 2 - cx,
+        dy = b.top + b.height / 2 - cy;
+      if (Math.hypot(dx, dy) < innerWidth * AWAY_MIN) dx = (dx < 0 ? -1 : 1) * innerWidth * AWAY_MIN;
+      return el.animate(
+        [
+          { transform: 'none', opacity: 1 },
+          { transform: `translate(${(dx * AWAY) / z}px, ${(dy * AWAY) / z}px) scale(${AWAY_SCALE})`, opacity: 0 },
+        ],
+        { duration: OUT_MS, endDelay: end - OUT_MS, easing: GO, fill: 'both' },
+      );
+    });
+  }
+
+  // A cover lifted out of its card grows to the whole screen and melts into the world behind it
+  function dive(src, end) {
+    const b = src.getBoundingClientRect(),
+      c = src.cloneNode();
+    // Only the cover's own look: the classes of its place (hidden off the phone card) stay behind
+    c.className = 'cover-art dive';
+    document.body.append(c);
+    src.style.visibility = 'hidden';
+    const from = { left: b.left + 'px', top: b.top + 'px', width: b.width + 'px', height: b.height + 'px' };
+    const to = { left: '0px', top: '0px', width: innerWidth + 'px', height: innerHeight + 'px' };
+    const timing = (ms, at = 0) => ({ duration: ms, delay: at, endDelay: end - at - ms, fill: 'both' });
+    return [
+      c,
+      [
+        c.animate([from, to], { ...timing(DIVE_MS), easing: GROW }),
+        c.animate([{ opacity: 1 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }], timing(DIVE_MS + WORLD_IN[1] / 2)),
+        deep.animate([{ opacity: 0 }, { opacity: 1 }], timing(WORLD_IN[1], WORLD_IN[0])),
+      ],
+    ];
+  }
+
+  // What flies past the camera: the top bar and the panes of this tab; on a phone, the cards
+  function panesOf(view, card) {
+    const own = phone.matches && view === views[1] ? [...qlist.children] : [...view.querySelectorAll(':scope > .pane')];
+    const near = own.filter((el) => {
+      const b = el.getBoundingClientRect();
+      return el !== card && b.bottom > 0 && b.top < innerHeight;
+    });
+    return [document.querySelector('.menu .top'), ...near];
+  }
+
+  function fillCase(q) {
     document.getElementById('where').textContent = 'Квест: ' + q.title.split(' ')[0];
     document.getElementById('pregion').innerHTML = tags(q);
     document.getElementById('ptitle').textContent = q.title;
@@ -3865,16 +4071,74 @@
     w.style.animation = 'none';
     void w.offsetWidth;
     w.style.animation = '';
+  }
+  function land(q) {
     document.body.classList.add('playing');
     showWorld(q.id, true);
     window.scrollTo(0, 0);
     document.getElementById('back').focus({ preventScroll: true });
   }
+
+  // src: the cover to dive into; without it the camera flies straight into the world behind
+  function open(src) {
+    if (!(src instanceof Element)) src = null;
+    const q = QUESTS[sel];
+    if (!q.open || trip || (!src && cur() !== 1)) return;
+    if (!canFly(q)) {
+      if (cur() !== 1) {
+        tab(1);
+        select(sel);
+      }
+      fillCase(q);
+      land(q);
+      return;
+    }
+    fillCase(q);
+    const card = src && src.closest('button'),
+      end = src ? DIVE_FLY_AT + FLY_MS : FLY_MS;
+    trip = { kind: q.id, world: shownKind, scroll: scrollY, back: card || document.activeElement, src, clone: null };
+    document.body.classList.add('flying');
+    deep.classList.add('on');
+    const anims = [...dolly(q.id, src ? DIVE_FLY_AT : 0, end, !src), ...flyOut(panesOf(views[cur()], card), end)];
+    if (src) {
+      const [clone, dived] = dive(src, end);
+      trip.clone = clone;
+      anims.push(...dived);
+      if (card) anims.push(card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: OUT_MS / 2, endDelay: end - OUT_MS / 2, fill: 'both' }));
+    }
+    trip.anims = anims;
+    Promise.all(anims.map((a) => a.finished)).then(() => {
+      document.body.classList.remove('flying');
+      document.body.classList.add('landed');
+      land(q);
+    });
+  }
   function pause() {
-    document.body.classList.remove('playing');
-    showWorld(QUESTS[sel].id);
-    window.scrollTo(0, 0);
-    document.getElementById('q-' + QUESTS[sel].id).focus();
+    if (!trip) {
+      document.body.classList.remove('playing');
+      showWorld(QUESTS[sel].id);
+      window.scrollTo(0, 0);
+      document.getElementById('q-' + QUESTS[sel].id).focus();
+      return;
+    }
+    if (document.body.classList.contains('flying')) return;
+    const t = trip;
+    document.body.classList.add('flying');
+    document.body.classList.remove('playing', 'landed');
+    window.scrollTo(0, t.scroll);
+    showWorld(t.world);
+    placeDeep(t.kind);
+    t.anims.forEach((a) => a.reverse());
+    Promise.all(t.anims.map((a) => a.finished)).then(() => {
+      t.anims.forEach((a) => a.cancel());
+      if (t.clone) t.clone.remove();
+      if (t.src) t.src.style.visibility = '';
+      deep.classList.remove('on');
+      deep.replaceChildren();
+      document.body.classList.remove('flying');
+      trip = null;
+      if (t.back && t.back.focus) t.back.focus({ preventScroll: true });
+    });
   }
   document.getElementById('back').addEventListener('click', pause);
 
