@@ -2582,6 +2582,168 @@
       });
     }
 
+    /* ── WB Bank: an amethyst cave in Wildberries violet and magenta. A shaft of light falls
+       through a hole in the vault onto an open chest of coins (the moneybox), crystal clusters
+       grow from the walls and floor, a still pool holds their glow. Sparks rise slowly ── */
+    const WB_CHEST = [162, 152];
+    const CRYSTALS = [
+      // cluster centre, direction it grows (radians, 0 = up), shard count, size
+      [24, 162, 0.5, 6, 26], [50, 160, -0.1, 4, 16], [294, 160, -0.5, 6, 28], [268, 160, 0.15, 4, 15],
+      [42, 100, 1.25, 5, 20], [282, 82, -1.25, 5, 22], [72, 32, 2.9, 4, 13], [250, 46, -2.9, 4, 15],
+      [216, 159, -0.25, 3, 10], [104, 159, 0.3, 3, 9],
+    ];
+    const caveWall = (x) => 42 + 14 * Math.sin(x * 0.05) + 8 * Math.sin(x * 0.13 + 1);
+    function wbCave(set, P) {
+      const r = rng(47),
+        deep = P('#120822'),
+        mid = P('#1d0d33'),
+        back = P('#2a1446'),
+        rock = P('#0b0516'),
+        rim = P('#3a1d5c');
+      // The back of the cave: darker at the edges, a violet haze in the middle
+      for (let y = 0; y < PH; y++)
+        for (let x = 0; x < PW; x++) {
+          const d = Math.hypot((x - 160) / 150, (y - 110) / 90);
+          set(x, y, d < 0.55 ? (dith(x, y, (0.55 - d) * 2) ? back : mid) : dith(x, y, 1.1 - d) ? mid : deep);
+          if (fbm(x * 0.06, y * 0.06) > 0.62) set(x, y, deep);
+        }
+      // The frame of rock: walls, a vault with a hole, stalactites, the floor
+      for (let y = 0; y < PH; y++)
+        for (let x = 0; x < PW; x++) {
+          const wl = 34 + 12 * Math.sin(y * 0.07) + 5 * Math.sin(y * 0.21),
+            wr = 286 - 12 * Math.sin(y * 0.06 + 2) - 5 * Math.sin(y * 0.19),
+            vault = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2)),
+            floor = 156 + 4 * Math.sin(x * 0.04) + 2 * Math.sin(x * 0.17);
+          const solid = x < wl || x > wr || y < vault || y > floor;
+          if (!solid) continue;
+          const edge = x < wl ? wl - x : x > wr ? x - wr : y < vault ? vault - y : y - floor;
+          set(x, y, edge < 1.5 ? rim : rock);
+        }
+      for (let k = 0; k < 22; k++) {
+        const x = 40 + r() * 240,
+          top = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2)),
+          len = 4 + r() * 14,
+          w = 1 + r() * 2.5;
+        if (Math.abs(x - 164) < 22) continue;
+        for (let y = top - 1; y < top + len; y++) {
+          const half = w * (1 - (y - top) / len);
+          for (let i = -half; i <= half; i++) set(x + i, y, i < -half + 1 ? rim : rock);
+        }
+      }
+      // Night sky through a crack in the vault, from the top of the frame down into the cave
+      const sky = P('#3c2a6a'),
+        skyLit = P('#6a52a8');
+      for (let y = 0; y < 40; y++) {
+        const half = 7 + 3 * Math.sin(y * 0.45) + y * 0.08,
+          c = 164 + 3 * Math.sin(y * 0.2);
+        for (let x = c - half - 1; x <= c + half + 1; x++) {
+          const vault = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2));
+          if (y > vault + 1) continue;
+          set(x, y, Math.abs(x - c) > half ? rim : dith(x | 0, y, 1 - y / 40) ? skyLit : sky);
+        }
+      }
+    }
+    function wbLight(set, P) {
+      // A shaft of pale light from the hole down to the chest
+      const beam = P('#8e6cc8'),
+        beam2 = P('#5e3f96');
+      for (let y = 8; y < 156; y++) {
+        const t = (y - 8) / 148,
+          c = lerp(164, WB_CHEST[0], t),
+          half = lerp(10, 26, t);
+        for (let x = c - half; x <= c + half; x++) {
+          const edge = 1 - Math.abs(x - c) / half;
+          if (dith(x | 0, y, edge * 0.28 * (1 - t * 0.4))) set(x, y, beam);
+          else if (dith(x | 0, y, edge * 0.5)) set(x, y, beam2);
+        }
+      }
+    }
+    function wbPool(set, P) {
+      const water = P('#2b1556'),
+        glow = P('#6b2fa0'),
+        shine = P('#e07ae0');
+      for (let y = 158; y < 172; y++)
+        for (let x = 100; x < 230; x++) {
+          const d = Math.hypot((x - 166) / 58, (y - 165) / 6.5);
+          if (d < 1) set(x, y, dith(x, y, (1 - d) * 0.7) ? glow : water);
+        }
+      for (const [x, y, l] of [[140, 163, 6], [176, 166, 9], [196, 162, 4], [124, 167, 3], [160, 169, 5]])
+        for (let i = 0; i < l; i++) set(x + i, y, shine);
+    }
+    function wbCrystals(set, P) {
+      const lit = P('#f0a0f0'),
+        face = P('#cb11ab'),
+        dark = P('#6b2fa0'),
+        edge = P('#ffe0ff'),
+        halo = P('#4a1a76'),
+        r = rng(53);
+      for (const [cx, cy, dir, n, size] of CRYSTALS) {
+        // A soft violet glow around the cluster
+        for (let y = cy - size; y < cy + size; y++)
+          for (let x = cx - size; x < cx + size; x++) {
+            const d = Math.hypot(x - cx, y - cy) / size;
+            if (d < 1 && dith(x, y, (1 - d) * 0.45)) set(x, y, halo);
+          }
+        for (let k = 0; k < n; k++) {
+          const a = dir + (r() - 0.5) * 1.1,
+            len = size * (0.45 + r() * 0.55),
+            w = 1.5 + len * 0.13,
+            bx = cx + (r() - 0.5) * size * 0.4,
+            by = cy + (r() - 0.5) * size * 0.2,
+            ux = Math.sin(a),
+            uy = -Math.cos(a);
+          // A shard: a long hexagonal prism seen side-on, a lit face and a dark face
+          for (let t = 0; t <= len; t += 0.5) {
+            const tip = t > len - w * 1.6 ? (len - t) / (w * 1.6) : 1,
+              half = w * tip;
+            for (let o = -half; o <= half; o += 0.5) {
+              const x = bx + ux * t - uy * o,
+                y = by + uy * t + ux * o;
+              set(x, y, Math.abs(o) < 0.6 ? edge : o < 0 ? (t > len * 0.5 ? lit : face) : dark);
+            }
+          }
+        }
+      }
+    }
+    function wbChest(set, P) {
+      const [cx, by] = WB_CHEST,
+        wood = P('#7d5a2a'),
+        woodD = P('#5a3d1c'),
+        gold = P('#e9c46a'),
+        goldD = P('#b38f3d'),
+        coin = P('#ffe08a'),
+        glow = P('#8a6a3a'),
+        r = rng(59);
+      for (let y = by - 22; y < by + 6; y++)
+        for (let x = cx - 26; x < cx + 26; x++) {
+          const d = Math.hypot((x - cx) / 26, (y - by + 6) / 16);
+          if (d < 1 && dith(x, y, (1 - d) * 0.5)) set(x, y, glow);
+        }
+      // Body, lid thrown back, gold bands and a lock
+      for (let y = by - 10; y < by; y++)
+        for (let x = cx - 12; x <= cx + 12; x++) set(x, y, y === by - 10 || x === cx - 12 || x === cx + 12 ? goldD : (x + y) % 5 ? wood : woodD);
+      for (let y = by - 19; y < by - 11; y++)
+        for (let x = cx - 12; x <= cx + 12; x++) set(x, y, y === by - 19 ? goldD : woodD);
+      for (const x of [cx - 7, cx + 7]) for (let y = by - 19; y < by; y++) set(x, y, gold);
+      set(cx, by - 6, gold);
+      set(cx, by - 5, goldD);
+      // Coins heaped in the chest and spilt on the floor
+      for (let k = 0; k < 60; k++) set(cx - 10 + r() * 20, by - 11 - r() * 4 * (1 - Math.abs(r() - 0.5)), r() < 0.5 ? coin : gold);
+      for (let k = 0; k < 18; k++) set(cx - 18 + r() * 36, by + r() * 3, r() < 0.5 ? coin : goldD);
+    }
+    // Sparks drifting up through the cave: a pixel that glints, now and then a small cross
+    function pxSpark(g, p, flip, t) {
+      const x = Math.round(p.x),
+        y = Math.round(p.y),
+        tw = Math.sin(t * 0.003 + p.phase * 5);
+      g.fillStyle = p.tone < 0.3 ? '#ffe08a' : p.tone < 0.7 ? '#f0a0f0' : '#ffe0ff';
+      g.fillRect(x, y, 1, 1);
+      if (tw > 0.75 && p.z > 0.9) {
+        g.fillRect(x - 1, y, 3, 1);
+        g.fillRect(x, y - 1, 1, 3);
+      }
+    }
+
     /* What falls in each world, in scene pixels: sakura petals, maple leaves */
     function pxPetal(g, p, flip) {
       const x = Math.round(p.x),
@@ -2626,6 +2788,12 @@
         // Nothing falls in orbit: pulses run along the routes instead
         fall: { pulses: true },
       },
+      wb: {
+        paint: [wbCave, wbLight, wbPool, wbCrystals, wbChest],
+        focus: '50% 60%',
+        // Sparks rise instead of falling: slower, barely drifting
+        fall: { draw: pxSpark, per: 70000, max: 20, min: 8, wind: 0.12, sink: -0.35, rise: true },
+      },
     };
     const art = {};
     // Each scene is drawn once and kept: the menu returns to it on every visit
@@ -2648,8 +2816,13 @@
         last = 0;
       const spawn = (p, first) => {
         p.z = 0.5 + r() * 0.9; // nearer ones are bigger and faster
-        p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
-        p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
+        if (cfg && cfg.rise) {
+          p.x = r() * w;
+          p.y = first ? r() * h : h + 4;
+        } else {
+          p.x = first ? r() * w : r() < 0.6 ? r() * w * 0.7 : -10;
+          p.y = first ? r() * h : p.x < 0 ? r() * h * 0.6 : -10;
+        }
         p.rot = r() * 6.283;
         p.spin = (0.3 + r() * 0.7) * (r() < 0.5 ? -1 : 1);
         p.phase = r() * 6.283;
@@ -2681,8 +2854,8 @@
           p.x += (3 + 2.5 * p.z + Math.sin(t * 0.0007 + p.phase) * 3) * p.z * cfg.wind * dt;
           p.y += (2 + 3 * p.z) * p.z * cfg.sink * dt;
           p.rot += p.spin * dt;
-          if (p.x > w + 12 || p.y > h + 12) spawn(p, false);
-          cfg.draw(g, p, Math.cos(p.rot));
+          if (p.x > w + 12 || p.y > h + 12 || p.y < -12) spawn(p, false);
+          cfg.draw(g, p, Math.cos(p.rot), t);
         }
       };
       const tick = (now) => {
