@@ -2499,9 +2499,9 @@
     }
 
     function pxHills(set, P) {
-      const far = P('#4a4677'),
-        near = P('#2f2a55'),
-        tuft = P('#252147'),
+      const far = P('#7a71a8'),
+        near = P('#6a5e96'),
+        tuft = P('#5a4f88'),
         bloom = P('#b06e90'),
         r = rng(5);
       for (let x = 0; x < PW; x++) {
@@ -2541,8 +2541,8 @@
     }
 
     function pxSlope(set, P) {
-      const ground = P('#221d3a'),
-        edge = P('#3b3157'),
+      const ground = P('#7e6ea6'),
+        edge = P('#9886ba'),
         petal = P('#e7a0bd'),
         r = rng(9);
       for (let x = 0; x < PW; x++) {
@@ -2868,100 +2868,107 @@
       });
     }
 
-    /* ── WB Bank: an amethyst cave in Wildberries violet and magenta. A shaft of light falls
-       through a hole in the vault onto an open chest of coins (the moneybox), crystal clusters
-       grow from the walls and floor, a still pool holds their glow. Sparks rise slowly ── */
+    /* ── WB Bank: an amethyst valley on a bright day, in Wildberries violet and magenta. A pale
+       lilac sky with clouds, violet ranges, a meadow of lilac flowers; great crystal clusters
+       grow out of the ground on both sides, and in the middle stands an open chest of coins
+       (the moneybox as a treasure). Light on purpose: beside the night of BittVPN it must not
+       read as one more dark world. Sparks rise slowly ── */
     const WB_CHEST = [162, 152];
     const CRYSTALS = [
       // cluster centre, direction it grows (radians, 0 = up), shard count, size
-      [24, 162, 0.5, 6, 26], [50, 160, -0.1, 4, 16], [294, 160, -0.5, 6, 28], [268, 160, 0.15, 4, 15],
-      [42, 100, 1.25, 5, 20], [282, 82, -1.25, 5, 22], [72, 32, 2.9, 4, 13], [250, 46, -2.9, 4, 15],
-      [216, 159, -0.25, 3, 10], [104, 159, 0.3, 3, 9],
+      [22, 184, 0.35, 8, 62], [64, 170, -0.15, 4, 24], [298, 184, -0.35, 8, 66], [258, 168, 0.2, 4, 26],
+      [86, 126, 0.1, 3, 8], [238, 122, -0.1, 3, 9],
     ];
-    const caveWall = (x) => 42 + 14 * Math.sin(x * 0.05) + 8 * Math.sin(x * 0.13 + 1);
-    function wbCave(set, P) {
-      const r = rng(47),
-        deep = P('#120822'),
-        mid = P('#1d0d33'),
-        back = P('#2a1446'),
-        rock = P('#0b0516'),
-        rim = P('#3a1d5c');
-      // The back of the cave: darker at the edges, a violet haze in the middle
-      for (let y = 0; y < PH; y++)
-        for (let x = 0; x < PW; x++) {
-          const d = Math.hypot((x - 160) / 150, (y - 110) / 90);
-          set(x, y, d < 0.55 ? (dith(x, y, (0.55 - d) * 2) ? back : mid) : dith(x, y, 1.1 - d) ? mid : deep);
-          if (fbm(x * 0.06, y * 0.06) > 0.62) set(x, y, deep);
-        }
-      // The frame of rock: walls, a vault with a hole, stalactites, the floor
-      for (let y = 0; y < PH; y++)
-        for (let x = 0; x < PW; x++) {
-          const wl = 34 + 12 * Math.sin(y * 0.07) + 5 * Math.sin(y * 0.21),
-            wr = 286 - 12 * Math.sin(y * 0.06 + 2) - 5 * Math.sin(y * 0.19),
-            vault = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2)),
-            floor = 156 + 4 * Math.sin(x * 0.04) + 2 * Math.sin(x * 0.17);
-          const solid = x < wl || x > wr || y < vault || y > floor;
-          if (!solid) continue;
-          const edge = x < wl ? wl - x : x > wr ? x - wr : y < vault ? vault - y : y - floor;
-          set(x, y, edge < 1.5 ? rim : rock);
-        }
-      for (let k = 0; k < 22; k++) {
-        const x = 40 + r() * 240,
-          top = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2)),
-          len = 4 + r() * 14,
-          w = 1 + r() * 2.5;
-        if (Math.abs(x - 164) < 22) continue;
-        for (let y = top - 1; y < top + len; y++) {
-          const half = w * (1 - (y - top) / len);
-          for (let i = -half; i <= half; i++) set(x + i, y, i < -half + 1 ? rim : rock);
-        }
+    const wbFar = (x) => 92 + 8 * Math.sin(x * 0.03) + 5 * Math.sin(x * 0.09 + 2) - 10 * Math.exp(-(((x - 228) / 30) ** 2));
+    const wbNear = (x) => 112 + 6 * Math.sin(x * 0.05 + 1) + 3 * Math.sin(x * 0.13);
+    const wbGround = (x) => 128 + 4 * Math.sin(x * 0.04) + 2 * Math.sin(x * 0.15);
+    function wbSky(set, P) {
+      const cols = ['#9a88da', '#ac9ae2', '#bfaee9', '#d1c1ef', '#e1d3f3', '#efe3f6', '#f7eef5'].map(P),
+        glow = P('#fbf3ef'),
+        sun = P('#fffaf2'),
+        r = rng(43);
+      for (let y = 0; y < 116; y++) {
+        const f = Math.min((y / 108) * (cols.length - 1), cols.length - 1.001),
+          i = f | 0;
+        for (let x = 0; x < PW; x++) set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
       }
-      // Night sky through a crack in the vault, from the top of the frame down into the cave
-      const sky = P('#3c2a6a'),
-        skyLit = P('#6a52a8');
-      for (let y = 0; y < 40; y++) {
-        const half = 7 + 3 * Math.sin(y * 0.45) + y * 0.08,
-          c = 164 + 3 * Math.sin(y * 0.2);
-        for (let x = c - half - 1; x <= c + half + 1; x++) {
-          const vault = caveWall(x) - 30 * Math.exp(-(((x - 164) / 26) ** 2));
-          if (y > vault + 1) continue;
-          set(x, y, Math.abs(x - c) > half ? rim : dith(x | 0, y, 1 - y / 40) ? skyLit : sky);
+      // A high sun on the right, a soft glow around it
+      for (let y = 0; y < 60; y++)
+        for (let x = 210; x < 300; x++) {
+          const dd = Math.hypot(x - 254, y - 24);
+          if (dd < 6) set(x, y, sun);
+          else if (dd < 32 && dith(x, y, ((1 - dd / 32) ** 2) * 0.8)) set(x, y, glow);
+        }
+      skyClouds(set, P, r, 5, 12, 58);
+    }
+    function wbRanges(set, P) {
+      // Two ranges, the far one paler with distance; each lit along its ridge and a step darker
+      // further down, so the sun reads from above
+      const ranges = [
+        [wbFar, ['#d3c4f0', '#c3b0ea', '#b6a0e2']],
+        [wbNear, ['#b49ae2', '#a286d8', '#9479cc']],
+      ];
+      for (const [top, tones] of ranges) {
+        const cols = tones.map(P);
+        for (let x = 0; x < PW; x++) {
+          const t0 = top(x);
+          for (let y = t0 | 0; y < PH; y++) {
+            const f = Math.min(((y - t0) / 16) * (cols.length - 1), cols.length - 1.001),
+              i = f | 0;
+            set(x, y, dith(x, y, f - i) ? cols[i + 1] : cols[i]);
+          }
         }
       }
     }
-    function wbLight(set, P) {
-      // A faint shaft of light from the crack down to the chest: a hint, not a spotlight
-      const beam = P('#7a5ab0'),
-        beam2 = P('#3e2266');
-      for (let y = 8; y < 156; y++) {
-        const t = (y - 8) / 148,
-          c = lerp(164, WB_CHEST[0], t),
-          half = lerp(8, 20, t);
-        for (let x = c - half; x <= c + half; x++) {
-          const edge = 1 - Math.abs(x - c) / half;
-          if (dith(x | 0, y, edge * edge * 0.12 * (1 - t * 0.5))) set(x, y, beam);
-          else if (dith(x | 0, y, edge * 0.3)) set(x, y, beam2);
+    // The meadow is a lavender field: rows of bushes run toward the chest, a bare path down the
+    // middle leads to it
+    const WB_VP = [162, 118];
+    function wbMeadow(set, P) {
+      const soil = P('#e3d6f2'),
+        soilD = P('#d2c2ea'),
+        bush = P('#9c7bd2'),
+        bushLit = P('#b99bea'),
+        bushD = P('#8566c2'),
+        bloom = P('#d46fcc'),
+        r = rng(49);
+      for (let x = 0; x < PW; x++) {
+        const top = wbGround(x) | 0;
+        for (let y = top; y < PH; y++) {
+          const dy = y - WB_VP[1],
+            a = (x - WB_VP[0]) / dy,
+            row = a / 0.8,
+            frac = row - Math.floor(row),
+            onPath = Math.abs(a) < 0.3;
+          // Far off the rows are too thin to draw: a lilac haze, the rows coming out of it
+          if (dy < 26 && !onPath && dith(x, y, 1 - (dy - 10) / 16)) {
+            set(x, y, dith(x + 1, y, 0.5) ? bushLit : soilD);
+            continue;
+          }
+          if (onPath || frac > 0.66) {
+            set(x, y, dith(x, y, (y - top) / 60) ? soilD : soil);
+            continue;
+          }
+          // Across a row: lit on its upper side, shaded toward the next furrow
+          set(x, y, frac < 0.18 ? bushLit : frac > 0.5 ? bushD : bush);
         }
+        set(x, top, soil);
       }
-    }
-    function wbPool(set, P) {
-      const water = P('#2b1556'),
-        glow = P('#6b2fa0'),
-        shine = P('#e07ae0');
-      for (let y = 158; y < 172; y++)
-        for (let x = 100; x < 230; x++) {
-          const d = Math.hypot((x - 166) / 58, (y - 165) / 6.5);
-          if (d < 1) set(x, y, dith(x, y, (1 - d) * 0.7) ? glow : water);
-        }
-      for (const [x, y, l] of [[140, 163, 6], [176, 166, 9], [196, 162, 4], [124, 167, 3], [160, 169, 5]])
-        for (let i = 0; i < l; i++) set(x + i, y, shine);
+      // Flowers on the bushes, denser near the viewer
+      for (let k = 0; k < 420; k++) {
+        const x = r() * PW,
+          y = wbGround(x) + 3 + r() ** 0.7 * 54,
+          a = (x - WB_VP[0]) / (y - WB_VP[1]),
+          frac = a / 0.8 - Math.floor(a / 0.8);
+        if (Math.abs(a) < 0.3 || frac > 0.6) continue;
+        set(x, y, r() < 0.55 ? bloom : bushLit);
+      }
     }
     function wbCrystals(set, P) {
       const lit = P('#f0a0f0'),
         face = P('#cb11ab'),
         dark = P('#6b2fa0'),
         edge = P('#ffe0ff'),
-        halo = P('#4a1a76'),
+        halo = P('#e7d3f6'),
         r = rng(53);
       for (const [cx, cy, dir, n, size] of CRYSTALS) {
         // A soft violet glow around the cluster
@@ -2998,7 +3005,7 @@
         gold = P('#e9c46a'),
         goldD = P('#b38f3d'),
         coin = P('#ffe08a'),
-        glow = P('#5a4030'),
+        glow = P('#f3e2b8'),
         r = rng(59);
       for (let y = by - 18; y < by + 4; y++)
         for (let x = cx - 20; x < cx + 20; x++) {
@@ -3017,7 +3024,7 @@
       for (let k = 0; k < 60; k++) set(cx - 10 + r() * 20, by - 11 - r() * 4 * (1 - Math.abs(r() - 0.5)), r() < 0.5 ? coin : gold);
       for (let k = 0; k < 18; k++) set(cx - 18 + r() * 36, by + r() * 3, r() < 0.5 ? coin : goldD);
     }
-    // Sparks drifting up through the cave: a pixel that glints, now and then a small cross
+    // Sparks drifting up over the valley: a pixel that glints, now and then a small cross
     function pxSpark(g, p, flip, t) {
       const x = Math.round(p.x),
         y = Math.round(p.y),
@@ -3383,7 +3390,7 @@
         fall: { pulses: true },
       },
       wb: {
-        paint: [wbCave, wbLight, wbPool, wbCrystals, wbChest],
+        paint: [wbSky, wbRanges, wbMeadow, wbCrystals, wbChest],
         focus: '50% 60%',
         // Sparks rise instead of falling: slower, barely drifting
         fall: { draw: pxSpark, per: 70000, max: 20, min: 8, wind: 0.12, sink: -0.35, rise: true },
