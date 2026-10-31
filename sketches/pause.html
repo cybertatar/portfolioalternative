@@ -506,6 +506,13 @@
       -webkit-mask-image: linear-gradient(#000 60%, transparent);
       mask-image: linear-gradient(#000 60%, transparent);
     }
+    /* A short phone (320×568): a wider, lower cover, so the next card still peeks in below the
+       first one */
+    @media (max-height: 700px) {
+      .q .glimpse {
+        aspect-ratio: 21 / 9;
+      }
+    }
     .q .ic {
       display: block;
       position: absolute;
@@ -3462,6 +3469,8 @@
     else {
       select(sel);
       evenCards();
+      // On a phone the world is the one of the card in the middle, not of the last selected
+      if (phone.matches) followCard();
     }
     ink.style.transition = '';
     inkAt(k);
@@ -3589,6 +3598,58 @@
     inkAt(cur());
   });
   const cur = () => tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
+
+  /* ── Phone, «Квесты»: the list scrolls natively, the finger is never fought. Once it lets go and
+   the scroll comes to rest, the list eases the nearest card to the middle of the screen (the
+   first card to the top, under the tabs). The world behind follows whichever card is in the
+   middle while scrolling, so every quest brings its own world, as in a feed of reels ── */
+  const SETTLE_MS = 140; // quiet time after the last scroll before easing in
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let touching = false,
+    settleTimer = 0,
+    followFrame = 0;
+  const onQuests = () => phone.matches && cur() === 1 && !document.body.classList.contains('playing');
+  // The card nearest the middle of the screen: [card, index, its box]
+  function centred() {
+    const mid = innerHeight / 2;
+    let best = null,
+      bestD = Infinity;
+    qlist.querySelectorAll('.q').forEach((card, i) => {
+      const b = card.getBoundingClientRect(),
+        d = Math.abs(b.top + b.height / 2 - mid);
+      if (d < bestD) [bestD, best] = [d, [card, i, b]];
+    });
+    return best;
+  }
+  function followCard() {
+    const c = centred();
+    if (c) showWorld(QUESTS[c[1]].id);
+  }
+  function settle() {
+    if (touching || !onQuests()) return;
+    const c = centred();
+    if (!c) return;
+    const [, i, b] = c;
+    const target = i === 0 ? 0 : scrollY + b.top + b.height / 2 - innerHeight / 2;
+    if (Math.abs(target - scrollY) > 4) scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+  }
+  const later = () => {
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(settle, SETTLE_MS);
+  };
+  addEventListener(
+    'scroll',
+    () => {
+      if (!onQuests()) return;
+      cancelAnimationFrame(followFrame);
+      followFrame = requestAnimationFrame(followCard);
+      later();
+    },
+    { passive: true },
+  );
+  addEventListener('touchstart', () => ((touching = true), clearTimeout(settleTimer)), { passive: true });
+  for (const ev of ['touchend', 'touchcancel'])
+    addEventListener(ev, () => ((touching = false), onQuests() && later()), { passive: true });
 
 
   /* ── Unpause into the case, pause back ── */
