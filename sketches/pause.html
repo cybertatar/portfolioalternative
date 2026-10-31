@@ -59,7 +59,9 @@
     --r-ctl-in: calc(var(--r-ctl) - var(--s2));
     --r-key: 6px;
 
-    /* The menu is laid out for ~1440×900 and scaled up on big monitors, like a game's UI scale */
+    /* The menu is laid out for 1440×900 and scaled up on big monitors, like a game's UI scale:
+       the script sets it smoothly to the screen (see uiScale), so every screen gets the same
+       layout, only bigger, and no extra height is left to stretch the panes */
     --z: 1;
     color-scheme: dark;
   }
@@ -69,21 +71,6 @@
       --pad: var(--s4);
       /* Never rounder than the padding, or controls at `--pad` would poke into the corner */
       --r: var(--s4);
-    }
-  }
-  @media (min-width: 1900px) and (min-height: 1050px) {
-    :root {
-      --z: 1.25;
-    }
-  }
-  @media (min-width: 2400px) and (min-height: 1300px) {
-    :root {
-      --z: 1.5;
-    }
-  }
-  @media (min-width: 3200px) and (min-height: 1800px) {
-    :root {
-      --z: 2;
     }
   }
   * {
@@ -899,9 +886,6 @@
       line-height: 1.35;
     }
   }
-  /* The latest quest: a cover (its world with the phone screen, melting into its colour), then
-     title, line, stats and the way in. Side by side when the card is wide, stacked when narrow
-     (see the container queries below) */
   /* The bottom of the sheet: the latest quest and the wishlist side by side, taking whatever
      height is left, so the sheet has no empty glass under the skills */
   .foot {
@@ -915,6 +899,13 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
   }
+  /* A narrow laptop: the wishlist gets a little more of the row, so its longest wish keeps to
+     two lines (every row is as tall as the tallest, see .wl); the card has no stats here anyway */
+  @media (min-width: 1200px) and (max-width: 1399px) {
+    .foot {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    }
+  }
   .last,
   .wish {
     display: flex;
@@ -923,31 +914,31 @@
   .last {
     container: lq / inline-size;
   }
+  /* The latest quest: a cover (its world with the phone screen) on top, melting down into its
+     colour; under it the title, the status line, three stats and a full-width button. Only a
+     card that has the whole row to itself and room for it lies on its side (see below) */
   .last button {
     flex: 1;
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    gap: var(--s5);
+    grid-template-columns: 1fr;
     align-items: stretch;
     padding: 0;
     border-radius: var(--r-in);
     overflow: hidden;
-    background: linear-gradient(90deg, var(--tone, transparent), transparent 75%), var(--fill);
+    background: linear-gradient(var(--tone, transparent), transparent 70%), var(--fill);
     text-align: left;
   }
   .last button:hover .lq-go {
     background: #f1d283;
   }
-  /* Exactly as wide as its column and at least 16:9 tall (the ::before keeps that height); when
-     the text beside it is taller, it grows with the card, cropping its sides, instead of leaving
-     bands above and below */
+  /* Exactly as wide as its column and at least 16:9 tall (the ::before keeps that height) */
   .lq-cover {
     position: relative;
     min-width: 0;
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
-    mask-image: linear-gradient(90deg, #000 75%, transparent);
+    -webkit-mask-image: linear-gradient(#000 70%, transparent);
+    mask-image: linear-gradient(#000 70%, transparent);
   }
   .lq-cover::before {
     content: '';
@@ -964,9 +955,9 @@
   }
   .lq-cover .phone {
     position: absolute;
-    left: 46%;
-    bottom: -14%;
-    height: 92%;
+    left: 50%;
+    bottom: -18%;
+    height: 96%;
     border-radius: 13% / 6%;
     transform: translateX(-50%);
     box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
@@ -976,7 +967,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: var(--s5) var(--s5) var(--s5) 0;
+    padding: var(--s2) var(--pad) var(--pad);
   }
   .last .lq-body b {
     display: block;
@@ -1013,48 +1004,53 @@
     margin-bottom: var(--s1);
     font-size: 17px;
     color: var(--ink);
+    white-space: nowrap;
   }
   .lq-go {
-    margin-top: var(--s5);
-    padding: var(--s3) var(--s5);
+    align-self: stretch;
+    margin-top: var(--s4);
+    padding: var(--s3);
     border-radius: var(--r-ctl);
     background: var(--gold);
     font-size: 15px;
     font-weight: 600;
+    text-align: center;
     color: var(--gold-ink);
-  }
-  /* A card too narrow for cover and text side by side (a phone, a small window): the cover goes
-     on top, 16:9, melting down into its colour; under it the title, the status line and a
-     full-width button */
-  @container lq (max-width: 640px) {
-    .last button {
-      grid-template-columns: 1fr;
-      gap: 0;
-      background: linear-gradient(var(--tone, transparent), transparent 70%), var(--fill);
-    }
-    .lq-cover {
-      -webkit-mask-image: linear-gradient(#000 70%, transparent);
-      mask-image: linear-gradient(#000 70%, transparent);
-    }
-    .lq-cover .phone {
-      left: 50%;
-      bottom: -18%;
-      height: 96%;
-    }
-    .lq-body {
-      padding: var(--s2) var(--pad) var(--pad);
-    }
-    .lq-go {
-      align-self: stretch;
-      margin-top: var(--s4);
-      padding: var(--s3);
-      text-align: center;
-    }
   }
   /* A phone-wide card has no room for the stats; the full card is one swipe away on «Квесты» */
   @container lq (max-width: 420px) {
     .lq-stats {
       display: none;
+    }
+  }
+  /* Below 1200px the card has the whole row; when that row is wide (a tablet, a small window) it
+     lies on its side: the cover on the left, melting right, the text beside it. Never in the
+     two-column row: there its width under the menu's zoom is measured differently by browsers,
+     and a card on its side squeezed the stats into one another */
+  @media (max-width: 1199px) {
+    @container lq (min-width: 640px) {
+      .last button {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: var(--s5);
+        background: linear-gradient(90deg, var(--tone, transparent), transparent 75%), var(--fill);
+      }
+      .lq-cover {
+        -webkit-mask-image: linear-gradient(90deg, #000 75%, transparent);
+        mask-image: linear-gradient(90deg, #000 75%, transparent);
+      }
+      .lq-cover .phone {
+        left: 46%;
+        bottom: -14%;
+        height: 92%;
+      }
+      .lq-body {
+        padding: var(--s5) var(--s5) var(--s5) 0;
+      }
+      .lq-go {
+        align-self: flex-start;
+        margin-top: var(--s5);
+        padding: var(--s3) var(--s5);
+      }
     }
   }
   /* On a wide desktop the card shares the bottom row with the wishlist, so its cover is a window
@@ -1076,39 +1072,47 @@
     .sheet {
       gap: var(--s5);
     }
+    .wish .wl-card {
+      padding: var(--s4) var(--pad);
+    }
     .wish .wl {
       gap: var(--s2);
-      padding: var(--s4) var(--pad);
     }
     .lq-stats {
       display: none;
     }
   }
   /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
-     a coin for one under way, empty boxes for the rest. The rows share the card's height */
-  .wl {
+     a coin for one under way, empty boxes for the rest. A plain list from the top of the card,
+     one step between rows, so a new wish is just one more row. Every row is as tall as the
+     tallest one (a caption or a wrapped line), so the boxes stand at one even pitch */
+  .wl-card {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s3);
-    margin: 0;
     padding: var(--pad);
     border-radius: var(--r-in);
     background: var(--fill);
+  }
+  .wl {
+    display: grid;
+    grid-auto-rows: 1fr;
+    gap: var(--s4);
+    margin: 0;
+    padding: 0;
     list-style: none;
   }
   .wl li {
-    flex: 1 0 auto;
     display: flex;
     gap: var(--s3);
-    align-items: center;
+    align-items: flex-start;
     font-size: 15px;
     line-height: 1.35;
   }
+  /* The box sits on the first line of its wish, centred on it */
   .wl canvas {
     flex: none;
     width: 24px;
     height: 24px;
+    margin-top: calc((1.35em - 24px) / 2);
   }
   .wl small {
     display: block;
@@ -1461,6 +1465,7 @@
         </div>
         <div class="wish">
           <h3 class="label">Вишлист</h3>
+          <div class="wl-card">
           <ul class="wl">
             <li class="main">
               <canvas class="px" data-sprite="wish-star" data-scale="2"></canvas>
@@ -1483,6 +1488,7 @@
               <span>Пройти Tears of the Kingdom на 100%</span>
             </li>
           </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -1537,6 +1543,18 @@
 </div>
 
 <script>
+  /* ── UI scale: as large as the screen allows while the 1440×900 layout still fits, never
+     below 1 and at most 2. Set before anything is measured, and again on resize ── */
+  const UI_W = 1440,
+    UI_H = 900,
+    UI_MAX = 2;
+  function uiScale() {
+    const z = Math.min(UI_MAX, Math.max(1, Math.min(innerWidth / UI_W, innerHeight / UI_H)));
+    document.documentElement.style.setProperty('--z', z.toFixed(3));
+  }
+  uiScale();
+  addEventListener('resize', uiScale);
+
   const PAL = {
     f: '#f1d5b8',
     F: '#e2bc98',
@@ -2482,18 +2500,6 @@
         rect(gx + 1, gy - 0.4, 1, 0.4, '#fff');
         rect(gx + 2, gy, 1, 0.4, '#fff');
       }
-    } else if (kind === 'char') {
-      ground('#2c3d2e', '#33473a', 0.25);
-      trees(120, '#1d2a20', '#26362a', (i, j) => Math.hypot(i - 80, j - 45) < 26);
-      rect(76, 44, 8, 5, '#3a2a1c');
-      rect(78, 40, 4, 4, '#f29b38');
-      rect(79, 38, 2, 3, '#ffd36b');
-      x.fillStyle = 'rgba(255,190,90,0.18)';
-      x.beginPath();
-      x.arc(80 * T, 44 * T, 22 * T, 0, 7);
-      x.fill();
-      rect(56, 30, 14, 10, '#8f7a5a');
-      rect(60, 34, 6, 6, '#3a2a1c');
     } else {
       ground('#8cbf6a', '#7fb35f', 0.25);
       const fl = ['#b7a6d2', '#e3b5b6', '#ead38b', '#8fb2d6', '#fbf8f1'];
@@ -2971,3 +2977,4 @@
   addEventListener('resize', evenCards);
   document.fonts.ready.then(evenCards);
 </script>
+
