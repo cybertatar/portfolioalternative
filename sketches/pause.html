@@ -451,6 +451,30 @@
     flex-direction: column;
     gap: var(--s2);
   }
+  /* How to move through the list from the keyboard, at the foot of the pane, under clean glass.
+     Not a part of the listbox for a screen reader: it already knows the arrows */
+  .qkeys {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+    padding: var(--s2);
+    color: var(--ink-3);
+    font-size: 13px;
+  }
+  /* Keys in their own column, so both labels start on one line */
+  .qkeys p {
+    display: contents;
+  }
+  .qkeys .keys {
+    display: flex;
+    gap: var(--s1);
+  }
+  .qkeys .arrow {
+    font-family: system-ui, sans-serif;
+    font-weight: 600;
+  }
   /* Rows like a music app's list: a small square of the quest's world on the left, then the title
      and its line. The world never sits under the text; hover only lights the row. The square sits
      8px from the row's edge, so its corners follow the row's */
@@ -517,6 +541,9 @@
      closed), and a full-width button at the bottom */
   @media (max-width: 860px) {
     #qd {
+      display: none;
+    }
+    .qkeys {
       display: none;
     }
     .qlist {
@@ -3622,6 +3649,12 @@
     b.addEventListener('dblclick', () => open());
     qlist.append(b);
   });
+  qlist.insertAdjacentHTML(
+    'beforeend',
+    `<div class="qkeys" aria-hidden="true">` +
+      `<p><span class="keys"><span class="key arrow">↑</span><span class="key arrow">↓</span></span>Переключать квесты</p>` +
+      `<p><span class="keys"><span class="key">Enter</span></span>Открыть кейс</p></div>`,
+  );
   function select(i) {
     sel = (i + QUESTS.length) % QUESTS.length;
     const q = QUESTS[sel];
