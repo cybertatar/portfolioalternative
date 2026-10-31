@@ -467,9 +467,16 @@
   .qkeys p {
     display: contents;
   }
+  /* Every key one height; Enter is as wide as both arrows, like on a keyboard, so the keys make
+     one even block and the gap to the labels is the same on both lines */
   .qkeys .keys {
     display: flex;
     gap: var(--s1);
+  }
+  .qkeys .key {
+    flex: 1;
+    height: var(--s5);
+    padding-block: 0;
   }
   .qkeys .arrow {
     font-family: system-ui, sans-serif;
