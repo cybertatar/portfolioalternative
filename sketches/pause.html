@@ -1036,38 +1036,180 @@
     letter-spacing: -0.01em;
     text-wrap: pretty;
   }
-  .gear {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--s3);
-  }
-  .slot {
+  /* Skills, two variants under comparison (see the switch next to the label) */
+  .label-row {
     display: flex;
-    gap: var(--s3);
+    justify-content: space-between;
     align-items: center;
-    padding: var(--s3) var(--s4);
+    gap: var(--s3);
+    margin-bottom: var(--s3);
+  }
+  .label-row .label {
+    margin: 0;
+  }
+  .variant {
+    display: flex;
+    gap: var(--s1);
+  }
+  .variant button {
+    padding: var(--s1) var(--s2);
+    border-radius: var(--r-ctl);
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  .variant button:hover {
+    color: var(--ink);
+  }
+  .variant button[aria-pressed='true'] {
+    background: var(--fill-2);
+    color: var(--ink);
+  }
+  [hidden].path,
+  [hidden].hotbar {
+    display: none;
+  }
+  /* The path: five waypoints in a row, a dotted pixel trail from one to the next */
+  .path {
+    --wp: 48px;
+    --dots: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--s3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .path li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+  .path .wp {
+    display: grid;
+    place-items: center;
+    width: var(--wp);
+    height: var(--wp);
+    margin-bottom: var(--s3);
     border-radius: var(--r-ctl);
     background: var(--fill);
-    font-size: 15px;
   }
-  /* Every skill icon takes the same 32px box, so the labels start on one line */
-  .slot canvas {
-    flex: none;
+  .path .wp canvas {
     width: 32px;
     height: 32px;
   }
-  /* Wide desktop: all five skills in one row, icon over label like inventory slots, so no slot
-     is left alone on a second row and the bottom row gets the height */
-  @media (min-width: 1200px) {
-    .gear {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+  .path b {
+    font-weight: 500;
+  }
+  .path small {
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  /* The trail starts a step after this waypoint and ends a step before the next one */
+  .path li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--wp) / 2 - 2px);
+    left: calc(var(--wp) + var(--s2));
+    right: calc(var(--s2) - var(--s3));
+    height: 4px;
+    background: var(--dots);
+    opacity: 0.6;
+  }
+  /* Too narrow for five in a row: the trail runs down, the words stand beside their waypoints */
+  @media (max-width: 1199px) {
+    .path {
+      grid-template-columns: 1fr;
+      gap: var(--s4);
     }
-    .slot {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--s2);
-      font-size: 14px;
-      line-height: 1.35;
+    .path li {
+      display: grid;
+      grid-template-columns: var(--wp) minmax(0, 1fr);
+      column-gap: var(--s4);
+      align-content: center;
+    }
+    .path .wp {
+      grid-row: span 2;
+      margin: 0;
+    }
+    .path b {
+      align-self: end;
+    }
+    .path small {
+      align-self: start;
+    }
+    .path li:not(:last-child)::after {
+      top: var(--wp);
+      left: calc(var(--wp) / 2 - 2px);
+      right: auto;
+      width: 4px;
+      height: var(--s4);
+      background: repeating-linear-gradient(var(--ink-3) 0 4px, transparent 4px 8px);
+    }
+  }
+  /* The hotbar: square slots with their keys, the chosen one lit and named beside the bar */
+  .hotbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s3) var(--s5);
+  }
+  .hb-slots {
+    flex: 0 1 calc(5 * 64px + 4 * var(--s2));
+    display: flex;
+    gap: var(--s2);
+  }
+  .hb {
+    position: relative;
+    flex: 1 1 0;
+    max-width: 64px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: var(--r-ctl);
+    background: var(--fill);
+  }
+  .hb:hover {
+    background: var(--fill-2);
+  }
+  .hb.on {
+    background: var(--gold-soft);
+  }
+  .hb canvas {
+    width: 32px;
+    height: 32px;
+  }
+  .hb-k {
+    position: absolute;
+    top: var(--s1);
+    left: var(--s2);
+    font: 700 14px/1 var(--pixel);
+    font-style: normal;
+    color: var(--ink-3);
+  }
+  .hb.on .hb-k {
+    color: var(--gold);
+  }
+  .hb-cap {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
+  }
+  .hb-cap b {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .hb-hint {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  @media (max-width: 860px) {
+    .hb-hint {
+      display: none;
     }
   }
   /* The bottom of the sheet: the latest quest and the wishlist side by side, taking whatever
@@ -1248,6 +1390,13 @@
     }
     .lq-stats {
       display: none;
+    }
+    /* Smaller waypoints, so the path is no taller than a row of tiles */
+    .path {
+      --wp: 40px;
+    }
+    .path .wp {
+      margin-bottom: var(--s2);
     }
   }
   /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
@@ -1637,23 +1786,60 @@
         </p>
       </div>
       <div>
-        <h3 class="label">Умения</h3>
-        <div class="gear">
-          <div class="slot">
-            <canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas>Интерфейсы
+        <div class="label-row">
+          <h3 class="label">Умения</h3>
+          <!-- Temporary: two ways to show the skills, for the owner to compare and pick one -->
+          <div class="variant" role="group" aria-label="Вариант блока">
+            <button data-v="path" aria-pressed="true">Путь</button>
+            <button data-v="hotbar" aria-pressed="false">Хотбар</button>
           </div>
-          <div class="slot">
-            <canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas>Интервью
+        </div>
+        <!-- The path: the skills in the order a project goes through them, waypoints on a dotted
+             trail, a short name and what it means under it -->
+        <ol class="path" id="sk-path">
+          <li>
+            <span class="wp"><canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas></span>
+            <b>Интервью</b><small>с пользователями</small>
+          </li>
+          <li>
+            <span class="wp"><canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas></span>
+            <b>Интерфейсы</b><small>и сценарии</small>
+          </li>
+          <li>
+            <span class="wp"><canvas class="px" data-sprite="skill-code" data-scale="2"></canvas></span>
+            <b>Прототипы</b><small>на коде</small>
+          </li>
+          <li>
+            <span class="wp"><canvas class="px" data-sprite="skill-test" data-scale="2"></canvas></span>
+            <b>Юзабилити</b><small>тесты</small>
+          </li>
+          <li>
+            <span class="wp"><canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas></span>
+            <b>Передача</b><small>в разработку</small>
+          </li>
+        </ol>
+        <!-- The hotbar: icons in slots with their keys, the chosen one named beside them -->
+        <div class="hotbar" id="sk-hotbar" hidden>
+          <div class="hb-slots">
+            <button class="hb on" aria-pressed="true" aria-label="Интервью с пользователями" data-name="Интервью с пользователями">
+              <i class="hb-k" aria-hidden="true">1</i><canvas class="px" data-sprite="skill-talk" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Сценарии и интерфейсы" data-name="Сценарии и интерфейсы">
+              <i class="hb-k" aria-hidden="true">2</i><canvas class="px" data-sprite="skill-screens" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Живые прототипы на коде" data-name="Живые прототипы на коде">
+              <i class="hb-k" aria-hidden="true">3</i><canvas class="px" data-sprite="skill-code" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Юзабилити-тесты" data-name="Юзабилити-тесты">
+              <i class="hb-k" aria-hidden="true">4</i><canvas class="px" data-sprite="skill-test" data-scale="2"></canvas>
+            </button>
+            <button class="hb" aria-pressed="false" aria-label="Передача в разработку" data-name="Передача в разработку">
+              <i class="hb-k" aria-hidden="true">5</i><canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas>
+            </button>
           </div>
-          <div class="slot">
-            <canvas class="px" data-sprite="skill-test" data-scale="2"></canvas>Юзабилити
-          </div>
-          <div class="slot">
-            <canvas class="px" data-sprite="skill-code" data-scale="2"></canvas>Прототипы
-          </div>
-          <div class="slot">
-            <canvas class="px" data-sprite="skill-ship" data-scale="2"></canvas>Спецификации
-          </div>
+          <p class="hb-cap" aria-live="polite">
+            <b id="hb-name">Интервью с пользователями</b><small class="hb-hint">Клавиши 1–5</small>
+          </p>
         </div>
       </div>
       <div class="foot">
@@ -2225,11 +2411,24 @@
       'Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в разработку.':
         'I design mobile apps and web services. I take projects from research through to developer handoff.',
       'Умения': 'Skills',
+      'Вариант блока': 'Block variant',
+      'Путь': 'Path',
+      'Хотбар': 'Hotbar',
       'Интерфейсы': 'Interfaces',
-      'Интервью': 'Interviews',
       'Юзабилити': 'Usability',
       'Прототипы': 'Prototypes',
-      'Спецификации': 'Handoff',
+      'Передача': 'Handoff',
+      'с пользователями': 'with users',
+      'и сценарии': 'and user flows',
+      'на коде': 'in code',
+      'тесты': 'testing',
+      'в разработку': 'to developers',
+      'Интервью с пользователями': 'User interviews',
+      'Сценарии и интерфейсы': 'User flows and interfaces',
+      'Живые прототипы на коде': 'Live prototypes in code',
+      'Юзабилити-тесты': 'Usability tests',
+      'Передача в разработку': 'Developer handoff',
+      'Клавиши 1–5': 'Keys 1–5',
       'Последний квест': 'Latest quest',
       'Вишлист': 'Wishlist',
       'Попасть в сильную продуктовую команду': 'Join a strong product team',
@@ -4464,7 +4663,8 @@
       return;
     }
     const k = e.key.toLowerCase();
-    if (k === 'q' || k === 'й') tab(cur() - 1);
+    if (cur() === 0 && /^[1-5]$/.test(e.key) && !hotbar.hidden) skill(+e.key - 1);
+    else if (k === 'q' || k === 'й') tab(cur() - 1);
     else if (k === 'e' || k === 'у') tab(cur() + 1);
     else if (cur() === 1 && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       e.preventDefault();
@@ -4494,6 +4694,39 @@
     evenCards();
     if (phone.matches) tabs[cur()].scrollIntoView({ inline: 'nearest', block: 'nearest' });
   });
+
+  /* Skills, temporary: the switch between the two variants; ?skills=path|hotbar picks one */
+  const hotbar = document.getElementById('sk-hotbar');
+  const slots = [...hotbar.querySelectorAll('.hb')];
+  function skill(i) {
+    slots.forEach((b, j) => {
+      b.classList.toggle('on', i === j);
+      b.setAttribute('aria-pressed', i === j);
+    });
+    document.getElementById('hb-name').textContent = slots[i].dataset.name;
+  }
+  slots.forEach((b, i) => {
+    b.addEventListener('click', () => skill(i));
+    b.addEventListener('mouseenter', () => skill(i));
+    b.addEventListener('focus', () => skill(i));
+  });
+  (function () {
+    const views = { path: document.getElementById('sk-path'), hotbar };
+    const btns = document.querySelectorAll('.variant button');
+    const show = (v) => {
+      Object.entries(views).forEach(([k, el]) => (el.hidden = k !== v));
+      btns.forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v));
+      try {
+        localStorage.setItem('skills', v);
+      } catch (e) {}
+    };
+    btns.forEach((b) => b.addEventListener('click', () => show(b.dataset.v)));
+    let v = (/[?&]skills=(path|hotbar)\b/.exec(location.search) || [])[1];
+    try {
+      v = v || localStorage.getItem('skills');
+    } catch (e) {}
+    show(views[v] ? v : 'path');
+  })();
 
   select(0);
   tab(0, false);
