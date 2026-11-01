@@ -310,7 +310,7 @@ module.exports = {
       ),
       stats: [
         ['63%', null, t('нашли кешбэк через вкладку «Выгода»', 'found cashback through the “Benefits” tab')],
-        ['37%', null, t('через бейдж у баланса: второй вход не остался незамеченным', 'through the badge by the balance: the second way in got noticed')],
+        ['37%', null, t('нашли через бейдж у баланса', 'found it through the badge by the balance')],
       ],
     },
     {

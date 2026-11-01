@@ -3201,16 +3201,14 @@
   .var.yes .var-tag {
     color: var(--gold);
   }
-  /* The test result: a line on what it means, then the numbers large */
+  /* The test result: a line on what it means, then the numbers on tiles of their own, one row
+     across the card, as the overview's numbers sit */
   .outcome {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--s2) var(--s7);
-    align-items: start;
+    gap: var(--s2);
     margin-top: var(--gap);
   }
   .outcome .kick {
-    grid-column: 1 / -1;
     margin: 0;
   }
   .outcome > p:not(.kick) {
@@ -3219,14 +3217,18 @@
     line-height: 1.55;
   }
   .nums {
-    display: flex;
-    gap: var(--s6);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--s4);
+    margin-top: var(--s4);
   }
   .nums div {
     display: grid;
     align-content: start;
     gap: var(--s2);
-    width: 160px;
+    padding: var(--s4);
+    border-radius: var(--r-ctl);
+    background: var(--fill);
   }
   .nums b {
     font: 500 clamp(28px, 2.6vw, 36px)/1 var(--body);
@@ -3709,8 +3711,7 @@
     }
     .ps,
     .duo,
-    .vars-row,
-    .outcome {
+    .vars-row {
       grid-template-columns: minmax(0, 1fr);
     }
     .ps,
@@ -3777,8 +3778,14 @@
       border-radius: var(--s1) var(--r) var(--r) var(--r);
     }
     .nums {
-      flex-wrap: wrap;
-      gap: var(--s4) var(--s5);
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s3);
+    }
+    .nums div {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: var(--s4);
+      padding: var(--s3) var(--s4);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -4024,7 +4031,7 @@
   <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="pair"><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/cb-01.webp" alt="Было" loading="lazy" decoding="async" /></div></div><figcaption>Было</figcaption></figure><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Стало" loading="lazy" decoding="async" /></div></div><figcaption>Стало</figcaption></figure></div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Баланс</span><p class="ch-now">«Всего на счетах» наверху, рядом бейдж кешбэка</p><p class="ch-was"><span>Было:</span> «Всего доступно средств» в отдельной карточке</p></li><li><span class="ch-k">Карты и счета</span><p class="ch-now">Карты внутри своих счетов</p><p class="ch-was"><span>Было:</span> Два отдельных списка</p></li><li><span class="ch-k">Частые действия</span><p class="ch-now">QR, перевод, по номеру и пополнение под счетами</p><p class="ch-was"><span>Было:</span> Нет на главной</p></li><li><span class="ch-k">Предложения банка</span><p class="ch-now">Баннеры сверху, их можно закрыть</p><p class="ch-was"><span>Было:</span> Вес как у продуктов, среди счетов и карт</p></li><li><span class="ch-k">Кешбэк</span><p class="ch-now">Бейдж у баланса и вкладка «Выгода»</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» в конце главной</p></li><li><span class="ch-k">История</span><p class="ch-now">На главной, сразу под действиями</p><p class="ch-was"><span>Было:</span> Отдельная вкладка, у каждой карты своя</p></li></ul></div>
   <div class="vars"><p class="kick">Варианты главной</p><div class="vars-row"><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/rejected-barrel.webp" alt="Барабан карт" loading="lazy" decoding="async" /></div></div><figcaption><b>Барабан карт</b><span class="var-tag">Отказались</span><span class="var-note">Мой вариант. Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.</span></figcaption></figure><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/home-iter-euro.webp" alt="Европейский стандарт" loading="lazy" decoding="async" /></div></div><figcaption><b>Европейский стандарт</b><span class="var-tag">Отказались</span><span class="var-note">Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.</span></figcaption></figure><figure class="box var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Привычная иерархия" loading="lazy" decoding="async" /></div></div><figcaption><b>Привычная иерархия</b><span class="var-tag">Выбрали</span><span class="var-note">Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.</span></figcaption></figure></div></div>
-  <div class="box outcome"><p class="kick">Результат теста</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="nums"><div><b>63%</b><span>нашли кешбэк через вкладку «Выгода»</span></div><div><b>37%</b><span>через бейдж у баланса: второй вход не остался незамеченным</span></div></div></div>
+  <div class="box outcome"><p class="kick">Результат теста</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="nums"><div><b>63%</b><span>нашли кешбэк через вкладку «Выгода»</span></div><div><b>37%</b><span>нашли через бейдж у баланса</span></div></div></div>
 </section>
 <section class="ch sol" id="c-card-data">
   <p class="kick">Решение 2 из 4</p><h2>Данные карты</h2>
@@ -4710,7 +4717,7 @@
       "Было": "Before",
       "Стало": "After",
       "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
-      "через бейдж у баланса: второй вход не остался незамеченным": "through the badge by the balance: the second way in got noticed",
+      "нашли через бейдж у баланса": "found it through the badge by the balance",
       "Решение 1 из 4": "Solution 1 of 4",
       "Главная страница": "Home screen",
       "Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.": "Everyday tasks and bank offers should be visible at the same time without competing with each other.",
