@@ -7501,9 +7501,8 @@
     loops.forEach((v) => seen.observe(v));
     document.addEventListener('story-turn', () => loops.forEach(syncLoop));
 
-    /* How we worked, told as the page scrolls: the step crossing the reading line (the middle of
-       the screen; on a phone, the middle of what is left under the stuck picture) lights up and
-       brings its picture; the pictures before it slip up, the ones after wait below */
+    /* How we worked, told as the page scrolls: the step crossing the reading line (see
+       readingLine) lights up and brings its picture; the pictures before it slip up, the ones after wait below */
     document.querySelectorAll('[data-story]').forEach((story) => {
       const steps = [...story.querySelectorAll('.story-step')];
       const slides = [...story.querySelectorAll('.story-slide')];
@@ -7511,6 +7510,9 @@
       const hud = document.querySelector('.hud');
       let at = 0,
         queued = false;
+      // Where a step counts as being read: the screen's middle beside the picture on a computer; on
+      // a phone a third of the way down what the stuck picture leaves, as its steps are short
+      const readingLine = (top) => top + (innerHeight - top) / (phone.matches ? 3 : 2);
       const show = (i) => {
         if (i === at) return;
         at = i;
@@ -7528,7 +7530,7 @@
         // On a phone the picture sticks just under the back button
         story.style.setProperty('--hud-h', `${Math.round(hud.getBoundingClientRect().bottom + 8)}px`);
         const top = phone.matches ? media.getBoundingClientRect().bottom : 0;
-        const line = top + (innerHeight - top) / 2;
+        const line = readingLine(top);
         let i = 0;
         steps.forEach((s, k) => s.getBoundingClientRect().top < line && (i = k));
         show(i);
@@ -7540,6 +7542,32 @@
       };
       addEventListener('scroll', later, { passive: true });
       addEventListener('resize', later);
+
+      /* A magnet, as on the phone's «Квесты»: the scroll is never fought, but once it comes to
+         rest inside the story, the lit step eases into its place: beside the picture's middle
+         on a computer, just under the stuck picture on a phone. Coming into the story and
+         leaving it stay free: only while the reading line is between the first step's top and
+         the last one's foot */
+      let rest = 0,
+        touching = false;
+      const settle = () => {
+        if (touching || !document.body.classList.contains('playing')) return;
+        const top = phone.matches ? media.getBoundingClientRect().bottom : 0;
+        const line = readingLine(top);
+        const first = steps[0].getBoundingClientRect(),
+          last = steps[steps.length - 1].getBoundingClientRect();
+        if (line < first.top || line > last.bottom) return;
+        const b = steps[at].getBoundingClientRect();
+        const target = scrollY + (phone.matches ? b.top - top : b.top + b.height / 2 - innerHeight / 2);
+        if (Math.abs(target - scrollY) > 4) scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      };
+      const restLater = () => {
+        clearTimeout(rest);
+        rest = setTimeout(settle, SETTLE_MS);
+      };
+      addEventListener('scroll', restLater, { passive: true });
+      addEventListener('touchstart', () => ((touching = true), clearTimeout(rest)), { passive: true });
+      for (const ev of ['touchend', 'touchcancel']) addEventListener(ev, () => ((touching = false), restLater()), { passive: true });
     });
 
     /* Pixel scenes (.toon, ported from the main site's scripts/scenes.ts): a scene is a list of
