@@ -1884,13 +1884,12 @@
     text-transform: uppercase;
     color: var(--ink-3);
   }
+  /* Was a card on a fill; now a plain item, apart from its neighbours by space alone (owner:
+     the grey cards made everything look the same) */
   .tile {
     display: flex;
     flex-direction: column;
-    gap: var(--s3);
-    padding: var(--pad);
-    border-radius: var(--r);
-    background: var(--fill);
+    gap: var(--s2);
     color: var(--ink-2);
     line-height: 1.55;
   }
@@ -1911,7 +1910,7 @@
   }
   .grid {
     display: grid;
-    gap: var(--s4);
+    gap: var(--s6) var(--s7);
   }
   .grid.two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2061,34 +2060,71 @@
   .ava img + img {
     margin-left: calc(-1 * var(--s1));
   }
-  .sum {
+  /* The result first: four numbers large, apart by space, no cards */
+  .kpi {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s4);
-    margin-top: var(--s7);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s6);
   }
-  .sum h3 {
+  .kpi div {
+    display: grid;
+    align-content: start;
+    gap: var(--s1);
+  }
+  .kpi b {
     margin-bottom: var(--s2);
-  }
-  .sum-r {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 var(--s4);
-  }
-  .sum-r p {
-    grid-column: 1 / -1;
-    margin-bottom: var(--s1);
-    font-size: var(--fs-cap);
-  }
-  .sum-r b {
-    display: block;
-    font-size: var(--fs-title);
-    font-weight: 500;
-    color: var(--ink);
+    font: 500 clamp(36px, 3.4vw, 48px)/1 var(--body);
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
-  .sum-r span {
+  .kpi small {
+    font-size: var(--fs-title);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .kpi p {
+    font-weight: 500;
+  }
+  .kpi span {
     font-size: var(--fs-cap);
+    line-height: 1.45;
+    color: var(--ink-3);
+  }
+  #c-overview > .aside {
+    margin: var(--s4) 0 var(--s7);
+  }
+  /* Problems and solutions: a line per solution, the problem quieter, what we did in full ink;
+     the name leads to the solution */
+  .qs {
+    margin-top: var(--s7);
+  }
+  .qs ol {
+    display: grid;
+    gap: var(--s5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .qs li {
+    display: grid;
+    grid-template-columns: minmax(0, 240px) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s6);
+    line-height: 1.5;
+  }
+  .qs .qc {
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .qs .qc::after {
+    content: ' →';
+    color: var(--ink-3);
+  }
+  .qs .qc:hover {
+    color: var(--ink-2);
+  }
+  .qs .was {
     color: var(--ink-3);
   }
 
@@ -2199,10 +2235,8 @@
     display: flex;
     align-items: center;
     gap: var(--s4);
-    margin-top: var(--s4);
-    padding: var(--pad);
-    border-radius: var(--r);
-    background: var(--fill);
+    margin-top: var(--s6);
+    max-width: 760px;
   }
   .say img {
     flex: none;
@@ -2611,7 +2645,7 @@
 
   @media (max-width: 860px) {
     .intro,
-    .sum,
+    .qs li,
     .grid.two,
     .grid.three,
     .sub-h,
@@ -2654,6 +2688,13 @@
     }
     .duo {
       padding: var(--s5) var(--pad);
+    }
+    .kpi {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s5) var(--s4);
+    }
+    .qs li {
+      gap: var(--s1);
     }
     .nums {
       flex-wrap: wrap;
@@ -2831,17 +2872,14 @@
 <nav class="toc" aria-label="Части кейса"><a href="#c-overview">Обзор</a><a href="#c-process">Исследование</a><a href="#c-home">Дизайн</a><a href="#c-testing">Тестирование</a><a href="#c-outcome">Выводы</a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
+  <div class="kpi"><div><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
+  <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
   <div class="intro"><div><p class="kick">Вступление</p><div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div></div><aside class="about">
     <div><p class="kick">Команда</p><p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>2 продуктовых дизайнера</span></p></div>
     <div><p class="kick">Проект</p><p class="pills"><span class="pill">Финтех</span><span class="pill">B2C</span><span class="pill">Мобильное приложение</span><span class="pill">Концепт 2026</span></p></div>
     <div><p class="kick">Инструменты</p><p class="pills"><span class="pill tool"><img src="img/tools/figma.svg" alt="" />Figma</span><span class="pill tool"><img src="img/tools/claude.svg" alt="" />Claude</span><span class="pill tool"><img src="img/tools/codex.svg" alt="" />Codex</span><span class="pill tool"><img src="img/tools/mobbin.svg" alt="" />Mobbin</span><span class="pill tool"><img src="img/tools/rive.svg" alt="" />Rive</span></p></div>
   </aside></div>
-  <div class="sum">
-    <div class="tile"><h3>Проблемы</h3><ul><li>Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</li><li>Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</li><li>12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</li><li>Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</li></ul></div>
-    <div class="tile"><h3>Решения</h3><ul><li>Баланс, частые действия и история наверху, а предложения банка можно закрыть</li><li>Их можно посмотреть и скопировать на одном экране, без кода из СМС</li><li>Одна кнопка рядом с условиями, и сразу выбор категорий</li><li>Их можно выбрать на месяц вперёд и поменять до его начала</li></ul></div>
-    <div class="tile"><h3>Результаты</h3><div class="sum-r"><p>Подключение кешбэка</p><div><b>12 → 5</b><span>Шаги</span></div><div><b>105 → 23</b><span>Время, с</span></div></div><div class="sum-r"><p>Данные карты</p><div><b>7 → 4</b><span>Шаги</span></div><div><b>42 → 17</b><span>Время, с</span></div></div><div class="sum-r"><p>Выбор категорий</p><div><b>7 → 6</b><span>Шаги</span></div><div><b>28,7 → 14</b><span>Время, с</span></div></div><div class="sum-r"><p>Медианные показатели теста</p><div><b>89%</b><span>Первый клик верный</span></div><div><b>6,4 из 7</b><span>Оценка лёгкости, SEQ</span></div></div></div>
-  </div>
-  <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
+  <div class="qs"><p class="kick">Проблемы и решения</p><ol><li><a class="qc" href="#c-home">Главная</a><p class="was">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</p><p>Баланс, частые действия и история наверху, а предложения банка можно закрыть</p></li><li><a class="qc" href="#c-card-data">Данные карты</a><p class="was">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</p><p>Их можно посмотреть и скопировать на одном экране, без кода из СМС</p></li><li><a class="qc" href="#c-cashback">Подключение кешбэка</a><p class="was">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</p><p>Одна кнопка рядом с условиями, и сразу выбор категорий</p></li><li><a class="qc" href="#c-categories">Кешбэк после подключения</a><p class="was">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</p><p>Их можно выбрать на месяц вперёд и поменять до его начала</p></li></ol></div>
 </section>
 <p class="part"><span>Финальные экраны</span></p>
 <section class="ch" id="c-screens">
@@ -3446,12 +3484,29 @@
       "Дизайн": "Design",
       "Тестирование": "Testing",
       "Выводы": "Takeaways",
+      "с": "s",
       "Подключение кешбэка": "Activating cashback",
-      "Шаги": "Steps",
-      "Время, с": "Time, s",
+      "вместо 105 с, 5 шагов вместо 12": "instead of 105 s, 5 steps instead of 12",
+      "Путь к данным карты": "Getting to card details",
+      "вместо 42 с, 4 шага вместо 7": "instead of 42 s, 4 steps instead of 7",
+      "Первый клик верный": "First click success",
+      "начали с правильного действия": "started with the right action",
+      "6,4": "6.4",
+      "из 7": "of 7",
+      "Оценка лёгкости": "Ease score",
+      "SEQ, среднее по задачам": "SEQ, average across tasks",
+      "Главная": "Home",
+      "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
+      "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
       "Данные карты": "Card details",
-      "Выбор категорий": "Choosing categories",
-      "28,7 → 14": "28.7 → 14",
+      "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
+      "Их можно посмотреть и скопировать на одном экране, без кода из СМС": "They can be viewed and copied on one screen, with no text message code",
+      "12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение": "12 steps through email and a browser, and the activated cashback didn’t show up until you reopened the app",
+      "Одна кнопка рядом с условиями, и сразу выбор категорий": "One button next to the terms, and straight on to choosing categories",
+      "Кешбэк после подключения": "Cashback after activation",
+      "Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало": "Categories had to be chosen every month, and the app never reminded you",
+      "Их можно выбрать на месяц вперёд и поменять до его начала": "They can be chosen a month ahead and changed before it starts",
+      "Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.": "A usability test with 30 of the bank’s customers: everyone got to the end of every task.",
       "Вступление": "Intro",
       "Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.": "I’m not a PSB customer, but I’ve heard from friends more than once that they gave up activating cashback halfway through. At some point curiosity got the better of me: what was confusing people so much? I studied the bank’s app and its terms.",
       "Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.": "The cashback terms are good, but activation took 12 steps: jumps to a browser and a mail app, email confirmation, several consents, and at the end it still wasn’t clear whether it had worked.",
@@ -3464,26 +3519,9 @@
       "Мобильное приложение": "Mobile app",
       "Концепт 2026": "Concept 2026",
       "Инструменты": "Tools",
-      "Проблемы": "Problems",
-      "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
-      "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
-      "12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение": "12 steps through email and a browser, and the activated cashback didn’t show up until you reopened the app",
-      "Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало": "Categories had to be chosen every month, and the app never reminded you",
-      "Решения": "Solutions",
-      "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
-      "Их можно посмотреть и скопировать на одном экране, без кода из СМС": "They can be viewed and copied on one screen, with no text message code",
-      "Одна кнопка рядом с условиями, и сразу выбор категорий": "One button next to the terms, and straight on to choosing categories",
-      "Их можно выбрать на месяц вперёд и поменять до его начала": "They can be chosen a month ahead and changed before it starts",
-      "Результаты": "Results",
-      "Медианные показатели теста": "Median test results",
-      "Первый клик верный": "First click success",
-      "6,4": "6.4",
-      "из 7": "of 7",
-      "Оценка лёгкости, SEQ": "Ease, SEQ",
-      "Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.": "A usability test with 30 of the bank’s customers: everyone got to the end of every task.",
+      "Проблемы и решения": "Problems and solutions",
       "Финальные экраны": "Final screens",
       "Экраны рабочего прототипа, на котором проходил юзабилити-тест: каждый открывает свой сценарий, а внутри всё приложение целиком.": "Screens of the working prototype we ran the usability test on: each opens its own flow, and the whole app is inside.",
-      "Главная": "Home",
       "Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.": "The screens are built from a UI kit: every component has a spec with its variants, sizes and states.",
       "UI-кит в Figma": "UI kit in Figma",
       "Проект в Figma": "Figma file",
@@ -3520,6 +3558,7 @@
       "Стало": "After",
       "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
       "через бейдж у баланса: второй вход не остался незамеченным": "through the badge by the balance: the second way in got noticed",
+      "Решения": "Solutions",
       "Решение 1 из 4": "Solution 1 of 4",
       "Главная страница": "Home screen",
       "Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.": "Everyday tasks and bank offers should be visible at the same time without competing with each other.",
@@ -3643,7 +3682,6 @@
       "Категории выбраны": "Categories chosen",
       "6,7": "6.7",
       "Решение 4 из 4": "Solution 4 of 4",
-      "Кешбэк после подключения": "Cashback after activation",
       "Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.": "Cashback should pay off every month, not only after the first activation.",
       "В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.": "In an interview someone told us they forget to choose categories at the start of the month, and sometimes can’t find cashback at all. The app never reminded them, and the choose button was easy to miss.",
       "Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.": "The benefit wasn’t visible at a glance, so there was no reason to come back.",
@@ -3671,6 +3709,7 @@
       "23 с": "23 s",
       "42 с": "42 s",
       "17 с": "17 s",
+      "Выбор категорий": "Choosing categories",
       "28,7 с": "28.7 s",
       "14 с": "14 s",
       "шагов": "steps",

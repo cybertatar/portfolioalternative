@@ -69,23 +69,24 @@ function about(a) {
   </aside>`;
 }
 
-function overview(o, flows) {
-  const list = (k) => `<ul>${o.quests.map((q) => `<li>${L(q[k])}</li>`).join('')}</ul>`;
-  const results = flows
+// The overview: the result in four big numbers first (a reviewer skims for the outcome), then
+// the intro with who, what and with what beside it, then each problem and what we did about it,
+// one line per solution, leading to it
+function overview(o) {
+  const nums = o.stats
+    .map(([n, unit, what, detail]) => `<div><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><p>${L(what)}</p><span>${L(detail)}</span></div>`)
+    .join('');
+  const quests = o.quests
     .map(
-      (f) =>
-        `<div class="sum-r"><p>${L(f.name)}</p><div><b>${f.steps[0]} → ${f.steps[1]}</b><span>${L(t('Шаги', 'Steps'))}</span></div><div><b>${L(t(`${secText(f.time[0]).ru} → ${f.time[1]}`, `${secText(f.time[0]).en} → ${f.time[1]}`))}</b><span>${L(t('Время, с', 'Time, s'))}</span></div></div>`,
+      ([id, name, problem, fix]) =>
+        `<li><a class="qc" href="#c-${id}">${L(name)}</a><p class="was">${L(problem)}</p><p>${L(fix)}</p></li>`,
     )
     .join('');
-  const [, , fcs, seq] = o.stats;
   return `<section class="ch" id="c-overview">
-  <div class="intro"><div>${kicker(t('Вступление', 'Intro'))}${prose(o.prose)}</div>${about(o.about)}</div>
-  <div class="sum">
-    <div class="tile"><h3>${L(t('Проблемы', 'Problems'))}</h3>${list(2)}</div>
-    <div class="tile"><h3>${L(t('Решения', 'Solutions'))}</h3>${list(3)}</div>
-    <div class="tile"><h3>${L(t('Результаты', 'Results'))}</h3>${results}<div class="sum-r"><p>${L(t('Медианные показатели теста', 'Median test results'))}</p><div><b>${L(num(fcs[0]))}</b><span>${L(fcs[2])}</span></div><div><b>${L(num(seq[0]))} ${L(seq[1])}</b><span>${L(t('Оценка лёгкости, SEQ', 'Ease, SEQ'))}</span></div></div></div>
-  </div>
+  <div class="kpi">${nums}</div>
   <p class="aside">${L(o.statsNote)}</p>
+  <div class="intro"><div>${kicker(t('Вступление', 'Intro'))}${prose(o.prose)}</div>${about(o.about)}</div>
+  <div class="qs">${kicker(t('Проблемы и решения', 'Problems and solutions'))}<ol>${quests}</ol></div>
 </section>`;
 }
 
@@ -254,7 +255,7 @@ const toc = () =>
 const body = [
   toc(),
   `<div class="cs">`,
-  overview(D.overview, D.testing.flows),
+  overview(D.overview),
   part(t('Финальные экраны', 'Final screens')),
   screens(D.screens),
   part(PARTS[1][1]),
