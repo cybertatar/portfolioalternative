@@ -3456,11 +3456,6 @@
   body.leaving .rail {
     opacity: 0;
   }
-  @media (max-width: 1259px) {
-    .rail {
-      display: none;
-    }
-  }
   .rail:is(:hover, :focus-within) {
     background: var(--glass-strong);
     -webkit-backdrop-filter: blur(10px);
@@ -3511,6 +3506,111 @@
     width: 20px;
     background: var(--gold);
     opacity: 1;
+  }
+
+  /* Narrower than the room for the rail (phones, tablets): the quest chip at the top right turns
+     into the contents. On the cover it names the quest, as before; in the case it names the
+     chapter in view, with a gold line along its foot for how far the case has been read. A tap
+     opens the same rail under it, names shown, rows a finger tall */
+  .hud .toc {
+    display: none;
+  }
+  @media (max-width: 1259px) {
+    .hud .where {
+      display: none;
+    }
+    .hud .toc {
+      position: relative;
+      display: inline-flex;
+      align-self: stretch;
+      align-items: center;
+      gap: var(--s2);
+      min-width: 0;
+      padding: 0 var(--s3) 0 var(--s4);
+      overflow: hidden;
+      border-radius: var(--r-ctl);
+      background: var(--glass-strong);
+      font-size: var(--fs-ui);
+      color: var(--ink);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    .toc-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .toc.cover .toc-name {
+      padding-top: 2px;
+      font: 700 var(--fs-px)/1 var(--pixel);
+    }
+    .toc-arrow {
+      flex: none;
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: var(--ink-3);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.2s ease;
+    }
+    .toc[aria-expanded='true'] .toc-arrow {
+      transform: rotate(180deg);
+    }
+    .toc-bar {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(var(--read, 0));
+      transform-origin: left;
+    }
+    .rail,
+    .rail.off {
+      top: calc(var(--below, 0px) + var(--s2));
+      left: auto;
+      right: max(var(--gap), env(safe-area-inset-right, 0px));
+      max-height: calc(100dvh - var(--below, 0px) - var(--s2) - var(--gap));
+      overflow-y: auto;
+      padding: var(--s2) var(--s5) var(--s2) var(--s4);
+      border-radius: var(--r);
+      /* A step lighter than the page and its chips, so the list reads as lying over them */
+      background: linear-gradient(var(--fill-2), var(--fill-2)), var(--glass-strong);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(calc(-1 * var(--s2)));
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
+    }
+    .rail.open,
+    .rail.open:is(:hover, :focus-within) {
+      background: linear-gradient(var(--fill-2), var(--fill-2)), var(--glass-strong);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .rail a {
+      height: 44px;
+      font-size: var(--fs-ui);
+    }
+    .rail a.part {
+      margin-top: 0;
+    }
+    .rail a.part:not(:first-child) {
+      margin-top: var(--s2);
+    }
+    .rail span,
+    .rail:is(:hover, :focus-within) span {
+      max-width: none;
+      opacity: 1;
+    }
   }
 
   @media (max-width: 860px) {
@@ -3733,7 +3833,12 @@
 <div class="play" id="play">
   <div class="hud">
     <button class="back" id="back"><span class="key">Esc</span>Пауза</button
-    ><span class="where" id="where"></span>
+    ><span class="where" id="where"></span
+    ><button class="toc" id="toc" type="button" aria-expanded="false" aria-controls="rail" aria-label="Содержание кейса"
+      ><span class="toc-name" id="toc-name"></span
+      ><svg class="toc-arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" /></svg
+      ><i class="toc-bar" id="toc-bar"></i
+    ></button>
   </div>
   <div class="stagefront">
     <div class="head" id="phead"><img class="cover-art head-cover" id="pcover" alt=""></div>
@@ -3749,7 +3854,7 @@
       <!-- The PSB case, the only open one. Built by tools/case-psb/build.js from its data.js:
            edit those and run `node tools/case-psb/build.js`, not this block -->
       <!-- case:psb -->
-<nav class="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
+<nav class="rail" id="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
   <div class="kpi"><div class="box"><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
@@ -7177,7 +7282,11 @@
 
   addEventListener('keydown', (e) => {
     if (document.body.classList.contains('playing')) {
-      if (e.key === 'Escape') pause();
+      if (e.key === 'Escape') {
+        // An open contents list takes the Esc for itself: the case and its films stay as they are
+        if (caseBody.closeSheet()) return e.stopImmediatePropagation();
+        pause();
+      }
       return;
     }
     const k = e.key.toLowerCase();
@@ -7222,6 +7331,11 @@
     document.body.append(rail);
     const railLinks = [...rail.querySelectorAll('a')];
     const chapters = railLinks.map((a) => document.querySelector(a.hash));
+    // Narrower than the rail's room, the quest chip names the chapter in view and opens the list
+    const toc = document.getElementById('toc'),
+      tocName = document.getElementById('toc-name'),
+      tocBar = document.getElementById('toc-bar'),
+      where = document.getElementById('where');
     const spy = () => {
       if (!document.body.classList.contains('playing')) return;
       const line = innerHeight / 2;
@@ -7229,12 +7343,30 @@
       chapters.forEach((c, i) => c && c.getBoundingClientRect().top <= line && (on = i));
       railLinks.forEach((a, i) => a.classList.toggle('on', i === on));
       rail.classList.toggle('off', on < 0);
+      // The name changes only when it differs: every change wakes the typograph
+      const name = on < 0 ? where.textContent : railLinks[on].querySelector('span').textContent;
+      if (tocName.textContent !== name) tocName.textContent = name;
+      toc.classList.toggle('cover', on < 0);
+      const end = document.documentElement.scrollHeight - innerHeight;
+      tocBar.style.setProperty('--read', end > 0 ? Math.min(1, Math.max(0, scrollY / end)).toFixed(3) : 0);
     };
+    function sheet(open) {
+      if (open) rail.style.setProperty('--below', toc.getBoundingClientRect().bottom + 'px');
+      rail.classList.toggle('open', open);
+      toc.setAttribute('aria-expanded', String(open));
+    }
+    toc.addEventListener('click', () => sheet(!rail.classList.contains('open')));
+    // A tap anywhere else, or Esc, closes it; Esc only pauses once it is closed
+    document.addEventListener('click', (e) => {
+      if (rail.classList.contains('open') && !rail.contains(e.target) && !toc.contains(e.target)) sheet(false);
+    });
+    const closeSheet = () => rail.classList.contains('open') && (sheet(false), toc.focus(), true);
     addEventListener('scroll', spy, { passive: true });
     // The problem cards in the overview and the rail lead to their chapter, smoothly
     railLinks.forEach((a) =>
       a.addEventListener('click', (e) => {
         e.preventDefault();
+        sheet(false);
         document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' });
       }),
     );
@@ -7608,8 +7740,9 @@
     // On pause everything stops
     function stop() {
       [...films, ...loops].forEach((v) => v.pause());
+      sheet(false);
     }
-    return { spy, filmsLang, stop };
+    return { spy, filmsLang, stop, closeSheet };
   })();
   document.getElementById('back').addEventListener('click', caseBody.stop);
   addEventListener('keydown', (e) => e.key === 'Escape' && caseBody.stop());
