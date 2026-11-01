@@ -208,7 +208,7 @@ function solution(s, i) {
   const paras = (ps) => ps.map((p) => `<p>${L(p)}</p>`).join('');
   const media = s.race
     ? race(s.race)
-    : `<div class="pair">${s.pair.map(([src, label]) => `<figure>${phoneOf(src, label)}<figcaption>${L(label)}</figcaption></figure>`).join('')}</div>`;
+    : `<div class="pair">${s.pair.map(([src, label]) => `<figure><figcaption>${L(label)}</figcaption>${phoneOf(src, label)}</figure>`).join('')}</div>`;
   const stats = `<div class="nums">${s.stats
     .map(([n, unit, what]) => `<div><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><span>${L(what)}</span></div>`)
     .join('')}</div>`;
