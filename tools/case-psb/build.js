@@ -104,10 +104,22 @@ function processSec(p) {
     `<video class="loop" src="${vsrc}" poster="${vposter}" muted loop playsinline preload="none" aria-label="${L(vlabel)}"></video>`,
     S.testing(L),
   ];
+  // One card, a quest log: the steps listed on the left, the open one with its text; its picture
+  // on the right, the pictures side by side on a strip that scrolls (swipe, the list, the arrows)
   return `${head('process', p)}
-  <div class="chapters">${p.steps
-    .map(([title, text], i) => `<article class="box chapter"><div class="chapter-copy"><p class="n">${nn(i)}</p><h3>${L(title)}</h3><p>${L(text)}</p></div><div class="chapter-media">${media[i]}</div></article>`)
-    .join('')}</div>
+  <div class="box journal" data-journal>
+    <div class="journal-steps">${p.steps
+      .map(
+        ([title, text], i) =>
+          `<div class="journal-step"${i ? '' : ' data-open'}><h3><button type="button" class="journal-tab" aria-controls="jr-${i}" aria-expanded="${!i}"><span class="n">${nn(i)}</span><span>${L(title)}</span></button></h3><div class="journal-text"><div><p>${L(text)}</p></div></div></div>`,
+      )
+      .join('')}
+      <div class="qkeys" aria-hidden="true"><p><span class="keys"><span class="key arrow">←</span><span class="key arrow">→</span></span>${L(t('Листать шаги', 'Flip through the steps'))}</p></div>
+    </div>
+    <div class="journal-view" tabindex="-1"><div class="journal-track">${media
+      .map((m, i) => `<div class="journal-slide" id="jr-${i}" role="group" aria-label="${L(p.steps[i][0])}">${m}</div>`)
+      .join('')}</div></div>
+  </div>
   <div class="sub-h"><h3>${L(c.title)}</h3><p>${L(c.lead)}</p></div>
   <div class="grid three">${c.items.map(([k, v]) => `<div class="box tile">${kicker(k)}<p class="big">${L(v)}</p></div>`).join('')}</div>
 </section>`;

@@ -2177,44 +2177,133 @@
     display: none;
   }
 
-  /* How we worked: a card per step, the text on the left `--pad` from the edge, the picture
-     on the right running to the card's edge and sharing its corners, as in the menu */
-  .chapters {
-    display: grid;
-    gap: var(--gap);
-  }
-  .cs .box.chapter {
+  /* How we worked: one card, a quest log. The steps are listed on the left, the open one shows
+     its text; the rows sit `--inset` in from the card's edge, so the text is `--pad` from it and the
+     rows' corners follow the card's. The list starts at the top, like a list does, and the
+     arrows' hint sits at its foot, as under the quests. On the right the steps' pictures lie side
+     by side on a strip that scrolls: a swipe, a step in the list or the arrows turn it, each
+     picture tilting away as a page does */
+  .cs .box.journal {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-    align-items: center;
-    gap: var(--s6);
-    padding: 0 0 0 var(--pad);
+    padding: 0;
     overflow: hidden;
   }
-  .chapter-copy {
+  .journal-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s1);
+    padding: var(--inset);
+  }
+  .journal-step {
+    border-radius: var(--r-in);
+    transition: background-color 0.25s;
+  }
+  .journal-step:has(.journal-tab:hover):not([data-open]) {
+    background: var(--fill);
+  }
+  .journal-step[data-open] {
+    background: var(--fill-2);
+  }
+  .journal-tab {
     display: grid;
-    gap: var(--s2);
-    padding-block: var(--pad);
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--s3);
+    width: 100%;
+    padding: var(--pad-in);
+    border-radius: var(--r-in);
+    text-align: left;
+    font-size: var(--fs-title);
+    line-height: 1.3;
+    color: var(--ink-2);
+    transition: color 0.25s;
+  }
+  .journal-step[data-open] .journal-tab {
+    color: var(--ink);
+  }
+  .journal-step[data-open] .n {
+    color: var(--gold);
+  }
+  /* The text opens and closes by its height: a row of the grid going from nothing to its own */
+  .journal-text {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .journal-step[data-open] .journal-text {
+    grid-template-rows: 1fr;
+  }
+  .journal-text > div {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .journal-text p {
+    padding: 0 var(--pad-in) var(--pad-in);
     color: var(--ink-2);
     line-height: 1.55;
+    opacity: 0;
+    transition: opacity 0.25s;
   }
-  .chapter-copy h3 {
-    color: var(--ink);
-    font-size: var(--fs-h3);
-    line-height: 1.2;
-    margin-bottom: var(--s1);
+  .journal-step[data-open] .journal-text p {
+    opacity: 1;
+    transition-delay: 0.1s;
   }
-  .chapter-media {
-    align-self: stretch;
+  .journal .qkeys {
+    padding: var(--pad-in);
+  }
+  .journal-view {
     display: grid;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
     background: rgb(0 0 0 / 0.28);
   }
-  .chapter-media .loop {
+  .journal-view::-webkit-scrollbar {
+    display: none;
+  }
+  .journal-view:focus {
+    outline: none;
+  }
+  .journal-track {
+    display: flex;
+  }
+  .journal-slide {
+    flex: 0 0 100%;
+    display: grid;
+    align-items: center;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .journal-slide .loop {
     display: block;
     width: 100%;
     height: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+  }
+  /* A page turning: the picture leaving tilts away and dims, the one coming in straightens up.
+     Driven by the strip's own scroll, so a swipe turns it under the finger */
+  @supports (animation-timeline: view()) {
+    .journal-slide > * {
+      animation: page-turn linear both;
+      animation-timeline: view(inline);
+    }
+  }
+  @keyframes page-turn {
+    0% {
+      transform: perspective(1400px) translateX(-12%) rotateY(-28deg) scale(0.86);
+      opacity: 0.2;
+    }
+    50% {
+      transform: none;
+      opacity: 1;
+    }
+    100% {
+      transform: perspective(1400px) translateX(12%) rotateY(28deg) scale(0.86);
+      opacity: 0.2;
+    }
   }
   .film video {
     display: block;
@@ -3635,7 +3724,7 @@
 
   @media (max-width: 860px) {
     .intro,
-    .cs .box.chapter,
+    .cs .box.journal,
     .qs ol,
     .grid.two,
     .grid.three,
@@ -3680,9 +3769,12 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--s5) var(--s4);
     }
-    .cs .box.chapter {
-      gap: 0;
-      padding: 0;
+    /* Phone: the picture on top, a swipe turns it; the steps under it */
+    .journal-view {
+      order: -1;
+    }
+    .journal .qkeys {
+      display: none;
     }
     .say {
       flex-direction: column;
@@ -3691,10 +3783,6 @@
     }
     .bubble {
       border-radius: var(--s1) var(--r) var(--r) var(--r);
-    }
-    .chapter-copy {
-      padding: var(--pad);
-      order: 2;
     }
     .nums {
       flex-wrap: wrap;
@@ -3876,7 +3964,7 @@
       <!-- The PSB case, the only open one. Built by tools/case-psb/build.js from its data.js:
            edit those and run `node tools/case-psb/build.js`, not this block -->
       <!-- case:psb -->
-<nav class="rail" id="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
+<nav class="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
   <div class="kpi"><div class="box"><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
@@ -3896,7 +3984,11 @@
 </section>
 <section class="ch" id="c-process">
   <h2>Как мы работали</h2>
-  <div class="chapters"><article class="box chapter"><div class="chapter-copy"><p class="n">01</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="chapter-media"><div class="toon team" data-scene="team" role="img" aria-label="Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»">
+  <div class="box journal" data-journal>
+    <div class="journal-steps"><div class="journal-step" data-open><h3><button type="button" class="journal-tab" aria-controls="jr-0" aria-expanded="true"><span class="n">01</span><span>Дизайнили вдвоём, проверяли у сеньора</span></button></h3><div class="journal-text"><div><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-1" aria-expanded="false"><span class="n">02</span><span>Выбрали четыре направления</span></button></h3><div class="journal-text"><div><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-2" aria-expanded="false"><span class="n">03</span><span>Не только макеты</span></button></h3><div class="journal-text"><div><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-3" aria-expanded="false"><span class="n">04</span><span>Видели путь, а не только финал</span></button></h3><div class="journal-text"><div><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div></div>
+      <div class="qkeys" aria-hidden="true"><p><span class="keys"><span class="key arrow">←</span><span class="key arrow">→</span></span>Листать шаги</p></div>
+    </div>
+    <div class="journal-view" tabindex="-1"><div class="journal-track"><div class="journal-slide" id="jr-0" role="group" aria-label="Дизайнили вдвоём, проверяли у сеньора"><div class="toon team" data-scene="team" role="img" aria-label="Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»">
   <div class="desk"></div>
   <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-sad"/></svg></div>
   <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-sad"/></svg></div>
@@ -3906,7 +3998,7 @@
   <div class="cloud"><svg class="sprite" viewBox="0 0 44 22" aria-hidden="true" focusable="false"><use href="#spr-cloud"/></svg><span class="puff p1"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p2"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p3"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="swear s1">#</span><span class="swear s2">!</span><span class="swear s3">@</span></div>
   <div class="elder"><span class="quest"><svg class="sprite" viewBox="0 0 4 9" aria-hidden="true" focusable="false"><use href="#spr-quest"/></svg></span><span class="arm-s left"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><span class="arm-s right"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder"/></svg><svg class="sprite face angry" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-angry"/></svg><svg class="sprite face talk" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-talk"/></svg></div>
   <div class="dialog px-clip" aria-hidden="true"><span class="dialog-label">Ревью сеньора</span><p class="dialog-text"><span data-type-ru="Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?" data-type-en="Cards above the account, and the balance is tiny. Do you even get what you’ve made?"></span></p></div>
-</div></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">02</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="chapter-media"><div class="toon bench" data-scene="bench" data-banks-ru="[{&quot;name&quot;:&quot;Сбер&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Флип карты&quot;},{&quot;name&quot;:&quot;Ozon Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Копирование иконкой&quot;},{&quot;name&quot;:&quot;Т-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Акцент на скорости&quot;},{&quot;name&quot;:&quot;Альфа-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Кешбэк в таббаре&quot;},{&quot;name&quot;:&quot;Райффайзен&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Кешбэк в бейдже&quot;}]" data-banks-en="[{&quot;name&quot;:&quot;Sber&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Card flip&quot;},{&quot;name&quot;:&quot;Ozon Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Copy icon&quot;},{&quot;name&quot;:&quot;T-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Focus on speed&quot;},{&quot;name&quot;:&quot;Alfa-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Cashback in the tab bar&quot;},{&quot;name&quot;:&quot;Raiffeisen&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Cashback in a badge&quot;}]" role="img" aria-label="Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже">
+</div></div><div class="journal-slide" id="jr-1" role="group" aria-label="Выбрали четыре направления"><div class="toon bench" data-scene="bench" data-banks-ru="[{&quot;name&quot;:&quot;Сбер&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Флип карты&quot;},{&quot;name&quot;:&quot;Ozon Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Копирование иконкой&quot;},{&quot;name&quot;:&quot;Т-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Акцент на скорости&quot;},{&quot;name&quot;:&quot;Альфа-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Кешбэк в таббаре&quot;},{&quot;name&quot;:&quot;Райффайзен&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Кешбэк в бейдже&quot;}]" data-banks-en="[{&quot;name&quot;:&quot;Sber&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Card flip&quot;},{&quot;name&quot;:&quot;Ozon Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Copy icon&quot;},{&quot;name&quot;:&quot;T-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Focus on speed&quot;},{&quot;name&quot;:&quot;Alfa-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Cashback in the tab bar&quot;},{&quot;name&quot;:&quot;Raiffeisen&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Cashback in a badge&quot;}]" role="img" aria-label="Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже">
   <div class="desk"></div>
   <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg></div>
   <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg></div>
@@ -3916,7 +4008,7 @@
   <span class="glint g1"></span><span class="glint g2"></span><span class="glint g3"></span>
   <span class="loot tile" data-loot aria-hidden="true"><img src="img/psb/banks/sber.svg" alt="" data-logo /></span>
   <div class="tooltip px-clip" aria-hidden="true"><span class="tooltip-bank" data-bank></span><span class="tooltip-idea" data-idea></span></div>
-</div></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">03</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="chapter-media"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">04</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div><div class="chapter-media"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
+</div></div><div class="journal-slide" id="jr-2" role="group" aria-label="Не только макеты"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div><div class="journal-slide" id="jr-3" role="group" aria-label="Видели путь, а не только финал"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
   <div class="tcard start px-clip"><span class="kicker">Юзабилити-тест ПСБ</span><span class="card-title">Начать тест</span><span class="field-label">Ваше имя</span><span class="field px-clip" data-target="field"><span data-type-ru="Участник 12" data-type-en="Participant 12"></span><i class="caret"></i></span><span class="sbtn px-clip" data-target="start">Начать тест</span></div>
   <div class="tcard task px-clip"><span class="kicker">Задание</span><span class="card-title">Первое подключение кешбэка</span><span class="card-text">Подключите кешбэк и выберите три категории на этот месяц.</span><span class="sbtn px-clip" data-target="go">Старт</span></div>
   <div class="session"><div class="ph mini-phone"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img class="shot on" src="img/psb/scene/cb-off.webp" alt="" loading="lazy" decoding="async" data-screen="0" /><img class="shot" src="img/psb/scene/cb-connect.webp" alt="" loading="lazy" decoding="async" data-screen="1" /><img class="shot" src="img/psb/scene/success.webp" alt="" loading="lazy" decoding="async" data-screen="2" /></div></div><div class="log px-clip"><span class="kicker">Повтор сессии</span><span class="timer" data-timer>+00:00.0</span><span class="tline"><span class="tline-fill"></span></span><ol><li data-row="0"><span class="log-t">+00:00.0</span><span class="log-kind start">start</span><span class="log-what">Первое подключение кешбэка</span></li><li data-row="1"><span class="log-t">+00:04.3</span><span class="log-kind tap">tap</span><span class="log-what">Хочу подключить</span></li><li data-row="2"><span class="log-t">+00:08.1</span><span class="log-kind tap">tap</span><span class="log-what">7% Деливери</span></li><li data-row="3"><span class="log-t">+00:11.1</span><span class="log-kind tap">tap</span><span class="log-what">3% На бензин</span></li><li data-row="4"><span class="log-t">+00:14.1</span><span class="log-kind tap">tap</span><span class="log-what">Подключить</span></li><li data-row="5"><span class="log-t">+00:18.3</span><span class="log-kind finish">finish</span><span class="log-what">Кешбэк подключён</span></li></ol></div></div>
@@ -3924,7 +4016,8 @@
   <div class="tcard summary px-clip"><span class="kicker">Саммари по сессиям</span><span class="card-title">30 клиентов ПСБ, 3 задания</span><table><thead><tr><th>Сценарий</th><th>Завершили</th><th>First click</th><th>SEQ</th></tr></thead><tbody><tr><td>Подключить кешбэк</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,5" data-final-en="6.5">6,5</span></td></tr><tr><td>Выбрать категории</td><td><span data-count="30">30</span>/30</td><td><span data-count="100">100</span>%<span class="sbar" style="--v:100%"></span></td><td><span data-final-ru="6,7" data-final-en="6.7">6,7</span></td></tr><tr><td>Скопировать данные карты</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,0" data-final-en="6.0">6,0</span></td></tr></tbody></table></div>
   <div class="tcard done px-clip"><span class="check px-clip" aria-hidden="true"><svg viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="currentColor" d="M1 6h2v2H1zM2 7h2v2H2zM3 8h2v2H3zM5 7h2v2H5zM6 6h2v2H6zM7 5h2v2H7zM8 4h2v2H8zM9 3h2v2H9zM4 9h2v1H4z"/></svg></span><span class="card-title">Тест завершён</span><span class="card-text">Запись сохранена. Спасибо за участие!</span></div>
   <img class="cursor" src="img/psb/scene/gauntlet.png" alt="" width="32" height="32" data-cursor />
-</div></div></article></div>
+</div></div></div></div>
+  </div>
   <div class="sub-h"><h3>Критерии успеха</h3><p>До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.</p></div>
   <div class="grid three"><div class="box tile"><p class="kick">Первый клик</p><p class="big">Человек сразу начинает с правильного действия</p></div><div class="box tile"><p class="kick">Время</p><p class="big">Новый путь занимает меньше времени, чем исходный</p></div><div class="box tile"><p class="kick">Лёгкость</p><p class="big">Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
 </section>
@@ -4605,6 +4698,7 @@
       "Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.": "We vibe-coded a prototype for quick testing: it lets you go through the flows on a phone, activate cashback, choose categories and open card details.",
       "Видели путь, а не только финал": "We saw the path, not just the finish",
       "Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.": "The prototype logged what participants did: taps, scrolling, screen transitions, the start and the end of each task.",
+      "Листать шаги": "Flip through the steps",
       "Критерии успеха": "Success criteria",
       "До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.": "Before the redesign we gave five of the bank’s customers a clickable copy of the original screens and watched where they went wrong and how long the tasks took. Activating cashback caused the most trouble. We measured the new design by three signs.",
       "Первый клик": "First click",
@@ -7425,6 +7519,56 @@
       }),
     );
     loops.forEach((v) => seen.observe(v));
+
+    /* How we worked, a quest log: a step in the list, a swipe on the strip or the arrows (while
+       the log is mostly in view) turn its pictures; the step whose picture is in place opens.
+       Scenes and the film off the strip are clipped out of view, so they stand still */
+    document.querySelectorAll('[data-journal]').forEach((log) => {
+      const steps = [...log.querySelectorAll('.journal-step')];
+      const view = log.querySelector('.journal-view');
+      let at = 0,
+        aim = null,
+        inView = false;
+      const mark = (i) => {
+        if (i === at) return;
+        at = i;
+        steps.forEach((s, k) => {
+          s.toggleAttribute('data-open', k === i);
+          s.querySelector('.journal-tab').setAttribute('aria-expanded', String(k === i));
+        });
+      };
+      const go = (i) => {
+        i = Math.max(0, Math.min(steps.length - 1, i));
+        aim = i;
+        mark(i);
+        view.scrollTo({ left: i * view.clientWidth, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      };
+      steps.forEach((s, k) => s.querySelector('.journal-tab').addEventListener('click', () => go(k)));
+      // A swipe opens the step it lands on; a turn the script started passes over the steps between
+      view.addEventListener(
+        'scroll',
+        () => {
+          const i = Math.round(view.scrollLeft / view.clientWidth);
+          if (aim !== null) {
+            if (i === aim && Math.abs(view.scrollLeft - i * view.clientWidth) < 2) aim = null;
+            return;
+          }
+          mark(i);
+        },
+        { passive: true },
+      );
+      view.addEventListener('scrollend', () => (aim = null));
+      new ResizeObserver(() => (view.scrollLeft = at * view.clientWidth)).observe(view);
+      new IntersectionObserver(([e]) => (inView = e.isIntersecting), { threshold: 0.6 }).observe(log);
+      addEventListener('keydown', (e) => {
+        if (!inView || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+        if (e.target.closest('input, textarea, video, [contenteditable]')) return;
+        e.preventDefault();
+        go(at + (e.key === 'ArrowRight' ? 1 : -1));
+        // Focus on a step follows the turn, so the ring never sits on a closed one
+        if (log.contains(document.activeElement)) steps[at].querySelector('.journal-tab').focus({ preventScroll: true });
+      });
+    });
 
     /* Pixel scenes (.toon, ported from the main site's scripts/scenes.ts): a scene is a list of
        states; the root's data-state switches on a timer and the CSS does the rest. A scene loops
