@@ -6,8 +6,8 @@
 // dictionary. Every text is one text node, so the dictionary can find it whole.
 //
 // The layout follows the co-author's version of the case (psb-portfolio-preview): one wide
-// column, five parts named by a pill between them and in a floating bar at the bottom; each
-// solution is three rows, a narrow card (problem, solution, result) beside a big stage.
+// column, five parts named by a pill between them and in a floating bar at the bottom. Each
+// solution is one scene as on the main site: the phones with the changes beside them.
 const fs = require('fs');
 const path = require('path');
 const D = require('./data.js');
@@ -122,7 +122,7 @@ function interviews(s) {
 </section>`;
 }
 
-/* ── Design: a solution as three rows ── */
+/* ── Design: a solution as one scene ── */
 
 // The clock of a flow: 1:45, 0:28,7 (0:28.7 in English)
 const clock = (sec) => {
@@ -158,50 +158,53 @@ function race(lanes) {
   </div>`;
 }
 
-// Options tried, in the solution's card; the phone on the stage shows the one picked
-function variants(v, id) {
-  const pick = v.items.findIndex((x) => x[3]);
-  const list = `<div class="vars" role="tablist" aria-label="${L(v.title)}">${v.items
+// Options tried, side by side under the scene: each phone with its name, the verdict and why,
+// so the dropped ones read at a glance and nothing hides behind a tab
+function variants(v) {
+  return `<div class="vars">${kicker(v.title)}<div class="vars-row">${v.items
     .map(
-      ([, name, note, chosen], i) =>
-        `<button role="tab" id="v-${id}-${i}" aria-controls="vp-${id}-${i}" aria-selected="${i === pick}" tabindex="${i === pick ? 0 : -1}"><b>${L(name)}</b><span class="var-tag${chosen ? ' yes' : ''}">${L(chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'))}</span><span class="var-note">${L(note)}</span></button>`,
+      ([src, name, note, chosen]) =>
+        `<figure class="var${chosen ? ' yes' : ''}">${phoneOf(src, name)}<figcaption><b>${L(name)}</b><span class="var-tag">${L(chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'))}</span><span class="var-note">${L(note)}</span></figcaption></figure>`,
     )
-    .join('')}</div>`;
-  const screens = v.items
-    .map(([src, name], i) => `<img role="tabpanel" id="vp-${id}-${i}" aria-labelledby="v-${id}-${i}" src="${src}" alt="${L(name)}" loading="lazy" decoding="async"${i === pick ? '' : ' hidden'} />`)
-    .join('');
-  return { list: `${kicker(v.title)}${list}`, phone: phone(screens, ' vars-ph') };
+    .join('')}</div></div>`;
 }
 
-const row = (label, body, stage) =>
-  `<div class="srow"><div class="tile">${kicker(label)}${body}</div><div class="stage">${stage}</div></div>`;
-
+// What changed, fact by fact, beside the phones (as on the main site, Changes.astro): the
+// subject, what it is now, and under it, quieter, what it was. One left edge, no table zigzag
 function changes(rs) {
-  return `<div class="changes"><p class="changes-h"><span></span><span>${L(t('Было', 'Before'))}</span><span>${L(t('Стало', 'After'))}</span></p>${rs
-    .map(([k, a, b]) => `<p class="changes-r"><b>${L(num(k))}</b><span class="was">${L(a)}</span><span>${L(b)}</span></p>`)
-    .join('')}</div>`;
+  return `<ul class="changes" aria-label="${L(t('Было и стало', 'Before and after'))}">${rs
+    .map(
+      ([k, a, b]) =>
+        `<li><span class="ch-k">${L(num(k))}</span><p class="ch-now">${L(b)}</p><p class="ch-was"><span>${L(t('Было:', 'Before:'))}</span> ${L(a)}</p></li>`,
+    )
+    .join('')}</ul>`;
 }
 
 function stepper(i) {
   return `<nav class="stepper" aria-label="${L(t('Решения', 'Solutions'))}">${D.solutions
-    .map((s, k) => (k === i ? `<a class="on" href="#c-${s.id}" aria-current="step">${L(s.title)}</a>` : `<a href="#c-${s.id}">${k + 1}</a>`))
+    .map((s, k) => `<a${k === i ? ' class="on" aria-current="step"' : ''} href="#c-${s.id}">${k + 1}</a>`)
     .join('')}</nav>`;
 }
 
+// A solution: its name and aim; the problem and what we did side by side; one scene, the
+// phones (a race, or before and after) with the changes beside them; the options dropped on
+// the way; the test result in big numbers
 function solution(s, i) {
   const paras = (ps) => ps.map((p) => `<p>${L(p)}</p>`).join('');
-  const v = s.variants ? variants(s.variants, s.id) : null;
-  const facts = `<ul class="res">${s.stats.map(([n, unit, what]) => `<li><b>${L(num(n))}${unit ? ` ${L(unit)}` : ''}</b> ${L(what)}</li>`).join('')}</ul>`;
-  const resultStage = s.race
+  const media = s.race
     ? race(s.race)
     : `<div class="pair">${s.pair.map(([src, label]) => `<figure>${phoneOf(src, label)}<figcaption>${L(label)}</figcaption></figure>`).join('')}</div>`;
+  const stats = `<div class="nums">${s.stats
+    .map(([n, unit, what]) => `<div><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><span>${L(what)}</span></div>`)
+    .join('')}</div>`;
   return `<section class="ch sol" id="c-${s.id}">
-  ${stepper(i)}
+  <div class="sol-h">${stepper(i)}<p class="kick">${L(t(`Решение ${i + 1} из ${D.solutions.length}`, `Solution ${i + 1} of ${D.solutions.length}`))}</p></div>
+  <h2>${L(s.title)}</h2>
   <p class="lead">${L(s.lead)}</p>
-  ${row(t('Проблема', 'Problem'), paras(s.problem), phoneOf(s.stage[0], t('Было', 'Before')))}
-  ${row(t('Решение', 'Solution'), paras(s.solution) + (v ? v.list : ''), v ? v.phone : phoneOf(s.stage[1], t('Стало', 'After')))}
-  ${row(t('Результат', 'Result'), `<p>${L(s.result)}</p>${facts}`, resultStage)}
-  ${changes(s.rows)}
+  <div class="ps"><div>${kicker(t('Проблема', 'Problem'))}<div class="prose">${paras(s.problem)}</div></div><div>${kicker(t('Решение', 'Solution'))}<div class="prose">${paras(s.solution)}</div></div></div>
+  <div class="duo"><div class="duo-m">${media}</div>${changes(s.rows)}</div>
+  ${s.variants ? variants(s.variants) : ''}
+  <div class="outcome">${kicker(t('Результат теста', 'Test result'))}<p>${L(s.result)}</p>${stats}</div>
 </section>`;
 }
 
