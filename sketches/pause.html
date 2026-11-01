@@ -1367,22 +1367,118 @@
     .sheet {
       gap: var(--s5);
     }
-    .wish .wl-card {
+    .wish .wg {
       padding: var(--s4) var(--pad);
     }
-    .wish .wl {
-      gap: var(--s2);
+    .wish .wl-card {
+      padding: var(--s3) var(--pad);
+    }
+    .wish .wg {
+      margin-bottom: var(--s4);
     }
     .lq-stats {
       display: none;
     }
   }
-  /* The wishlist is one card, a checklist like a quest log: a star for the main goal, a box with
-     a coin for one under way, empty boxes for the rest. A plain list from the top of the card,
-     one step between rows, so a new wish is just one more row. Every row is as tall as the
-     tallest one (a caption or a wrapped line), so the boxes stand at one even pitch */
+  /* The wishlist: the main goal is a hero tile tinted gold, a party of two with a free third
+     place beside the goal, taking whatever height the row leaves (as the latest quest's cover
+     does), so the card has no empty glass. Under it the rest is a checklist like a quest log: a
+     box with a coin for one under way, empty boxes for the rest; a status is a small tag on the
+     line, so every row stays one line and the boxes keep one even pitch */
+  .wish .wg {
+    margin-bottom: var(--gap);
+  }
+  .wg {
+    flex: 1 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    column-gap: var(--s4);
+    row-gap: var(--s2);
+    padding: var(--pad);
+    border-radius: var(--r-in);
+    background: var(--gold-soft);
+  }
+  .wg-kick {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    margin: 0;
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .wg-kick canvas {
+    width: 24px;
+    height: 24px;
+  }
+  .wg-title {
+    margin: 0;
+    font-size: var(--fs-title);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  /* The party stands on the tile's floor; the empty place is a gold silhouette that breathes */
+  .wg-party {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: end;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--s1);
+  }
+  .wg-party canvas {
+    display: block;
+  }
+  .wg-party .free {
+    opacity: 0.55;
+    animation: wg-free 2.4s steps(2, jump-none) infinite alternate;
+  }
+  @keyframes wg-free {
+    to {
+      opacity: 0.3;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wg-party .free {
+      animation: none;
+    }
+  }
+  /* A narrow card (a phone): the party moves under the goal */
+  @container wish (max-width: 400px) {
+    .wg {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .wg-party {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: var(--s2);
+    }
+  }
+  .wish {
+    container: wish / inline-size;
+  }
+  /* A desktop no taller than 720 px: no room for the party, so the goal is one line, its star
+     and the gold tile saying it is the main one (the caption stays for screen readers) */
+  @media (min-width: 1200px) and (max-height: 720px) {
+    .wg {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto;
+      align-items: center;
+      column-gap: var(--s3);
+    }
+    .wg-kick span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .wg-party {
+      display: none;
+    }
+  }
   .wl-card {
-    flex: 1;
     padding: var(--pad);
     border-radius: var(--r-in);
     background: var(--fill);
@@ -1390,7 +1486,7 @@
   .wl {
     display: grid;
     grid-auto-rows: 1fr;
-    gap: var(--s4);
+    gap: var(--s2);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -1409,13 +1505,17 @@
     height: 24px;
     margin-top: calc((1.35em - 24px) / 2);
   }
-  .wl small {
-    display: block;
+  .wl-tag {
+    display: inline-block;
+    margin-left: var(--s2);
+    padding: 0 var(--s2);
+    border-radius: var(--r-key);
     font-size: var(--fs-cap);
-    color: var(--ink-2);
-  }
-  .wl .main small {
+    font-style: normal;
+    line-height: 1.35;
     color: var(--gold);
+    background: var(--gold-soft);
+    white-space: nowrap;
   }
 
   /* Side quests: a bento of cards that fills the screen; the biggest project gets the tall one,
@@ -4037,29 +4137,38 @@
         </div>
         <div class="wish">
           <h3 class="label">Вишлист</h3>
+          <div class="wg">
+            <p class="wg-kick"><canvas class="px" data-sprite="wish-star" data-scale="2" aria-hidden="true"></canvas><span>Главная цель</span></p>
+            <p class="wg-title">Попасть в сильную продуктовую команду</p>
+            <div class="wg-party" aria-hidden="true">
+              <canvas class="px" data-sprite="swordsman" data-scale="2"></canvas>
+              <canvas class="px" data-sprite="mage" data-scale="2"></canvas>
+              <canvas class="px free" data-sprite="swordsman" data-scale="2" data-tint="#e9c46a"></canvas>
+            </div>
+          </div>
           <div class="wl-card">
           <ul class="wl">
-            <li class="main">
-              <canvas class="px" data-sprite="wish-star" data-scale="2"></canvas>
-              <span>Попасть в сильную продуктовую команду<small>Главная цель</small></span>
-            </li>
-            <li>
+            <li class="wip">
               <canvas class="px" data-sprite="wish-wip" data-scale="2"></canvas>
-              <span>Выпустить свой плагин для Figma<small>На проверке у Figma</small></span>
+              <span>Выпустить плагин для Figma <em class="wl-tag">На проверке</em></span>
             </li>
             <li>
               <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
-              <span>Глубже разобраться в аналитике и экспериментах</span>
+              <span>Выпустить приложение в App&nbsp;Store</span>
             </li>
             <li>
               <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
-              <span>Выступить с докладом на дизайн-конференции</span>
+              <span>Освоить моушн-графику</span>
+            </li>
+            <li>
+              <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
+              <span>Научиться кататься на коньках</span>
             </li>
             <li>
               <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
               <span>Пройти Tears of the Kingdom на 100%</span>
             </li>
-        </ul>
+          </ul>
           </div>
         </div>
       </div>
@@ -4594,7 +4703,7 @@
     rows.forEach((r, j) =>
       [...r].forEach((ch, i) => {
         if (PAL[ch]) {
-          x.fillStyle = PAL[ch];
+          x.fillStyle = c.dataset.tint || PAL[ch];
           x.fillRect(i * s, j * s, s, s);
         }
       }),
@@ -4683,10 +4792,11 @@
       'Вишлист': 'Wishlist',
       'Попасть в сильную продуктовую команду': 'Join a strong product team',
       'Главная цель': 'Main goal',
-      'Выпустить свой плагин для Figma': 'Ship my own Figma plugin',
-      'На проверке у Figma': 'In review at Figma',
-      'Глубже разобраться в аналитике и экспериментах': 'Dig deeper into analytics and experiments',
-      'Выступить с докладом на дизайн-конференции': 'Give a talk at a design conference',
+      'Выпустить плагин для Figma': 'Ship a Figma plugin',
+      'На проверке': 'In review',
+      'Выпустить приложение в App Store': 'Ship an app to the App Store',
+      'Освоить моушн-графику': 'Learn motion graphics',
+      'Научиться кататься на коньках': 'Learn to ice skate',
       'Пройти Tears of the Kingdom на 100%': 'Finish Tears of the Kingdom at 100%',
       // Quests
       'Финтех': 'Fintech',
