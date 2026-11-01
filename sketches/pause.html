@@ -1935,6 +1935,7 @@
     gap: var(--s2);
     color: var(--ink-2);
     line-height: 1.55;
+    text-wrap: pretty;
   }
   .tile h3 {
     color: var(--ink);
@@ -1970,19 +1971,19 @@
     line-height: 1.4;
     color: var(--ink);
   }
-  /* A heading with its lead beside it */
+  /* A heading with its lead under it, read in one line of sight like the chapter heads */
   .sub-h {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s5);
-    align-items: end;
+    gap: var(--s3);
     margin: calc(2 * var(--s7)) 0 var(--s5);
   }
   .sub-h h3 {
     font-size: var(--fs-h3);
   }
   .sub-h p {
+    max-width: 60ch;
     color: var(--ink-2);
+    line-height: 1.55;
   }
 
 
@@ -4122,7 +4123,7 @@
 </div></div></div></div>
   </div>
   <div class="sub-h"><h3>Критерии успеха</h3><p>До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.</p></div>
-  <div class="grid three"><div class="box tile"><p class="kick">Первый клик</p><p class="big">Человек сразу начинает с правильного действия</p></div><div class="box tile"><p class="kick">Время</p><p class="big">Новый путь занимает меньше времени, чем исходный</p></div><div class="box tile"><p class="kick">Лёгкость</p><p class="big">Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
+  <div class="grid three"><div class="box tile"><p class="n">01</p><h3>Первый клик</h3><p>Человек сразу начинает с правильного действия</p></div><div class="box tile"><p class="n">02</p><h3>Время</h3><p>Новый путь занимает меньше времени, чем исходный</p></div><div class="box tile"><p class="n">03</p><h3>Лёгкость</h3><p>Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
 </section>
 <section class="ch" id="c-interviews">
   <h2>Что показали интервью</h2>

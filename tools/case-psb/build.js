@@ -124,7 +124,7 @@ function processSec(p) {
       .join('')}</div></div>
   </div>
   <div class="sub-h"><h3>${L(c.title)}</h3><p>${L(c.lead)}</p></div>
-  <div class="grid three">${c.items.map(([k, v]) => `<div class="box tile">${kicker(k)}<p class="big">${L(v)}</p></div>`).join('')}</div>
+  <div class="grid three">${c.items.map(([k, v], i) => `<div class="box tile"><p class="n">${nn(i)}</p><h3>${L(k)}</h3><p>${L(v)}</p></div>`).join('')}</div>
 </section>`;
 }
 
