@@ -2159,6 +2159,7 @@
     container-type: inline-size;
   }
   .stage figure .ph,
+  .pair figure .ph,
   .lane .ph {
     width: 100%;
   }
@@ -3124,6 +3125,8 @@
   /* Named above the phone, as the race's lanes are */
   .pair figcaption {
     margin-bottom: var(--s3);
+    /* Letter spacing trails the last letter too; as much on the left keeps the word centred */
+    padding-left: 0.06em;
     text-align: center;
     font-size: var(--fs-cap);
     letter-spacing: 0.06em;
@@ -3284,6 +3287,7 @@
   }
   .lane-h {
     justify-self: center;
+    padding-left: 0.06em;
     margin-bottom: var(--s3);
     font-size: var(--fs-cap);
     letter-spacing: 0.06em;
@@ -3756,6 +3760,7 @@
       width: 180px;
     }
     .pair {
+      width: 100%;
       gap: var(--s4);
     }
     .pair figure {
