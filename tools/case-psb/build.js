@@ -61,12 +61,20 @@ function about(a) {
   </aside>`;
 }
 
+// A big number that grows from zero once in view ([data-count-from] in a [data-play] block):
+// the figure in its own node, a sign after it (89%) stays put
+function grow(n) {
+  const split = (s) => /^([\d.,]+)(.*)$/.exec(s);
+  const [, ru, rest] = split(n.ru);
+  return `<span data-count-from="0">${L(t(ru, split(n.en)[1]))}</span>${esc(rest)}`;
+}
+
 // The overview: the result in four big numbers first (a reviewer skims for the outcome), then
 // the intro with who, what and with what beside it, then each problem and what we did about it,
 // one line per solution, leading to it
 function overview(o) {
   const nums = o.stats
-    .map(([n, unit, what, detail]) => `<div class="box"><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><p>${L(what)}</p><span>${L(detail)}</span></div>`)
+    .map(([n, unit, what, detail]) => `<div class="box"><b>${grow(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><p>${L(what)}</p><span>${L(detail)}</span></div>`)
     .join('');
   const quests = o.quests
     .map(
@@ -75,7 +83,7 @@ function overview(o) {
     )
     .join('');
   return `<section class="ch" id="c-overview">
-  <div class="kpi">${nums}</div>
+  <div class="kpi" data-play>${nums}</div>
   <p class="aside">${L(o.statsNote)}</p>
   <div class="intro"><div>${kicker(t('Вступление', 'Intro'))}${prose(o.prose)}</div>${about(o.about)}</div>
   <div class="qs"><h3 class="sub">${L(t('Проблемы и решения', 'Problems and solutions'))}</h3><ol>${quests}</ol></div>

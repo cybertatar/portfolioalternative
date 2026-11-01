@@ -2041,7 +2041,7 @@
   .kpi p {
     font-weight: 500;
   }
-  .kpi span {
+  .kpi .box > span {
     font-size: var(--fs-cap);
     line-height: 1.45;
     color: var(--ink-3);
@@ -3944,7 +3944,7 @@
 <nav class="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
-  <div class="kpi"><div class="box"><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
+  <div class="kpi" data-play><div class="box"><b><span data-count-from="0">23</span><small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b><span data-count-from="0">17</span><small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b><span data-count-from="0">89</span>%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b><span data-count-from="0">6,4</span><small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
   <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
   <div class="intro"><div><p class="kick">Вступление</p><div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div></div><aside class="box about">
     <div><p class="kick">Отряд</p><p class="team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>2 продуктовых дизайнера</p></div>
@@ -7795,15 +7795,21 @@
     // from the old value to the new one, the numbers count to the figure the page holds
     const COUNT_DELAY = 200,
       COUNT_MS = 1400;
+    // A figure as the page writes it: 23, 6,4 or 6.4; the count keeps its decimals and separator
+    const figure = (s) => {
+      const [, int, sep = '', frac = ''] = /^(\d+)(?:([.,])(\d+))?$/.exec(s) || [, s];
+      const shown = (x) => x.toFixed(frac.length).replace('.', sep);
+      return { to: parseFloat(int + '.' + (frac || 0)), shown };
+    };
     const counters = (root) =>
       root.querySelectorAll('[data-count-from]').forEach((el) => {
         const n = el.firstChild,
           from = +el.dataset.countFrom,
-          to = +i18n.text(n);
+          { to, shown } = figure(i18n.text(n));
         const t0 = performance.now() + COUNT_DELAY;
         const step = (now) => {
           const k = Math.min(1, Math.max(0, (now - t0) / COUNT_MS));
-          n.data = String(Math.round(from + (to - from) * (1 - (1 - k) ** 3)));
+          n.data = k < 1 ? shown(from + (to - from) * (1 - (1 - k) ** 3)) : i18n.text(n);
           if (k < 1) requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
@@ -7821,7 +7827,7 @@
       );
       document.querySelectorAll('[data-play]').forEach((el) => {
         el.classList.add('armed');
-        el.querySelectorAll('[data-count-from]').forEach((c) => (c.firstChild.data = c.dataset.countFrom));
+        el.querySelectorAll('[data-count-from]').forEach((c) => (c.firstChild.data = figure(i18n.text(c.firstChild)).shown(+c.dataset.countFrom)));
         seenPlay.observe(el);
       });
     }
