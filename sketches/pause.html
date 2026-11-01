@@ -644,6 +644,78 @@
   .q[aria-selected='true'] {
     background: var(--gold-soft);
   }
+  /* Computer: the row's own background is the quest's world, full on the left under the product's
+     logo and fading out where the text begins (the text never sits on a sharp world). The row
+     names the product, says in a phrase what it is, and the ready case adds its main result */
+  @media (min-width: 861px) {
+    .q {
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .q .glimpse {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      /* Slightly dimmed, so a white logo holds even on a light sky (Mouette) */
+      filter: brightness(0.8);
+      /* The same smooth melt as the covers, sideways: whole under the logo, nearly gone where
+         the text starts */
+      -webkit-mask: linear-gradient(90deg, var(--melt)) 0 0 / var(--melt-w) 100% no-repeat;
+      mask: linear-gradient(90deg, var(--melt)) 0 0 / var(--melt-w) 100% no-repeat;
+      --melt-w: 104px;
+    }
+    .q .logo {
+      grid-area: 1 / 1;
+      place-self: center;
+      width: var(--logo-w);
+      height: auto;
+      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6)) drop-shadow(0 0 8px rgb(0 0 0 / 0.35));
+    }
+    .q > div {
+      grid-area: 1 / 2;
+    }
+    .q > div > b,
+    .q > div > small {
+      display: none;
+    }
+    .q-name {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--s2);
+      margin-bottom: var(--s1);
+      font-weight: 500;
+    }
+    .q-name i {
+      font-style: normal;
+      font-size: var(--fs-cap);
+      color: var(--ink-3);
+    }
+    .q-name i.open {
+      color: var(--green);
+    }
+    .q-what,
+    .q-hook {
+      display: block;
+      font-size: var(--fs-cap);
+      line-height: 1.35;
+      color: var(--ink-2);
+    }
+    .q-hook {
+      margin-top: var(--s1);
+      color: var(--gold);
+    }
+  }
+  @media (max-width: 860px) {
+    .q .logo,
+    .q-name,
+    .q-what,
+    .q-hook {
+      display: none;
+    }
+  }
   /* The title and its line are one element: a small step between them */
   .q b {
     display: block;
@@ -3147,6 +3219,13 @@
         'Rethinking the savings-jar flow in a banking app.',
       'Не хватает маны. Этот кейс откроется позже.': 'Not enough mana. This case unlocks later.',
       'Интернет-магазин одежды для ателье.': 'An online clothing store for a tailoring studio.',
+      'ПСБ': 'PSB',
+      'WB Банк': 'WB Bank',
+      'Редизайн приложения банка': 'A bank app redesign',
+      'Кешбэк в 4 раза быстрее': 'Cashback 4× faster',
+      'VPN как Mini App в Telegram': 'A VPN as a Telegram Mini App',
+      'Копилка в банковском приложении': 'A moneybox in a banking app',
+      'Интернет-магазин одежды для ателье': 'An online clothing store for a tailoring studio',
       'В эти края пути нет. Кейс под NDA.': 'There is no road to these lands. This case is under NDA.',
       'Открыть кейс': 'Open case',
       'Пока закрыт': 'Locked for now',
@@ -4885,6 +4964,11 @@
       area: 'Финтех',
       year: '2026',
       st: 'Готов',
+      // The computer's list row: the product, what it is in a phrase, the main result
+      name: 'ПСБ',
+      what: 'Редизайн приложения банка',
+      hook: 'Кешбэк в 4 раза быстрее',
+      logo: 24,
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
       facts: [
@@ -4909,6 +4993,10 @@
       area: 'Telegram',
       year: '2026',
       st: 'Кейс пишется',
+      name: 'BittVPN',
+      what: 'VPN как Mini App в Telegram',
+      // img/logos/vpn.svg is a stand-in until the product's logo is ready
+      logo: 18,
       icon: ['coin', 3],
       sub: 'Telegram Mini App для безопасного доступа в интернет через VPN.',
       lock: 'Кейс ещё пишется. Скоро здесь будет журнал этого квеста.',
@@ -4919,6 +5007,9 @@
       area: 'Финтех',
       year: '2025',
       st: 'Кейс позже',
+      name: 'WB Банк',
+      what: 'Копилка в банковском приложении',
+      logo: 34,
       icon: ['chest', 2],
       sub: 'Переосмысление сценария копилки в банковском приложении.',
       lock: 'Не хватает маны. Этот кейс откроется позже.',
@@ -4929,6 +5020,9 @@
       area: 'E-commerce',
       year: '2025',
       st: 'Под NDA',
+      name: 'Mouette',
+      what: 'Интернет-магазин одежды для ателье',
+      logo: 30,
       icon: ['heart', 3],
       sub: 'Интернет-магазин одежды для ателье.',
       lock: 'В эти края пути нет. Кейс под NDA.',
@@ -5085,7 +5179,11 @@
     b.append(mk(q.icon[0], q.icon[1], 'ic'));
     b.insertAdjacentHTML(
       'beforeend',
-      `<div><b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
+      `<img class="logo" src="img/logos/${q.id}.svg" style="--logo-w:${q.logo}px" alt="">` +
+        `<div><span class="q-name">${q.name}<i class="${q.open ? 'open' : ''}">${q.st}</i></span>` +
+        `<span class="q-what">${q.what}</span>` +
+        (q.hook ? `<span class="q-hook">${q.hook}</span>` : '') +
+        `<b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
         // Phone only: the row is the whole quest card, so it carries the summary and the way in
         `<p class="q-sub">${q.sub}</p>` +
         (q.stats
