@@ -7839,9 +7839,15 @@
     }
     filmsLang();
 
-    // The CV opens in the page's language: two PDFs on the owner's Google Drive (tools/cv)
+    // The CV opens in the page's language: two PDFs on the owner's Google Drive (tools/cv). The
+    // language switches in place, without a reload, so the link is set on load and again at
+    // the moment of the click (a middle click and a long press read it too)
     const cv = document.getElementById('cv');
-    if (cv) cv.href = cv.dataset[i18n.isEn() ? 'hrefEn' : 'hrefRu'];
+    const cvLang = () => (cv.href = cv.dataset[i18n.isEn() ? 'hrefEn' : 'hrefRu']);
+    if (cv) {
+      cvLang();
+      ['pointerdown', 'focus', 'click'].forEach((t) => cv.addEventListener(t, cvLang));
+    }
 
     // The walkthrough loops only while it is seen
     // A picture of «Как мы работали» that is not the one shown stands still too
