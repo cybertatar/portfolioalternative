@@ -282,7 +282,7 @@ function testing(s) {
       // Dots: their finish (x, a share of the axis) and a lane height; the order is shuffled so
       // the fast and the slow don't sit in bands
       const dot = (sec, k, n, cls) =>
-        `<i class="dot ${cls}" data-t="${sec.toFixed(1)}" style="--x:${(sec / axis).toFixed(4)};--y:${(((k * 0.6180339) % 1) * 0.84 + 0.08).toFixed(3)}"></i>`;
+        `<i class="pt ${cls}" data-t="${sec.toFixed(1)}" style="--x:${(sec / axis).toFixed(4)};--y:${(((k * 0.6180339) % 1) * 0.84 + 0.08).toFixed(3)}"></i>`;
       const dots = now.map((x, k) => dot(x, k, NEW, 'now')).join('') + old.map((x, k) => dot(x, k + 7, OLD, 'was')).join('');
       const [st0, st1] = f.steps;
       return `<div class="rl" data-axis="${axis}">
@@ -297,7 +297,7 @@ function testing(s) {
   <div class="run" data-run>
     <div class="run-top">${kicker(t('Забег: время на задачу', 'The run: time per task'))}<button class="btn" type="button" data-rerun hidden>${L(t('Ещё раз', 'Replay'))}</button></div>
     ${lanes}
-    <p class="run-key"><span><i class="dot now"></i>${L(t(`${NEW} клиентов в новом прототипе`, `${NEW} customers on the new prototype`))}</span><span><i class="dot was"></i>${L(t(`${OLD} клиентов на копии старых экранов`, `${OLD} customers on a copy of the old screens`))}</span><span><i class="mk"></i>${L(t('медиана', 'median'))}</span></p>
+    <p class="run-key"><span><i class="pt now"></i>${L(t(`${NEW} клиентов в новом прототипе`, `${NEW} customers on the new prototype`))}</span><span><i class="pt was"></i>${L(t(`${OLD} клиентов на копии старых экранов`, `${OLD} customers on a copy of the old screens`))}</span><span><i class="mk"></i>${L(t('медиана', 'median'))}</span></p>
   </div>
   <p class="aside">${L(t('Медианы измерены, разброс точек вокруг них условный: на сайте нет времени каждого участника. «Было» — медиана тех, кто дошёл до конца.', 'The medians are measured; the spread of the dots around them is drawn, as the site doesn’t hold each person’s time. “Before” is the median of those who finished.'))}</p>
 </section>`;
@@ -322,7 +322,7 @@ const toc = () =>
   ).join('')}</nav>`;
 
 const body = [
-  `<aside class="side">`,
+  `<aside class="cside">`,
   toc(),
   `</aside>`,
   `<div class="cs">`,
