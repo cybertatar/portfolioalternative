@@ -1529,6 +1529,26 @@
   .hud .back .key {
     border-radius: var(--r-ctl-in);
   }
+  /* A touch screen has no Esc: there the key shows a pixel arrow back, the same arrow as in
+     «Свайпни меня», turned to the left */
+  .hud .back .go {
+    display: none;
+  }
+  .hud .back .go svg {
+    display: block;
+    width: 12px;
+    height: 12px;
+    margin-block: 3px;
+    transform: rotate(-90deg);
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .hud .back .esc {
+      display: none;
+    }
+    .hud .back .go {
+      display: inline-grid;
+    }
+  }
   .hud .where {
     padding: var(--s3) var(--s4) 10px;
     border-radius: var(--r-ctl);
@@ -3832,7 +3852,9 @@
 <!-- The case, unpaused -->
 <div class="play" id="play">
   <div class="hud">
-    <button class="back" id="back"><span class="key">Esc</span>Назад</button
+    <button class="back" id="back"><span class="key esc">Esc</span
+      ><span class="key go" aria-hidden="true"><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="currentColor" d="M3 0h2v1h1v1h1v1h1v1H5v4H3V4H0V3h1V2h1V1h1z" /></svg></span
+      >Назад</button
     ><span class="where" id="where"></span
     ><button class="toc" id="toc" type="button" aria-expanded="false" aria-controls="rail"
       ><span class="toc-name" id="toc-name"></span
