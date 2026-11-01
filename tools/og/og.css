@@ -74,8 +74,8 @@
   display: flex;
   gap: 18px;
   align-items: center;
-  padding: 14px 28px 14px 14px;
-  align-self: flex-start;
+  padding: 14px;
+  align-self: stretch;
   border-radius: var(--r-in);
   background: var(--fill);
 }
