@@ -29,6 +29,7 @@ jobs:
           mkdir -p _site
           cp -r sketches/img _site/img
           cp -r sketches/live _site/live
+          cp -r sketches/cv _site/cv
           { printf '<!doctype html>\n<html lang="ru">\n<meta charset="utf-8" />\n'; cat sketches/pause.html; } > _site/index.html
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
