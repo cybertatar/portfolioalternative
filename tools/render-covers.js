@@ -4,7 +4,7 @@
   (it is a uniform pattern), and cover-<id>.webp, the objects alone on transparency, which the
   page always fits whole (16:9 inside any window), so a very wide window never cuts them.
 
-  PSB, BittVPN and Mouette are the cover scenes of the main site (cybertatar/Portfolio,
+  PSB, BittVPN and Mouette are the cover scenes of the previous site (cybertatar/Portfolio,
   tools/case-covers/*.html) restyled for this dark site: the beige parchment becomes a calm
   graphite, the faint pixel pattern of each cover stays but barely lighter than the background,
   and the shadows are neutral instead of warm brown. WB had only a pattern there; its scene here

@@ -1,4 +1,4 @@
-// The pixel scenes of «Как мы работали», ported from the main site
+// The pixel scenes of «Как мы работали», ported from the previous site
 // (src/components/case/scenes/*.astro in cybertatar/Portfolio): the swordsman and the mage (the
 // two of us) argue and get the senior's review, open a chest of bank ideas, and run the test.
 // Each scene is a list of states: the page script (runScene in pause.html) switches the root's

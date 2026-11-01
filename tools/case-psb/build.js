@@ -7,7 +7,7 @@
 //
 // The layout is the menu's own: a heading over each chapter, what belongs together grouped on
 // a card that differs from the page by fill alone (no strokes), long reading left on the page,
-// and the pixel scenes of the main site in «Как мы работали». Each solution is one scene: the phones with the
+// and the pixel scenes of the previous site in «Как мы работали». Each solution is one scene: the phones with the
 // changes beside them.
 const fs = require('fs');
 const path = require('path');
@@ -100,7 +100,7 @@ function screens(s) {
 }
 
 /* ── Research ── */
-// How we worked: a card per step, its text beside a picture of it, as on the main site: the
+// How we worked: a card per step, its text beside a picture of it, as on the previous site: the
 // pixel scenes for the pair and the senior, the banks and the test, the walkthrough film for
 // the prototype
 function processSec(p) {
@@ -190,7 +190,7 @@ function variants(v) {
     .join('')}</div></div>`;
 }
 
-// What changed, fact by fact, beside the phones (as on the main site, Changes.astro): the
+// What changed, fact by fact, beside the phones (as on the previous site, Changes.astro): the
 // subject, what it is now, and under it, quieter, what it was. One left edge, no table zigzag
 function changes(rs) {
   return `<ul class="changes" aria-label="${L(t('Было и стало', 'Before and after'))}">${rs

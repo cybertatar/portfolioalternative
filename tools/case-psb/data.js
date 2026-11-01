@@ -1,6 +1,6 @@
 // The PSB case, both languages side by side. tools/case-psb/build.js turns it into the case
 // body of sketches/pause.html (between the case:psb markers) and the English dictionary entries.
-// Texts come from the main site (src/pages/cases/psb.astro in cybertatar/Portfolio); the
+// Texts come from the previous site (src/pages/cases/psb.astro in cybertatar/Portfolio); the
 // iterations, success criteria and per-flow results are adapted from the co-author's version of
 // the case (psb-portfolio-preview.gremten.workers.dev). No interpuncts anywhere.
 

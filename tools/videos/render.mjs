@@ -1,10 +1,10 @@
 /**
  * Renders the PSB case films in the site's look, in Russian and English:
  *
- *   node tools/videos/render.mjs interviews <interviews.ru.mp4 of the main site>
- *   node tools/videos/render.mjs review <review.ru.mp4 of the main site>
+ *   node tools/videos/render.mjs interviews <interviews.ru.mp4 of the previous site>
+ *   node tools/videos/render.mjs review <review.ru.mp4 of the previous site>
  *
- * The source is the main site's finished film (cybertatar/Portfolio,
+ * The source is the previous site's finished film (cybertatar/Portfolio,
  * public/assets/cases/psb/{interviews,review}.ru.mp4): the same takes on the same timeline, so
  * its footage is cropped from inside its cards, its audio is kept as is, and only the dressing
  * around them changes (../pause.css).
@@ -26,7 +26,7 @@ const root = join(here, '../..');
 const out = join(root, 'sketches/img/psb');
 const [name, source, flag] = process.argv.slice(2);
 
-// Where the footage sits in the main site's frame: inside each card, clear of its stepped
+// Where the footage sits in the previous site's frame: inside each card, clear of its stepped
 // corners and of the label that rides the card's bottom edge
 const FILMS = {
   interviews: {

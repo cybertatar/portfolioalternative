@@ -4,7 +4,7 @@ A card shows its icon up to 240 CSS px, so 720 device px on a 3x screen; every i
 Photos and drawings come from the projects' own repositories at 1024 px; pixel icons are rebuilt
 from their cell grid and enlarged by whole cells, so their edges stay hard.
 
-Sources, cloned side by side into one folder (the main site is cybertatar/Portfolio):
+Sources, cloned side by side into one folder (the previous site is cybertatar/Portfolio):
   DOBROANDPOZITIV, sunnyshamanlang, telegramspeedreader, uxuieducationminiapp, Portfolio
 Run from the repo root:
   python3 tools/side-icons.py ../path/to/that/folder

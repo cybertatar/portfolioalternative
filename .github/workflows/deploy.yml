@@ -1,7 +1,7 @@
 name: Deploy to GitHub Pages
 
 # The portfolio goes live on every push to main (the github-pages environment only lets main
-# deploy, as on the main site).
+# deploy, as on the previous site).
 on:
   push:
     branches: [main]

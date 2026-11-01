@@ -1707,7 +1707,7 @@
   }
   /* A case with a live prototype (PSB): the head is taller (HEAD in the script sets it), and its
      cover's fan is drawn as phones, not as a picture. Once the cover has landed, the fan folds
-     into its middle phone, and that phone grows into the clickable prototype of the main site
+     into its middle phone, and that phone grows into the clickable prototype of the previous site
      (sketches/live/psb, LivePhone.astro there). The fan keeps the cover's own geometry (Portfolio
      tools/case-covers/psb.html) in a 16:9 frame fitted whole into the head, as the cover's
      objects are, and melts the same way, until the grown phone takes the melt away */
@@ -2440,7 +2440,7 @@
   .film {
     margin-bottom: var(--gap);
   }
-  /* ── Pixel scenes in «Как мы работали», ported from the main site (scenes/*.astro there):
+  /* ── Pixel scenes in «Как мы работали», ported from the previous site (scenes/*.astro there):
      tools/case-psb/scenes.js writes them, runScene below switches data-state on a timer and
      these rules do the rest. Everything is placed in % of the stage width (cqi), so a scene
      scales as one picture. Colours are the pause's: a dark stage, a lighter desk, gold for
@@ -3180,7 +3180,7 @@
     width: 6cqi;
     height: 6cqi;
   }
-  /* The pixel gauntlet of the main site's cursor; the script aims it at what is tapped */
+  /* The pixel gauntlet of the previous site's cursor; the script aims it at what is tapped */
   .testing .cursor {
     position: absolute;
     z-index: 10;
@@ -5229,7 +5229,7 @@
     return { text, labels, set, head, isEn };
   })();
 
-  /* ── Typograph: no hanging prepositions. Ported from the main site (src/typograph.ts): the
+  /* ── Typograph: no hanging prepositions. Ported from the previous site (src/typograph.ts): the
    space after a function word becomes non-breaking, numbers stay with what they count, a dash
    or a particle never starts a line. Here it runs on text nodes, including ones scripts add. ── */
   const typo = (() => {
@@ -7940,7 +7940,7 @@
       for (const ev of ['touchend', 'touchcancel']) addEventListener(ev, () => ((touching = false), restLater()), { passive: true });
     });
 
-    /* Pixel scenes (.toon, ported from the main site's scripts/scenes.ts): a scene is a list of
+    /* Pixel scenes (.toon, ported from the previous site's scripts/scenes.ts): a scene is a list of
        states; the root's data-state switches on a timer and the CSS does the rest. A scene loops
        only while it is on screen; with reduced motion it stays on its `still` state */
     const lang = () => (i18n.isEn() ? 'en' : 'ru');

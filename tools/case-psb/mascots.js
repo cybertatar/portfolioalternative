@@ -1,4 +1,4 @@
-// Pixel party and props for the PSB case scenes, copied from the main site (src/content/mascots.ts
+// Pixel party and props for the PSB case scenes, copied from the previous site (src/content/mascots.ts
 // in cybertatar/Portfolio, drawn there by tools/mascots/draw.py). Rows of characters keyed to the palette.
 const palette = {
   f: '#f1d5b8',
