@@ -661,11 +661,11 @@
       border-radius: 0;
       /* Slightly dimmed, so a white logo holds even on a light sky (Mouette) */
       filter: brightness(0.8);
-      /* The same smooth melt as the covers, sideways: whole under the logo, nearly gone where
-         the text starts */
-      -webkit-mask: linear-gradient(90deg, var(--melt)) 0 0 / var(--melt-w) 100% no-repeat;
-      mask: linear-gradient(90deg, var(--melt)) 0 0 / var(--melt-w) 100% no-repeat;
-      --melt-w: 104px;
+      /* Whole under the logo, then a long ease-out fade across most of the row: no visible edge,
+         and under the text only a faint trace of the world is left */
+      -webkit-mask-image: var(--row-melt);
+      mask-image: var(--row-melt);
+      --row-melt: linear-gradient(90deg, rgb(0 0 0 / 1) 0, rgb(0 0 0 / 0.92) 12%, rgb(0 0 0 / 0.75) 20%, rgb(0 0 0 / 0.55) 28%, rgb(0 0 0 / 0.38) 37%, rgb(0 0 0 / 0.24) 47%, rgb(0 0 0 / 0.13) 58%, rgb(0 0 0 / 0.06) 70%, rgb(0 0 0 / 0.02) 84%, rgb(0 0 0 / 0) 100%);
     }
     .q .logo {
       grid-area: 1 / 1;
