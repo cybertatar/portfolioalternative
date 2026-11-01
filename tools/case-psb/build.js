@@ -150,12 +150,15 @@ const clock = (sec) => {
   return tenths ? t(`${base},${tenths}`, `${base}.${tenths}`) : t(base, base);
 };
 
+// pixelarticons (MIT) "reload": the replay, between the phones once the race is over
+const REPLAY_ICON = 'M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z';
+
 // "Before / after" as a race: both flows start together and run at their measured median times,
 // sped up; the screens are spread evenly over the time of the flow. The bars share one scale, so
 // the faster flow stops short. Without the script, or with reduced motion, it shows the finish
 function race(lanes) {
   const longest = Math.max(...lanes.map((l) => secs(l[2])));
-  return `<div class="race" data-race>
+  return `<div class="race" data-race tabindex="-1">
     <div class="lanes">${lanes
       .map(([label, n, sec, shots], i) => {
         const s = secs(sec);
@@ -171,8 +174,8 @@ function race(lanes) {
         <p class="rcap">${caps}</p>
       </div>`;
       })
-      .join('')}</div>
-    <button class="btn replay" type="button" data-replay hidden>${L(t('Ещё раз', 'Replay'))}</button>
+      .join('')}
+    <button class="replay" type="button" data-replay disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${REPLAY_ICON}" fill="currentColor"/></svg><span>${L(t('Ещё раз', 'Replay'))}</span></button></div>
   </div>`;
 }
 

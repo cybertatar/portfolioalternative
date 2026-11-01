@@ -3257,20 +3257,32 @@
     gap: var(--s5);
     width: 100%;
   }
+  /* Each lane's parts share the rows of the race (a subgrid), so the replay can sit on the
+     phones' row, between them, without taking a line of its own */
   .lanes {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 200px));
+    grid-template-rows: repeat(5, auto);
     justify-content: center;
-    gap: var(--s7);
+    column-gap: var(--s7);
     width: 100%;
   }
   .lane {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-row: 1 / -1;
+    grid-template-rows: subgrid;
     min-width: 0;
   }
+  /* Placed by hand: auto-placement would step around the replay's cell */
+  .lane + .lane {
+    grid-column: 2;
+  }
+  .lane:first-child {
+    grid-column: 1;
+  }
   .lane-h {
-    align-self: center;
+    justify-self: center;
     margin-bottom: var(--s3);
     font-size: var(--fs-cap);
     letter-spacing: 0.06em;
@@ -3347,8 +3359,51 @@
   .rcap span.on {
     visibility: visible;
   }
-  .replay[hidden] {
-    display: none;
+  .race:focus {
+    outline: none;
+  }
+  /* Replay: a glass key on the phones' row, between them; it fades in when the race is over,
+     the layout never moves. Its word is for screen readers, the arrows say it */
+  .replay {
+    grid-area: 2 / 1 / 3 / -1;
+    place-self: center;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-ctl);
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      opacity 0.3s,
+      transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+      background 0.2s;
+  }
+  .replay:hover {
+    background: var(--glass-strong);
+  }
+  .replay svg {
+    width: 24px;
+    height: 24px;
+  }
+  .replay span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .replay:disabled {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
   }
   button.btn {
     border: 0;
@@ -3707,7 +3762,7 @@
     }
     .lanes {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--s4);
+      column-gap: var(--s4);
     }
     .ps,
     .duo,
@@ -4037,7 +4092,7 @@
   <p class="kick">Решение 2 из 4</p><h2>Данные карты</h2>
   <p class="lead">Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.</p>
   <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div></div></div>
-  <div class="duo"><div class="duo-m"><div class="race" data-race>
+  <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="42" data-steps="7">
         <p class="lane-h">Было</p>
         <div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/card-01.webp" alt="Главная, карта в «Картах»" loading="lazy" decoding="async" /><img src="img/psb/before/card-02.webp" alt="«Настройки» карты" loading="lazy" decoding="async" /><img src="img/psb/before/card-03.webp" alt="Свайп, «История»" loading="lazy" decoding="async" /><img src="img/psb/before/card-04.webp" alt="Третья вкладка, «О карте»" loading="lazy" decoding="async" /><img src="img/psb/before/card-05.webp" alt="Номер скрыт" loading="lazy" decoding="async" /><img src="img/psb/before/card-07.webp" alt="Удержал поле, скопировано" loading="lazy" decoding="async" /><img src="img/psb/before/card-08.webp" alt="CVV только по СМС" loading="lazy" decoding="async" /><img src="img/psb/before/card-09.webp" alt="Код не подставился" loading="lazy" decoding="async" /><img src="img/psb/before/card-10.webp" alt="Согласие подтверждено" loading="lazy" decoding="async" class="on" /></div></div>
@@ -4050,8 +4105,8 @@
         <span class="rbar" aria-hidden="true"><i style="--to:40.5%"></i></span>
         <p class="rclock"><b data-clock>0:17</b><span><span>Шаг</span> <span data-step>4</span> <span>из</span> <span>4</span></span></p>
         <p class="rcap"><span>Главная, текущий счёт</span><span>Карта внутри счёта</span><span>«Данные карты» на карте</span><span>Номер, срок и CVV сразу</span><span class="on">Скопировано</span></p>
-      </div></div>
-    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+      </div>
+    <button class="replay" type="button" data-replay disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z" fill="currentColor"/></svg><span>Ещё раз</span></button></div>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">Карта внутри счёта, данные на ней</p><p class="ch-was"><span>Было:</span> Третья вкладка в карточке карты</p></li><li><span class="ch-k">CVV</span><p class="ch-now">Сразу, вместе с номером и сроком</p><p class="ch-was"><span>Было:</span> Только по коду из СМС, даже после входа по биометрии</p></li><li><span class="ch-k">Выход из приложения</span><p class="ch-now">Не нужен</p><p class="ch-was"><span>Было:</span> В сообщения за кодом: сам он не подставлялся</p></li><li><span class="ch-k">Копирование</span><p class="ch-now">Кнопка у каждого поля и плашка «Скопировано»</p><p class="ch-was"><span>Было:</span> Удержать поле, пока внизу не появится подсказка</p></li></ul></div>
   
   <div class="box outcome"><p class="kick">Результат теста</p><p>Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>67%</b><span>прошли без единой ошибки</span></div><div><b>6,0<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
@@ -4060,7 +4115,7 @@
   <p class="kick">Решение 3 из 4</p><h2>Подключение кешбэка</h2>
   <p class="lead">Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.</p>
   <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div></div></div>
-  <div class="duo"><div class="duo-m"><div class="race" data-race>
+  <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="105" data-steps="12">
         <p class="lane-h">Было</p>
         <div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/cb-01.webp" alt="Главная" loading="lazy" decoding="async" /><img src="img/psb/before/cb-02.webp" alt="Внизу «Бонусный счёт»" loading="lazy" decoding="async" /><img src="img/psb/before/cb-03.webp" alt="Условия и «Подключить»" loading="lazy" decoding="async" /><img src="img/psb/before/cb-04.webp" alt="Почта и два согласия" loading="lazy" decoding="async" /><img src="img/psb/before/cb-05.webp" alt="Ждём письмо" loading="lazy" decoding="async" /><img src="img/psb/before/cb-06.webp" alt="Не дождался, ошибка" loading="lazy" decoding="async" /><img src="img/psb/before/cb-07.webp" alt="Письмо в почте" loading="lazy" decoding="async" /><img src="img/psb/before/cb-08.webp" alt="Ссылка в браузере" loading="lazy" decoding="async" /><img src="img/psb/before/cb-09.webp" alt="Согласие не открыть" loading="lazy" decoding="async" /><img src="img/psb/before/cb-10.webp" alt="Готово" loading="lazy" decoding="async" /><img src="img/psb/before/cb-01.webp" alt="А на главной кешбэка нет" loading="lazy" decoding="async" class="on" /></div></div>
@@ -4073,8 +4128,8 @@
         <span class="rbar" aria-hidden="true"><i style="--to:21.9%"></i></span>
         <p class="rclock"><b data-clock>0:23</b><span><span>Шаг</span> <span data-step>5</span> <span>из</span> <span>5</span></span></p>
         <p class="rcap"><span>«Хочу подключить» в «Выгоде»</span><span>Выбор трёх категорий</span><span>Отметил три</span><span class="on">Кешбэк подключён</span></p>
-      </div></div>
-    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+      </div>
+    <button class="replay" type="button" data-replay disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z" fill="currentColor"/></svg><span>Ещё раз</span></button></div>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">«Выгода» в таббаре и бейдж у баланса</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» внизу главной</p></li><li><span class="ch-k">Выход из приложения</span><p class="ch-now">Не нужен</p><p class="ch-was"><span>Было:</span> В почту за письмом, в браузер по ссылке</p></li><li><span class="ch-k">Согласия</span><p class="ch-now">Одна кнопка рядом с условиями</p><p class="ch-was"><span>Было:</span> Два переключателя и экран, который не открыть</p></li><li><span class="ch-k">Категории</span><p class="ch-now">Сразу, кнопка считает выбранные</p><p class="ch-was"><span>Было:</span> Отдельно, после подключения</p></li><li><span class="ch-k">После подключения</span><p class="ch-now">Кешбэк сразу виден у баланса</p><p class="ch-was"><span>Было:</span> Главная как раньше, пока не перезайдёшь</p></li></ul></div>
   
   <div class="box outcome"><p class="kick">Результат теста</p><p>Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>63%</b><span>прошли без единой ошибки</span></div><div><b>6,5<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
@@ -4083,7 +4138,7 @@
   <p class="kick">Решение 4 из 4</p><h2>Кешбэк после подключения</h2>
   <p class="lead">Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.</p>
   <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div></div></div>
-  <div class="duo"><div class="duo-m"><div class="race" data-race>
+  <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="28.7" data-steps="7">
         <p class="lane-h">Было</p>
         <div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/card-01.webp" alt="Главная" loading="lazy" decoding="async" /><img src="img/psb/before/cats-02.webp" alt="Ищет кешбэк, листая главную" loading="lazy" decoding="async" /><img src="img/psb/before/cats-03.webp" alt="«Бонусный счёт» внизу" loading="lazy" decoding="async" /><img src="img/psb/before/cats-04.webp" alt="Выбрал, проверка данных" loading="lazy" decoding="async" /><img src="img/psb/before/cats-05.webp" alt="Операция выполнена" loading="lazy" decoding="async" class="on" /></div></div>
@@ -4096,8 +4151,8 @@
         <span class="rbar" aria-hidden="true"><i style="--to:48.8%"></i></span>
         <p class="rclock"><b data-clock>0:14</b><span><span>Шаг</span> <span data-step>6</span> <span>из</span> <span>6</span></span></p>
         <p class="rcap"><span>Главная, вкладка «Выгода»</span><span>«Категории на октябрь»</span><span>Выбор трёх категорий</span><span>Отметил три</span><span class="on">Категории выбраны</span></p>
-      </div></div>
-    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+      </div>
+    <button class="replay" type="button" data-replay disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 2h-2v2h2v2H4v2H2v5h2V8h12v2h-2v2h2v-2h2V8h2V6h-2V4h-2V2zM6 20h2v2h2v-2H8v-2h12v-2h2v-5h-2v5H8v-2h2v-2H8v2H6v2H4v2h2v2z" fill="currentColor"/></svg><span>Ещё раз</span></button></div>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">«Выгода» в таббаре</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» в конце главной</p></li><li><span class="ch-k">Напоминание</span><p class="ch-now">Плашка «Категории на октябрь» с кнопкой «Выбрать»</p><p class="ch-was"><span>Было:</span> Нет, о новом месяце нужно помнить самому</p></li><li><span class="ch-k">Когда выбирать</span><p class="ch-now">Заранее, и поменять до начала месяца</p><p class="ch-was"><span>Было:</span> Каждый месяц, когда он уже начался</p></li><li><span class="ch-k">Подтверждение</span><p class="ch-now">Кнопка «Подключить» под категориями</p><p class="ch-was"><span>Было:</span> Отдельный экран с юридическими формулировками</p></li></ul></div>
   <div class="vars"><p class="kick">Варианты блока статистики</p><div class="vars-row"><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-2-line.webp" alt="График по месяцам" loading="lazy" decoding="async" /></div></div><figcaption><b>График по месяцам</b><span class="var-tag">Отказались</span><span class="var-note">Выглядел красиво, но не объяснял, за что начислен кешбэк.</span></figcaption></figure><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-3-pics.webp" alt="Категории картинками" loading="lazy" decoding="async" /></div></div><figcaption><b>Категории картинками</b><span class="var-tag">Отказались</span><span class="var-note">Понятно, но занимает полэкрана, и выбору на следующий месяц не хватает места.</span></figcaption></figure><figure class="box var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-1-month.webp" alt="Полоса по категориям" loading="lazy" decoding="async" /></div></div><figcaption><b>Полоса по категориям</b><span class="var-tag">Выбрали</span><span class="var-note">Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.</span></figcaption></figure></div></div>
   <div class="box outcome"><p class="kick">Результат теста</p><p>Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.</p><div class="nums"><div><b>100%</b><span>сразу начали с правильного действия</span></div><div><b>90%</b><span>прошли без единой ошибки</span></div><div><b>6,7<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
@@ -7973,7 +8028,7 @@
           l.at = -1;
         });
         race.classList.add('running');
-        replay.hidden = true;
+        replay.disabled = true;
         paint(0);
       };
       async function run() {
@@ -7984,7 +8039,7 @@
           // A frame's time can be a little before t0 (it is when the frame began)
           if (paint((Math.max(0, now - t0) / 1000) * RACE_SPEED)) {
             race.classList.remove('running');
-            replay.hidden = false;
+            replay.disabled = false;
           } else raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
@@ -7999,7 +8054,11 @@
         { threshold: 0.5 },
       );
       seenRace.observe(race);
-      replay.addEventListener('click', run);
+      replay.addEventListener('click', () => {
+        // The key fades out under the cursor; focus moves to the race so it is not lost
+        race.focus({ preventScroll: true });
+        run();
+      });
     });
 
     // On pause everything stops
