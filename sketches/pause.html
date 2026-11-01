@@ -2211,9 +2211,17 @@
     display: none;
   }
 
-  /* Research */
+  /* Research: the steps of how we worked beside the walkthrough film, half the width each */
+  .how {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s7);
+    align-items: start;
+  }
   .walk {
-    margin: var(--s4) 0 0;
+    position: sticky;
+    top: 80px;
+    margin: 0;
     display: grid;
     gap: var(--s2);
     font-size: var(--fs-cap);
@@ -2645,6 +2653,7 @@
 
   @media (max-width: 860px) {
     .intro,
+    .how,
     .qs li,
     .grid.two,
     .grid.three,
@@ -2891,8 +2900,8 @@
 <p class="part"><span>Исследование</span></p>
 <section class="ch" id="c-process">
   <h2>Как мы работали</h2>
-  <div class="grid two"><div class="tile"><p class="n">[01]</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="tile"><p class="n">[02]</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="tile"><p class="n">[03]</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="tile"><p class="n">[04]</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div>
-  <figure class="walk"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video><figcaption>Прохождение прототипа на телефоне</figcaption></figure>
+  <div class="how"><div class="grid"><div class="tile"><p class="n">[01]</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="tile"><p class="n">[02]</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="tile"><p class="n">[03]</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="tile"><p class="n">[04]</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div>
+  <figure class="walk"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video><figcaption>Прохождение прототипа на телефоне</figcaption></figure></div>
   <div class="sub-h"><h3>Критерии успеха</h3><p>До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.</p></div>
   <div class="grid three"><div class="tile"><p class="kick">Первый клик</p><p class="big">Человек сразу начинает с правильного действия</p></div><div class="tile"><p class="kick">Время</p><p class="big">Новый путь занимает меньше времени, чем исходный</p></div><div class="tile"><p class="kick">Лёгкость</p><p class="big">Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
 </section>

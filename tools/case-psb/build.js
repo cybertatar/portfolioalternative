@@ -104,8 +104,8 @@ function processSec(p) {
   const [vsrc, vposter, vlabel] = p.video;
   const c = p.criteria;
   return `${head('process', p)}
-  <div class="grid two">${p.steps.map(([title, text], i) => `<div class="tile"><p class="n">[${nn(i)}]</p><h3>${L(title)}</h3><p>${L(text)}</p></div>`).join('')}</div>
-  <figure class="walk"><video class="loop" src="${vsrc}" poster="${vposter}" muted loop playsinline preload="none" aria-label="${L(vlabel)}"></video><figcaption>${L(vlabel)}</figcaption></figure>
+  <div class="how"><div class="grid">${p.steps.map(([title, text], i) => `<div class="tile"><p class="n">[${nn(i)}]</p><h3>${L(title)}</h3><p>${L(text)}</p></div>`).join('')}</div>
+  <figure class="walk"><video class="loop" src="${vsrc}" poster="${vposter}" muted loop playsinline preload="none" aria-label="${L(vlabel)}"></video><figcaption>${L(vlabel)}</figcaption></figure></div>
   <div class="sub-h"><h3>${L(c.title)}</h3><p>${L(c.lead)}</p></div>
   <div class="grid three">${c.items.map(([k, v]) => `<div class="tile">${kicker(k)}<p class="big">${L(v)}</p></div>`).join('')}</div>
 </section>`;
