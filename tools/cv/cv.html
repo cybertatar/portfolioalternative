@@ -60,7 +60,8 @@
          proximity: 4–8 inside an element (a subheading and its content), 12 from a section label
          to its section and between cards, 24 between groups, 32 between sections; padding inside
          a surface never exceeds the gap around it. Corners step down: panel 16, tile 12, chip 8.
-         Text colours keep 4.5:1 on every surface, the gold marks 3:1 */
+         Text colours keep 4.5:1 on every surface. The one accent is the warm fill of the key
+         projects; markers stay neutral so they never compete with the headings */
       :root {
         --ink: #15191d;
         --ink-2: #4f5a64;
@@ -69,7 +70,6 @@
         --side: #f3f4f6;
         --chip: #ffffff;
         --tint: #faf5e8;
-        --gold: #a67a0f;
 
         --s1: 4px;
         --s2: 8px;
@@ -136,11 +136,8 @@
         gap: var(--s6);
       }
 
-      /* Section label: one style on both sides, a gold pixel before it, 12 from its section */
+      /* Section label: one style on both sides, 12 from its section */
       .label {
-        display: flex;
-        align-items: center;
-        gap: var(--s2);
         font-size: var(--t-s);
         font-weight: 600;
         line-height: 1;
@@ -148,12 +145,6 @@
         text-transform: uppercase;
         color: var(--ink-3);
         margin-bottom: var(--s3);
-      }
-      .label::before {
-        content: '';
-        width: 6px;
-        height: 6px;
-        background: var(--gold);
       }
       /* Subheading inside a section: part of its group, 8 from the content, 24 from the group
          before it */
@@ -206,7 +197,7 @@
          after the rest, and a PDF parser would then read the list at the very end of the page */
       .dots li {
         padding-left: var(--s4);
-        background: linear-gradient(var(--gold), var(--gold)) 0 0.6em / 5px 5px no-repeat;
+        background: radial-gradient(circle, var(--ink-3) 2px, transparent 2.5px) 0 0.55em / 5px 5px no-repeat;
       }
       .dots li + li {
         margin-top: var(--s2);
