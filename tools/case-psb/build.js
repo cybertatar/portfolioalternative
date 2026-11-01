@@ -5,9 +5,9 @@
 // <!-- /case:psb -->, and its English entries between // case:psb and // /case:psb in the
 // dictionary. Every text is one text node, so the dictionary can find it whole.
 //
-// The layout follows the co-author's version of the case (psb-portfolio-preview): one wide
-// column, five parts named by a pill between them and in a floating bar at the bottom; each
-// solution is three rows, a narrow card (problem, solution, result) beside a big stage.
+// The case is one column beside a sidebar of its chapters, grouped by the five parts. Each
+// solution is a quest card: the obstacle, what we did, the reward; its screens open in a viewer.
+// The test is a run of every participant, before and after, on the clock.
 const fs = require('fs');
 const path = require('path');
 const D = require('./data.js');
@@ -38,11 +38,11 @@ const nn = (i) => String(i + 1).padStart(2, '0');
 
 // The five parts of the case: the bar at the bottom and the pills between them
 const PARTS = [
-  ['overview', t('Обзор', 'Overview')],
-  ['process', t('Исследование', 'Research')],
-  ['home', t('Дизайн', 'Design')],
-  ['testing', t('Тестирование', 'Testing')],
-  ['outcome', t('Выводы', 'Takeaways')],
+  ['overview', t('Обзор', 'Overview'), ['overview', 'screens']],
+  ['process', t('Исследование', 'Research'), ['process', 'interviews']],
+  ['home', t('Дизайн', 'Design'), ['home', 'card-data', 'cashback', 'categories']],
+  ['testing', t('Тестирование', 'Testing'), ['testing', 'review']],
+  ['outcome', t('Выводы', 'Takeaways'), ['outcome']],
 ];
 const part = (label) => `<p class="part"><span>${L(label)}</span></p>`;
 
@@ -58,10 +58,16 @@ const phone = (inner, cls = '') => `<div class="ph${cls}"><img class="body" src=
 const phoneOf = (src, alt) => phone(`<img src="${src}" alt="${L(alt)}" loading="lazy" decoding="async" />`);
 
 /* ── Overview ── */
+// The team as two designer classes, drawn by tools/team/draw.js
+const CLASSES = [
+  ['researcher', t('Исследователь', 'Researcher')],
+  ['designer', t('Проектировщик', 'Designer')],
+];
+const ofSeven = (x) => t(`${x.ru} из 7`, `${x.en} of 7`);
 function about(a) {
   const pill = (x) => `<span class="pill">${L(x)}</span>`;
   return `<aside class="about">
-    <div>${kicker(t('Команда', 'Team'))}<p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>${L(a.team)}</span></p></div>
+    <div>${kicker(t('Команда', 'Team'))}<p class="pills">${CLASSES.map(([icon, name]) => `<span class="pill team"><img src="img/tools/team-${icon}.svg" alt="" />${L(name)}</span>`).join('')}</p><p class="team-n">${L(a.team)}</p></div>
     <div>${kicker(t('Проект', 'Project'))}<p class="pills">${a.project.map(pill).join('')}</p></div>
     <div>${kicker(t('Инструменты', 'Tools'))}<p class="pills">${a.tools
       .map(([icon, name]) => `<span class="pill tool"><img src="img/tools/${icon}.svg" alt="" />${L(name)}</span>`)
@@ -70,7 +76,13 @@ function about(a) {
 }
 
 function overview(o, flows) {
-  const list = (k) => `<ul>${o.quests.map((q) => `<li>${L(q[k])}</li>`).join('')}</ul>`;
+  // The four quests: the obstacle and what beat it, each leading to its card
+  const log = o.quests
+    .map(
+      ([id, name, problem, solution], i) =>
+        `<a class="qc" href="#c-${id}"><span class="qc-n">${L(t(`Квест ${i + 1}`, `Quest ${i + 1}`))}</span><b>${L(name)}</b><span class="qc-p">${L(problem)}</span><span class="qc-s">${L(solution)}</span></a>`,
+    )
+    .join('');
   const results = flows
     .map(
       (f) =>
@@ -80,11 +92,8 @@ function overview(o, flows) {
   const [, , fcs, seq] = o.stats;
   return `<section class="ch" id="c-overview">
   <div class="intro"><div>${kicker(t('Вступление', 'Intro'))}${prose(o.prose)}</div>${about(o.about)}</div>
-  <div class="sum">
-    <div class="tile"><h3>${L(t('Проблемы', 'Problems'))}</h3>${list(2)}</div>
-    <div class="tile"><h3>${L(t('Решения', 'Solutions'))}</h3>${list(3)}</div>
-    <div class="tile"><h3>${L(t('Результаты', 'Results'))}</h3>${results}<div class="sum-r"><p>${L(t('Медианные показатели теста', 'Median test results'))}</p><div><b>${L(num(fcs[0]))}</b><span>${L(fcs[2])}</span></div><div><b>${L(num(seq[0]))} ${L(seq[1])}</b><span>${L(t('Оценка лёгкости, SEQ', 'Ease, SEQ'))}</span></div></div></div>
-  </div>
+  <div class="qlog">${kicker(t('Журнал квестов', 'Quest log'))}<div class="qlog-h" aria-hidden="true"><span></span><span>${L(t('Препятствие', 'Obstacle'))}</span><span>${L(t('Решение', 'Solution'))}</span></div>${log}</div>
+  <div class="sum">${results}<div class="sum-r"><p>${L(t('Медианные показатели теста', 'Median test results'))}</p><div><b>${L(num(fcs[0]))}</b><span>${L(fcs[2])}</span></div><div><b>${L(ofSeven(num(seq[0])))}</b><span>${L(t('Оценка лёгкости, SEQ', 'Ease, SEQ'))}</span></div></div></div>
   <p class="aside">${L(o.statsNote)}</p>
 </section>`;
 }
@@ -118,7 +127,7 @@ function interviews(s) {
   return `${head('interviews', s)}
   ${video(s.video)}
   <div class="grid three">${s.findings.map(([h, p], i) => `<div class="tile"><p class="n">[${nn(i)}]</p><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
-  <div class="say"><img src="img/tools/team-mage.svg" alt="" /><div>${kicker(s.say[0])}<p>${L(s.say[1])}</p></div></div>
+  <div class="say"><img src="img/tools/team-researcher.svg" alt="" /><div>${kicker(s.say[0])}<p>${L(s.say[1])}</p></div></div>
 </section>`;
 }
 
@@ -158,79 +167,139 @@ function race(lanes) {
   </div>`;
 }
 
-// Options tried, in the solution's card; the phone on the stage shows the one picked
-function variants(v, id) {
-  const pick = v.items.findIndex((x) => x[3]);
-  const list = `<div class="vars" role="tablist" aria-label="${L(v.title)}">${v.items
-    .map(
-      ([, name, note, chosen], i) =>
-        `<button role="tab" id="v-${id}-${i}" aria-controls="vp-${id}-${i}" aria-selected="${i === pick}" tabindex="${i === pick ? 0 : -1}"><b>${L(name)}</b><span class="var-tag${chosen ? ' yes' : ''}">${L(chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'))}</span><span class="var-note">${L(note)}</span></button>`,
-    )
-    .join('')}</div>`;
-  const screens = v.items
-    .map(([src, name], i) => `<img role="tabpanel" id="vp-${id}-${i}" aria-labelledby="v-${id}-${i}" src="${src}" alt="${L(name)}" loading="lazy" decoding="async"${i === pick ? '' : ' hidden'} />`)
-    .join('');
-  return { list: `${kicker(v.title)}${list}`, phone: phone(screens, ' vars-ph') };
-}
-
-const row = (label, body, stage) =>
-  `<div class="srow"><div class="tile">${kicker(label)}${body}</div><div class="stage">${stage}</div></div>`;
-
+// What changed, row by row: the old way faded, the new one in full ink. Folded under the card
 function changes(rs) {
-  return `<div class="changes"><p class="changes-h"><span></span><span>${L(t('Было', 'Before'))}</span><span>${L(t('Стало', 'After'))}</span></p>${rs
+  return `<details class="changes"><summary>${L(t('Что изменилось, по пунктам', 'What changed, point by point'))}</summary><div class="changes-t"><p class="changes-h"><span></span><span>${L(t('Было', 'Before'))}</span><span>${L(t('Стало', 'After'))}</span></p>${rs
     .map(([k, a, b]) => `<p class="changes-r"><b>${L(num(k))}</b><span class="was">${L(a)}</span><span>${L(b)}</span></p>`)
-    .join('')}</div>`;
+    .join('')}</div></details>`;
 }
 
-function stepper(i) {
-  return `<nav class="stepper" aria-label="${L(t('Решения', 'Solutions'))}">${D.solutions
-    .map((s, k) => (k === i ? `<a class="on" href="#c-${s.id}" aria-current="step">${L(s.title)}</a>` : `<a href="#c-${s.id}">${k + 1}</a>`))
-    .join('')}</nav>`;
+/* ── Design: a solution as a quest card ── */
+// The screens of a quest, in the order of the story: before, the options tried, after. Each
+// opens in the quest's viewer; the race «before / after» is the viewer's last slide
+function slidesOf(s) {
+  const list = [{ src: s.stage[0], name: t('Было', 'Before'), where: 'obstacle' }];
+  if (s.variants)
+    s.variants.items.forEach(([src, name, note, chosen]) =>
+      list.push({ src, name, note, tag: chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'), chosen: !!chosen, where: 'action' }),
+    );
+  else list.push({ src: s.stage[1], name: t('Стало', 'After'), where: 'action' });
+  return list;
+}
+
+// A screen as a small card that opens the viewer on it
+const shot = (x, i, id) =>
+  `<button class="shot${x.chosen ? ' yes' : ''}" type="button" data-open="${id}" data-slide="${i}"><span class="shot-img"><img src="${x.src}" alt="" loading="lazy" decoding="async" /></span><span class="shot-t"><b>${L(x.name)}</b>${x.tag ? `<span class="var-tag${x.chosen ? ' yes' : ''}">${L(x.tag)}</span>` : ''}</span></button>`;
+
+// The viewer: one big phone at a time, its caption under it, arrows and Esc
+function viewer(s, slides) {
+  const items = slides
+    .map(
+      (x, i) =>
+        `<figure class="slide" data-n="${i}" hidden>${phoneOf(x.src, x.name)}<figcaption><b>${L(x.name)}</b>${x.tag ? ` <span class="var-tag${x.chosen ? ' yes' : ''}">${L(x.tag)}</span>` : ''}${x.note ? `<span>${L(x.note)}</span>` : ''}</figcaption></figure>`,
+    )
+    .join('');
+  const race_ = s.race ? `<figure class="slide" data-n="${slides.length}" hidden>${race(s.race)}</figure>` : '';
+  return `<dialog class="viewer" id="vw-${s.id}" aria-label="${L(s.title)}">
+    <div class="vw-top"><p class="vw-n"><span data-vw-at>1</span> / ${slides.length + (s.race ? 1 : 0)}</p><button class="vw-x btn" type="button" data-close>${L(t('Закрыть', 'Close'))}</button></div>
+    <div class="vw-body"><button class="vw-arrow prev" type="button" data-step="-1" aria-label="${L(t('Назад', 'Previous'))}"></button><div class="vw-slides">${items}${race_}</div><button class="vw-arrow next" type="button" data-step="1" aria-label="${L(t('Дальше', 'Next'))}"></button></div>
+  </dialog>`;
 }
 
 function solution(s, i) {
   const paras = (ps) => ps.map((p) => `<p>${L(p)}</p>`).join('');
-  const v = s.variants ? variants(s.variants, s.id) : null;
-  const facts = `<ul class="res">${s.stats.map(([n, unit, what]) => `<li><b>${L(num(n))}${unit ? ` ${L(unit)}` : ''}</b> ${L(what)}</li>`).join('')}</ul>`;
-  const resultStage = s.race
-    ? race(s.race)
-    : `<div class="pair">${s.pair.map(([src, label]) => `<figure>${phoneOf(src, label)}<figcaption>${L(label)}</figcaption></figure>`).join('')}</div>`;
-  return `<section class="ch sol" id="c-${s.id}">
-  ${stepper(i)}
+  const slides = slidesOf(s);
+  const shots = (where) =>
+    `<div class="shots">${slides.map((x, k) => (x.where === where ? shot(x, k, s.id) : '')).join('')}</div>`;
+  // The reward: for a flow with a race, its time and steps before and after come first
+  let head_ = '';
+  if (s.race) {
+    const [[, n0, t0], [, n1, t1]] = s.race;
+    head_ = `<p class="rw-big"><b>${L(clock(t1))}</b><span>${L(t(`вместо ${clock(t0).ru}`, `instead of ${clock(t0).en}`))}</span></p><p class="rw-steps">${L(t(`${steps(n1).ru} вместо ${n0}`, `${steps(n1).en} instead of ${n0}`))}</p>`;
+  }
+  const facts = `<ul class="rw-list">${s.stats
+    .map(([n, unit, what]) => {
+      const v = unit ? (typeof n === 'object' ? t(`${n.ru} ${unit.ru}`, `${n.en} ${unit.en}`) : t(`${n} ${unit.ru}`, `${n} ${unit.en}`)) : num(n);
+      return `<li><b>${L(v)}</b><span>${L(what)}</span></li>`;
+    })
+    .join('')}</ul>`;
+  const raceBtn = s.race
+    ? `<button class="btn rw-race" type="button" data-open="${s.id}" data-slide="${slides.length}">${L(t('Гонка «было и стало»', 'Race: before and after'))}</button>`
+    : '';
+  return `<section class="ch quest" id="c-${s.id}">
+  <p class="q-no"><span>${L(t(`Квест ${i + 1} из ${D.solutions.length}`, `Quest ${i + 1} of ${D.solutions.length}`))}</span><span class="q-done">${L(t('Пройден', 'Cleared'))}</span></p>
+  <h2>${L(s.title)}</h2>
   <p class="lead">${L(s.lead)}</p>
-  ${row(t('Проблема', 'Problem'), paras(s.problem), phoneOf(s.stage[0], t('Было', 'Before')))}
-  ${row(t('Решение', 'Solution'), paras(s.solution) + (v ? v.list : ''), v ? v.phone : phoneOf(s.stage[1], t('Стало', 'After')))}
-  ${row(t('Результат', 'Result'), `<p>${L(s.result)}</p>${facts}`, resultStage)}
+  <div class="qcard">
+    <div class="qstep">${kicker(t('Препятствие', 'Obstacle'))}<div class="qtext">${paras(s.problem)}</div>${shots('obstacle')}</div>
+    <div class="qstep">${kicker(t('Что сделали', 'What we did'))}<div class="qtext">${paras(s.solution)}</div>${s.variants ? kicker(s.variants.title) : ''}${shots('action')}</div>
+    <div class="qstep reward">${kicker(t('Награда', 'Reward'))}${head_}${facts}<p class="qtext">${L(s.result)}</p>${raceBtn}</div>
+  </div>
   ${changes(s.rows)}
+  ${viewer(s, slides)}
 </section>`;
 }
 
-/* ── Testing: time on one scale, then a card per flow ── */
+/* ── Testing: a run of every participant ── */
+// Each dot is a participant: 30 on the new prototype, 5 on a copy of the old screens. The medians
+// are measured; the spread around them is drawn, as the page doesn't hold each person's time. All
+// dots start together and move with the clock; each stops when its participant finishes, so the
+// end is every finish time on the lane's own axis
+const Q = (p) => {
+  // The normal quantile (Acklam's approximation is more than enough for a picture)
+  const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239];
+  const b = [-54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572];
+  const c = [-0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416];
+  const lo = 0.02425;
+  if (p < lo) {
+    const q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+  if (p > 1 - lo) return -Q(1 - p);
+  const q = p - 0.5,
+    r = q * q;
+  return ((((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q) / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+};
+// n finish times spread around a median, the same on every build
+const spread = (median, n, sigma) => Array.from({ length: n }, (_, i) => median * Math.exp(sigma * Q((i + 0.5) / n)));
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+// A tidy step for the axis: no more than five marks
+const tickStep = (max) => [5, 10, 15, 30, 60].find((st) => max / st <= 5) || 60;
+
 function testing(s) {
-  const longest = Math.max(...s.flows.map((f) => secs(f.time[0])));
-  const word = (n) => {
-    const x = steps(n);
-    return t(x.ru.split(' ')[1], x.en.split(' ')[1]);
-  };
-  const bars = s.flows
+  const NEW = s.people,
+    OLD = 5;
+  const lanes = s.flows
     .map((f) => {
       const [tw, tn] = f.time;
-      return `<div class="bar"><p>${L(f.name)}</p><div class="bar-t"><i class="was" style="width:${pct(secs(tw) / longest)}"><span>${L(t(`${secText(tw).ru} с`, `${secText(tw).en} s`))}</span></i><i class="now" style="--to:${pct(tn / longest)}"><span>${L(t(`${tn} с`, `${tn} s`))}</span></i></div></div>`;
-    })
-    .join('');
-  const cards = s.flows
-    .map((f) => {
-      const [was, now] = f.steps;
-      return `<div class="tile tf">${kicker(f.name)}<p class="tf-big"><b>${now}</b> ${L(word(now))}</p><p class="tf-was"><span class="down">−${Math.round((1 - now / was) * 100)}%</span><span>${L(t(`было ${was}`, `was ${was}`))}</span></p><div class="tf-more"><div><b><span data-count-from="0">${f.fcs}</span>%</b><span>first click</span></div><div><b>${L(f.seq[1])} ${L(t('из 7', 'of 7'))}</b><span>${L(t('оценка лёгкости', 'ease score'))}</span></div></div></div>`;
+      const was = secs(tw);
+      const now = spread(tn, NEW, 0.35),
+        old = spread(was, OLD, 0.3);
+      const axis = Math.ceil(Math.max(...old) / tickStep(Math.max(...old))) * tickStep(Math.max(...old));
+      const st = tickStep(axis);
+      const ticks = Array.from({ length: Math.floor(axis / st) + 1 }, (_, k) => `<span class="tick" style="left:${pct((k * st) / axis)}">${mmss(k * st)}</span>`).join('');
+      // Dots: their finish (x, a share of the axis) and a lane height; the order is shuffled so
+      // the fast and the slow don't sit in bands
+      const dot = (sec, k, n, cls) =>
+        `<i class="dot ${cls}" data-t="${sec.toFixed(1)}" style="--x:${(sec / axis).toFixed(4)};--y:${(((k * 0.6180339) % 1) * 0.84 + 0.08).toFixed(3)}"></i>`;
+      const dots = now.map((x, k) => dot(x, k, NEW, 'now')).join('') + old.map((x, k) => dot(x, k + 7, OLD, 'was')).join('');
+      const [st0, st1] = f.steps;
+      return `<div class="rl" data-axis="${axis}">
+      <div class="rl-h"><h3>${L(f.name)}</h3><p class="rl-steps">${L(t(`${steps(st1).ru} вместо ${st0}`, `${steps(st1).en} instead of ${st0}`))}</p>
+        <p class="rl-clock"><b data-clock>${mmss(tn)}</b><span>${L(t(`медиана, было ${mmss(was)}`, `median, was ${mmss(was)}`))}</span></p>
+        <dl class="rl-stats"><div><dt>${L(t('Дошли', 'Finished'))}</dt><dd><span data-fin>${NEW}</span> ${L(t(`из ${NEW}`, `of ${NEW}`))}</dd></div><div><dt>${L(t('Первый клик', 'First click'))}</dt><dd>${f.fcs}%</dd></div><div><dt>${L(t('Лёгкость', 'Ease'))}</dt><dd>${L(ofSeven(f.seq[1]))}</dd></div></dl></div>
+      <div class="rl-track"><div class="rl-ticks">${ticks}</div><div class="rl-field">${dots}<span class="med now" style="left:${pct(tn / axis)}"><b>${L(t(`${tn} с`, `${tn} s`))}</b></span><span class="med was" style="left:${pct(was / axis)}"><b>${L(t(`${secText(tw).ru} с`, `${secText(tw).en} s`))}</b></span></div></div>
+    </div>`;
     })
     .join('');
   return `${head('testing', s)}
-  <div data-play>
-    ${kicker(t('Медианное время на задачу', 'Median time per task'))}
-    <div class="bars">${bars}</div>
-    <div class="grid three">${cards}</div>
+  <div class="run" data-run>
+    <div class="run-top">${kicker(t('Забег: время на задачу', 'The run: time per task'))}<button class="btn" type="button" data-rerun hidden>${L(t('Ещё раз', 'Replay'))}</button></div>
+    ${lanes}
+    <p class="run-key"><span><i class="dot now"></i>${L(t(`${NEW} клиентов в новом прототипе`, `${NEW} customers on the new prototype`))}</span><span><i class="dot was"></i>${L(t(`${OLD} клиентов на копии старых экранов`, `${OLD} customers on a copy of the old screens`))}</span><span><i class="mk"></i>${L(t('медиана', 'median'))}</span></p>
   </div>
-  <p class="aside">${L(s.note)}</p>
+  <p class="aside">${L(t('Медианы измерены, разброс точек вокруг них условный: на сайте нет времени каждого участника. «Было» — медиана тех, кто дошёл до конца.', 'The medians are measured; the spread of the dots around them is drawn, as the site doesn’t hold each person’s time. “Before” is the median of those who finished.'))}</p>
 </section>`;
 }
 
@@ -244,12 +313,18 @@ const outcome = (s) => `${head('outcome', s)}
   <div class="grid three">${s.next.map(([h, p]) => `<div class="tile"><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
 </section>`;
 
-// The floating bar at the bottom: the five parts, the one in view lit
+// The sidebar: the chapters grouped by the five parts, the one in view lit. On a narrow screen it
+// folds into a button «Содержание» in the corner
+const tocName = (id) => D.toc.find((x) => x[0] === id)[1];
 const toc = () =>
-  `<nav class="toc" aria-label="${L(t('Части кейса', 'Parts of the case'))}">${PARTS.map(([id, label]) => `<a href="#c-${id}">${L(label)}</a>`).join('')}</nav>`;
+  `<button class="toc-btn btn" type="button" aria-expanded="false" aria-controls="toc">${L(t('Содержание', 'Contents'))}</button><nav class="toc" id="toc" aria-label="${L(t('Содержание кейса', 'Case contents'))}">${PARTS.map(
+    ([, label, ids]) => `<div class="toc-g"><p>${L(label)}</p>${ids.map((id) => `<a href="#c-${id}">${L(tocName(id))}</a>`).join('')}</div>`,
+  ).join('')}</nav>`;
 
 const body = [
+  `<aside class="side">`,
   toc(),
+  `</aside>`,
   `<div class="cs">`,
   overview(D.overview, D.testing.flows),
   part(t('Финальные экраны', 'Final screens')),
