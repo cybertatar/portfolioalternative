@@ -47,9 +47,8 @@ await page.evaluate(() => {
   // «веб-сервисы» never breaks at its hyphen
   const bio = document.querySelector('.sheet .bio').textContent.trim().replace(/\s+/g, ' ').replace('веб-', 'веб\u2011');
   const cover = document.querySelector('#last .lq-cover').cloneNode(true);
-  // The quest's Russian name as the list of quests gives it, and its headline result
+  // The quest's Russian name, as the list of quests gives it
   const quest = 'Редизайн приложения ПСБ';
-  const [num, what] = ['В 4 раза', 'быстрее подключить<br>кешбэк'];
   const og = document.createElement('div');
   og.className = 'og';
   og.innerHTML =
@@ -58,7 +57,7 @@ await page.evaluate(() => {
     `<p class="kicker">${role}<span class="on">Открыт к предложениям</span></p>` +
     `<h1>${name}</h1><p class="bio">${bio}</p>` +
     `<div class="quest"><div class="thumb"></div><div><small>Последний квест</small>` +
-    `<b>${quest}</b></div><p class="win"><b>${num}</b>${what}</p></div></div>`;
+    `<b>${quest}</b></div></div></div>`;
   og.querySelector('.thumb').append(cover);
   document.body.append(og);
 });
