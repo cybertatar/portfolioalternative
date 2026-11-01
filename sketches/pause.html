@@ -1,6 +1,21 @@
 <title>Портфолио: меню паузы</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="claude:viewport-fit-sides" content="cover" />
+<!-- The link preview in Telegram, hh.ru, LinkedIn and the rest: they read these tags without
+     running the page, so it is the Russian one. The picture is drawn by tools/og/render.mjs -->
+<meta name="description" content="Продуктовый дизайнер. Проектирую мобильные приложения и веб-сервисы, веду задачу от исследования до передачи в разработку. Портфолио в виде меню паузы." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Даниил Тынчеров" />
+<meta property="og:title" content="Даниил Тынчеров, продуктовый дизайнер" />
+<meta property="og:description" content="Проектирую мобильные приложения и веб-сервисы. Последний квест: редизайн приложения ПСБ, кешбэк подключается в 4 раза быстрее." />
+<meta property="og:url" content="https://cybertatar.github.io/portfolioalternative/" />
+<meta property="og:image" content="https://cybertatar.github.io/portfolioalternative/img/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Даниил Тынчеров, продуктовый дизайнер, открыт к предложениям" />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:locale:alternate" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
 <!-- The language is decided before the first paint: ?lang=ru|en in the address, then the reader's
      own earlier choice, then the browser (Russian for a Russian browser, English for any other).
      No redirect: the page stays where it is and the switch in the top bar is always one tap away -->
@@ -6647,6 +6662,68 @@
     open(last.querySelector('.cover-art'));
   });
 
+  /* ── The address: a link to a tab or a case opens right there. The tab is the hash (#quests,
+     #side; «Персонаж» has none), an open case is its quest's id (#psb). Switching tabs rewrites
+     the address in place; opening a case adds a step to the history, so the browser's own back
+     (or a swipe back on a phone) takes the reader to the menu, like «Назад» does ── */
+  const address = (() => {
+    const TAB_HASH = ['', 'quests', 'side'];
+    let pushed = false; // the case was opened here, so its step in the history is ours to take back
+    let ready = false; // the first tab is set before the address is read: it must not wipe it
+    const write = (hash, push) => {
+      const url = new URL(location.href);
+      url.hash = hash;
+      if (url.href === location.href) return;
+      history[push ? 'pushState' : 'replaceState'](history.state, '', url);
+    };
+    // What the address asks for: a tab, or an open case
+    const wanted = () => {
+      const h = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+      const q = QUESTS.find((x) => x.open && x.id === h);
+      return q ? { q } : { tab: Math.max(0, TAB_HASH.indexOf(h)) };
+    };
+    const playing = () => document.body.classList.contains('playing') || !!trip;
+    function onTab(k) {
+      if (ready && !playing()) write(TAB_HASH[k] || '', false);
+    }
+    function onOpen(q) {
+      pushed = location.hash.slice(1) !== q.id;
+      if (pushed) write(q.id, true);
+    }
+    // «Назад» and Esc: the step into the case is taken back, the menu shows the tab it came from
+    function leave() {
+      if (document.body.classList.contains('flying')) return;
+      if (pushed) return history.back();
+      pause();
+      write(TAB_HASH[cur()] || '', false);
+    }
+    // Bring the page to what the address says; mid-flight, once the flight is over
+    function follow(instant) {
+      ready = true;
+      if (document.body.classList.contains('flying')) return setTimeout(() => follow(instant), 100);
+      const w = wanted();
+      if (w.q) {
+        if (trip) return;
+        sel = QUESTS.indexOf(w.q);
+        // The case goes up from «Квесты»; the address already names the case and keeps it
+        ready = false;
+        tab(1, false);
+        ready = true;
+        select(sel);
+        pushed = false;
+        requestAnimationFrame(() => open(null, instant));
+      } else {
+        if (trip) {
+          pushed = false;
+          return pause();
+        }
+        if (w.tab !== cur()) tab(w.tab, !instant);
+      }
+    }
+    addEventListener('popstate', () => follow(false));
+    return { tab: onTab, open: onOpen, leave, follow };
+  })();
+
   /* ── Tabs ── */
   // The menu's own tabs only: the case has tab lists of its own (its options)
   const tabs = [...document.querySelectorAll('.top .tabs [role="tab"]')];
@@ -6704,6 +6781,7 @@
     }
     ink.style.transition = '';
     inkAt(k);
+    address.tab(k);
     if (phone.matches) {
       pager.style.height = views[k].offsetHeight + 'px';
       tabs[k].scrollIntoView({ inline: 'nearest', block: 'nearest' });
@@ -7275,7 +7353,7 @@
     document.body.append(v);
     return [v, v.animate([{ opacity: 0 }, { opacity: 1 }], { duration: VEIL[1], delay: VEIL[0], endDelay: DIVE_MS - VEIL[0] - VEIL[1], easing: 'ease', fill: 'both' })];
   }
-  function open(src) {
+  function open(src, instant = false) {
     if (!(src instanceof Element)) src = null;
     const q = QUESTS[sel];
     if (!q.open || trip) return;
@@ -7286,7 +7364,8 @@
     trip = { sel, scroll: scrollY, back: card || document.activeElement, src, clone: null, veil: null, anims: [], fold: null };
     const t = trip;
     if (q.live) loadLive();
-    if (!reduceMotion.matches) {
+    address.open(q);
+    if (!reduceMotion.matches && !instant) {
       const [clone, grow] = dive(src, HEAD(q)),
         [v, fade] = veil();
       Object.assign(t, { clone, veil: v });
@@ -7368,14 +7447,14 @@
         .then(back);
     else unfold(t.fold).then(back);
   }
-  document.getElementById('back').addEventListener('click', pause);
+  document.getElementById('back').addEventListener('click', () => address.leave());
 
   addEventListener('keydown', (e) => {
     if (document.body.classList.contains('playing')) {
       if (e.key === 'Escape') {
         // An open contents list takes the Esc for itself: the case and its films stay as they are
         if (caseBody.closeSheet()) return e.stopImmediatePropagation();
-        pause();
+        address.leave();
       }
       return;
     }
@@ -7929,6 +8008,7 @@
 
   select(0);
   tab(0, false);
+  address.follow(true);
   document.fonts.ready.then(() => inkAt(cur()));
   addEventListener('resize', evenCards);
   document.fonts.ready.then(evenCards);
