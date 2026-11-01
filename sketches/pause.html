@@ -2773,19 +2773,14 @@
     color: var(--gold-ink);
     font: 700 var(--fs-m)/1 var(--pixel);
   }
+  /* The phone is the case's own iPhone (.ph): the body over a window cut to its display, as wide
+     as the replay's height allows */
   .testing .mini-phone {
-    position: relative;
     flex: none;
-    width: 30cqi;
-    background: #000;
+    width: auto;
+    height: 100%;
   }
   .testing .shot {
-    position: absolute;
-    inset: 1cqi;
-    width: calc(100% - 2cqi);
-    height: calc(100% - 2cqi);
-    object-fit: cover;
-    object-position: top;
     opacity: 0;
   }
   .testing .shot.on {
@@ -2895,7 +2890,7 @@
     color: var(--ink-3);
   }
   .testing .summary {
-    width: 78cqi;
+    width: 86cqi;
   }
   .testing table {
     width: 100%;
@@ -2915,8 +2910,10 @@
     font-weight: 400;
     color: var(--ink-3);
   }
+  /* The flow's name may take two lines, so the numbers always fit the card */
   .testing td:first-child {
     padding-left: 1cqi;
+    white-space: normal;
   }
   .testing td:nth-child(n + 2) {
     font-variant-numeric: tabular-nums;
@@ -3795,7 +3792,7 @@
 </div></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">03</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="chapter-media"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">04</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div><div class="chapter-media"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
   <div class="tcard start px-clip"><span class="kicker">Юзабилити-тест ПСБ</span><span class="card-title">Начать тест</span><span class="field-label">Ваше имя</span><span class="field px-clip" data-target="field"><span data-type-ru="Участник 12" data-type-en="Participant 12"></span><i class="caret"></i></span><span class="sbtn px-clip" data-target="start">Начать тест</span></div>
   <div class="tcard task px-clip"><span class="kicker">Задание</span><span class="card-title">Первое подключение кешбэка</span><span class="card-text">Подключите кешбэк и выберите три категории на этот месяц.</span><span class="sbtn px-clip" data-target="go">Старт</span></div>
-  <div class="session"><div class="mini-phone px-clip"><img class="shot on" src="img/psb/scene/cb-off.webp" alt="" loading="lazy" decoding="async" data-screen="0" /><img class="shot" src="img/psb/scene/cb-connect.webp" alt="" loading="lazy" decoding="async" data-screen="1" /><img class="shot" src="img/psb/scene/success.webp" alt="" loading="lazy" decoding="async" data-screen="2" /></div><div class="log px-clip"><span class="kicker">Повтор сессии</span><span class="timer" data-timer>+00:00.0</span><span class="tline"><span class="tline-fill"></span></span><ol><li data-row="0"><span class="log-t">+00:00.0</span><span class="log-kind start">start</span><span class="log-what">Первое подключение кешбэка</span></li><li data-row="1"><span class="log-t">+00:04.3</span><span class="log-kind tap">tap</span><span class="log-what">Хочу подключить</span></li><li data-row="2"><span class="log-t">+00:08.1</span><span class="log-kind tap">tap</span><span class="log-what">7% Деливери</span></li><li data-row="3"><span class="log-t">+00:11.1</span><span class="log-kind tap">tap</span><span class="log-what">3% На бензин</span></li><li data-row="4"><span class="log-t">+00:14.1</span><span class="log-kind tap">tap</span><span class="log-what">Подключить</span></li><li data-row="5"><span class="log-t">+00:18.3</span><span class="log-kind finish">finish</span><span class="log-what">Кешбэк подключён</span></li></ol></div></div>
+  <div class="session"><div class="ph mini-phone"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img class="shot on" src="img/psb/scene/cb-off.webp" alt="" loading="lazy" decoding="async" data-screen="0" /><img class="shot" src="img/psb/scene/cb-connect.webp" alt="" loading="lazy" decoding="async" data-screen="1" /><img class="shot" src="img/psb/scene/success.webp" alt="" loading="lazy" decoding="async" data-screen="2" /></div></div><div class="log px-clip"><span class="kicker">Повтор сессии</span><span class="timer" data-timer>+00:00.0</span><span class="tline"><span class="tline-fill"></span></span><ol><li data-row="0"><span class="log-t">+00:00.0</span><span class="log-kind start">start</span><span class="log-what">Первое подключение кешбэка</span></li><li data-row="1"><span class="log-t">+00:04.3</span><span class="log-kind tap">tap</span><span class="log-what">Хочу подключить</span></li><li data-row="2"><span class="log-t">+00:08.1</span><span class="log-kind tap">tap</span><span class="log-what">7% Деливери</span></li><li data-row="3"><span class="log-t">+00:11.1</span><span class="log-kind tap">tap</span><span class="log-what">3% На бензин</span></li><li data-row="4"><span class="log-t">+00:14.1</span><span class="log-kind tap">tap</span><span class="log-what">Подключить</span></li><li data-row="5"><span class="log-t">+00:18.3</span><span class="log-kind finish">finish</span><span class="log-what">Кешбэк подключён</span></li></ol></div></div>
   <div class="tcard seq px-clip"><span class="card-title">Насколько легко было выполнить задание?</span><span class="scale"><span class="pick px-clip" data-pick="1">1</span><span class="pick px-clip" data-pick="2">2</span><span class="pick px-clip" data-pick="3">3</span><span class="pick px-clip" data-pick="4">4</span><span class="pick px-clip" data-pick="5">5</span><span class="pick px-clip" data-pick="6">6</span><span class="pick px-clip" data-pick="7">7</span></span><span class="scale-ends"><span>Очень сложно</span><span>Очень легко</span></span></div>
   <div class="tcard summary px-clip"><span class="kicker">Саммари по сессиям</span><span class="card-title">30 клиентов ПСБ, 3 задания</span><table><thead><tr><th>Сценарий</th><th>Завершили</th><th>First click</th><th>SEQ</th></tr></thead><tbody><tr><td>Подключить кешбэк</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,5" data-final-en="6.5">6,5</span></td></tr><tr><td>Выбрать категории</td><td><span data-count="30">30</span>/30</td><td><span data-count="100">100</span>%<span class="sbar" style="--v:100%"></span></td><td><span data-final-ru="6,7" data-final-en="6.7">6,7</span></td></tr><tr><td>Скопировать данные карты</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,0" data-final-en="6.0">6,0</span></td></tr></tbody></table></div>
   <div class="tcard done px-clip"><span class="check px-clip" aria-hidden="true"><svg viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="currentColor" d="M1 6h2v2H1zM2 7h2v2H2zM3 8h2v2H3zM5 7h2v2H5zM6 6h2v2H6zM7 5h2v2H7zM8 4h2v2H8zM9 3h2v2H9zM4 9h2v1H4z"/></svg></span><span class="card-title">Тест завершён</span><span class="card-text">Запись сохранена. Спасибо за участие!</span></div>
