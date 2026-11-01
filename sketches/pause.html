@@ -3087,37 +3087,54 @@
     }
   }
 
-  /* The takeaway, said by the party from the scenes: the two sprites and a bubble beside them */
+  /* The takeaway, said by the party from the scenes: the two sprites standing on one line and a
+     bubble beside them, its pixel tail pointing at them. Sprites at a whole 3x, so every pixel is
+     crisp */
   .say {
     display: flex;
     align-items: flex-end;
-    gap: var(--s4);
+    gap: var(--s5);
     margin: var(--s6) 0 0;
-    max-width: 820px;
+    max-width: 860px;
   }
   .party {
     display: flex;
-    gap: var(--s1);
+    align-items: flex-end;
+    gap: var(--s2);
     flex: none;
   }
   .member {
     position: relative;
-    width: 56px;
+    width: 72px;
   }
   .member .sprite {
     display: block;
     width: 100%;
     height: auto;
+    image-rendering: pixelated;
   }
   .member .face {
     position: absolute;
     inset: 0;
   }
   .bubble {
+    position: relative;
     margin: 0;
     padding: var(--pad);
-    border-radius: var(--r) var(--r) var(--r) var(--s1);
+    border-radius: var(--r);
     background: var(--fill-2);
+    text-wrap: pretty;
+  }
+  /* The tail: a staircase of 4px steps, as if drawn in the sprites' pixels */
+  .bubble::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--s4));
+    bottom: var(--s5);
+    width: var(--s4);
+    height: var(--s4);
+    background: inherit;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 75%, 25% 75%, 25% 50%, 50% 50%, 50% 25%, 75% 25%, 75% 0);
   }
   .bubble .kick {
     margin-bottom: var(--s2);
@@ -3894,10 +3911,16 @@
     .say {
       flex-direction: column;
       align-items: flex-start;
-      gap: var(--s3);
+      gap: var(--s4);
     }
-    .bubble {
-      border-radius: var(--s1) var(--r) var(--r) var(--r);
+    .member {
+      width: 48px;
+    }
+    .bubble::before {
+      left: var(--s6);
+      top: calc(-1 * var(--s4));
+      bottom: auto;
+      clip-path: polygon(0 0, 25% 0, 25% 25%, 50% 25%, 50% 50%, 75% 50%, 75% 75%, 100% 75%, 100% 100%, 0 100%);
     }
     .nums {
       grid-template-columns: minmax(0, 1fr);
