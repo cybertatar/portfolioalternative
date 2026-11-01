@@ -1833,9 +1833,10 @@
     padding-left: max(var(--gap), env(safe-area-inset-left, 0px));
     padding-right: max(var(--gap), env(safe-area-inset-right, 0px));
   }
-  /* ── The case body, after the co-author's version of the case (psb-portfolio-preview): one wide
-     column, calm type, grey captions; five parts named by a pill between them and by a floating
-     bar at the bottom. Surfaces differ by fill only, as in the menu ── */
+  /* ── The case body, in the menu's own look: one wide column; each chapter under its title on
+     the left; what belongs together grouped on a card that differs from the page by fill alone,
+     as the menu's panes do (no strokes), long reading left on the page; small pixel captions
+     over groups, as .label in the menu ── */
   .reading .inner {
     max-width: 1176px;
     margin: 0 auto;
@@ -1848,6 +1849,16 @@
   }
   .ch + .ch {
     margin-top: calc(2 * var(--s7));
+  }
+  /* A card: a fill on the page, never a stroke; text `--pad` from its edge */
+  .cs .box {
+    padding: var(--pad);
+    border-radius: var(--r);
+    background: var(--fill);
+  }
+  .reading h3.sub {
+    margin-bottom: var(--s4);
+    font-size: var(--fs-h3);
   }
   .reading h2 {
     margin: 0 0 var(--s3);
@@ -1876,16 +1887,13 @@
     font-size: var(--fs-cap);
     color: var(--ink-3);
   }
-  /* Small grey caps over a group: Вступление, Проблема, the name of a flow */
+  /* Small pixel captions over a group, as .label in the menu: Вступление, Проблема */
   .kick {
     margin-bottom: var(--s3);
-    font-size: var(--fs-cap);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font: 700 var(--fs-px)/1 var(--pixel);
     color: var(--ink-3);
   }
-  /* Was a card on a fill; now a plain item, apart from its neighbours by space alone (owner:
-     the grey cards made everything look the same) */
+  /* An item on a card: its number or caption, title and text */
   .tile {
     display: flex;
     flex-direction: column;
@@ -1910,7 +1918,7 @@
   }
   .grid {
     display: grid;
-    gap: var(--s6) var(--s7);
+    gap: var(--gap);
   }
   .grid.two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1919,7 +1927,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .n {
-    font: 500 var(--fs-cap)/1 ui-monospace, 'SF Mono', Menlo, monospace;
+    font: 700 var(--fs-px)/1 var(--pixel);
     color: var(--ink-3);
   }
   .big {
@@ -1942,110 +1950,35 @@
     color: var(--ink-2);
   }
 
-  /* A part of the case: its name in a pill, centred between the chapters */
-  .part {
-    margin: calc(2 * var(--s7)) 0 var(--s7);
-    text-align: center;
-  }
-  .part span {
-    display: inline-block;
-    padding: var(--s1) var(--s3);
-    border-radius: var(--r-ctl);
-    background: var(--fill-2);
-    font-size: var(--fs-cap);
-    color: var(--ink-2);
-  }
-  .part + .ch {
-    margin-top: 0;
-  }
 
-  /* The parts in a bar floating at the bottom of the screen; the one in view is lit */
-  .toc {
-    position: fixed;
-    z-index: 5;
-    left: 50%;
-    bottom: max(var(--s4), env(safe-area-inset-bottom, 0px));
-    transform: translateX(-50%);
-    display: flex;
-    gap: var(--s1);
-    max-width: calc(100% - 2 * var(--gap));
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding: var(--s1);
-    border-radius: var(--r-ctl);
-    background: var(--glass-strong);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-  }
-  body:not(.playing) .toc {
-    display: none;
-  }
-  /* Fades in with the case; it keeps its own transform (centred), so no rise */
-  body.landed .toc {
-    animation: toc-in 0.5s ease 240ms both;
-  }
-  @keyframes toc-in {
-    from {
-      opacity: 0;
-    }
-  }
-  body.leaving .toc {
-    opacity: 0;
-    transition: opacity 0.18s ease;
-  }
-  .toc a {
-    flex: none;
-    padding: var(--s2) var(--s3);
-    border-radius: calc(var(--r-ctl) - var(--s1));
-    font-size: var(--fs-ui);
-    color: var(--ink-2);
-    text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  .toc a:hover {
-    color: var(--ink);
-  }
-  .toc a.on {
-    color: var(--ink);
-    background: var(--fill-3);
-  }
-
-  /* Overview: the intro and who, what and with what beside it; then problems, solutions and
-     results in three cards */
+  /* Overview: the result in four cards, the intro on a card with who, what and with what on
+     its own card beside it, then a card per problem leading to its solution */
   .intro {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
-    gap: var(--s7);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+    gap: var(--gap);
     align-items: start;
   }
   .about {
     display: grid;
-    gap: var(--s4);
+    gap: var(--s5);
+    line-height: 1.5;
   }
   .about .kick {
     margin-bottom: var(--s2);
   }
-  .pills {
+  .about .team,
+  .about .tools span {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--s2);
-  }
-  .pill {
-    display: inline-flex;
     align-items: center;
     gap: var(--s2);
-    padding: var(--s1) var(--s3);
-    border-radius: var(--r-ctl);
-    background: var(--fill-2);
-    font-size: var(--fs-cap);
-    line-height: 20px;
-    white-space: nowrap;
   }
-  .pill.team,
-  .pill.tool {
-    padding-left: var(--s1);
+  .about .tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s2) var(--s4);
   }
-  .pill img {
+  .about img {
     width: 20px;
     height: 20px;
     flex: none;
@@ -2054,17 +1987,19 @@
     display: flex;
   }
   .ava img {
+    width: 28px;
+    height: 28px;
     border-radius: var(--r-key);
     image-rendering: pixelated;
   }
   .ava img + img {
     margin-left: calc(-1 * var(--s1));
   }
-  /* The result first: four numbers large, apart by space, no cards */
+  /* The result first: four numbers large, a card each */
   .kpi {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s6);
+    gap: var(--gap);
   }
   .kpi div {
     display: grid;
@@ -2092,37 +2027,48 @@
     color: var(--ink-3);
   }
   #c-overview > .aside {
-    margin: var(--s4) 0 var(--s7);
+    margin: var(--s4) 0 var(--s6);
   }
-  /* Problems and solutions: a line per solution, the problem quieter, what we did in full ink;
-     the name leads to the solution */
+  /* Problems and solutions: a card per solution, the problem quieter, what we did in full ink;
+     the card leads to the solution */
   .qs {
     margin-top: var(--s7);
   }
   .qs ol {
     display: grid;
-    gap: var(--s5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
     margin: 0;
     padding: 0;
     list-style: none;
   }
   .qs li {
     display: grid;
-    grid-template-columns: minmax(0, 240px) minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s6);
-    line-height: 1.5;
   }
   .qs .qc {
-    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2);
+    line-height: 1.5;
     color: var(--ink);
     text-decoration: none;
-  }
-  .qs .qc::after {
-    content: ' →';
-    color: var(--ink-3);
+    transition: background-color 0.2s ease;
   }
   .qs .qc:hover {
-    color: var(--ink-2);
+    background: var(--fill-2);
+  }
+  .qs .qn {
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--ink-3);
+  }
+  .qs .qc b {
+    margin-bottom: var(--s2);
+    font-size: var(--fs-title);
+    font-weight: 500;
+  }
+  .qs .qc b::after {
+    content: ' →';
+    color: var(--ink-3);
   }
   .qs .was {
     color: var(--ink-3);
@@ -2211,23 +2157,45 @@
     display: none;
   }
 
-  /* Research: the steps of how we worked beside the walkthrough film, half the width each */
-  .how {
+  /* How we worked: a card per step, the text on the left `--pad` from the edge, the picture
+     on the right running to the card's edge and sharing its corners, as in the menu */
+  .chapters {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: var(--s7);
-    align-items: start;
+    gap: var(--gap);
   }
-  .walk {
-    position: sticky;
-    top: 80px;
-    margin: 0;
+  .cs .box.chapter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    align-items: center;
+    gap: var(--s6);
+    padding: 0 0 0 var(--pad);
+    overflow: hidden;
+  }
+  .chapter-copy {
     display: grid;
     gap: var(--s2);
-    font-size: var(--fs-cap);
-    color: var(--ink-3);
+    padding-block: var(--pad);
+    color: var(--ink-2);
+    line-height: 1.55;
   }
-  .walk .loop,
+  .chapter-copy h3 {
+    color: var(--ink);
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    margin-bottom: var(--s1);
+  }
+  .chapter-media {
+    align-self: stretch;
+    display: grid;
+    background: rgb(0 0 0 / 0.28);
+  }
+  .chapter-media .loop {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
   .film video {
     display: block;
     width: 100%;
@@ -2237,73 +2205,827 @@
     background: #000;
   }
   .film {
-    margin-bottom: var(--s4);
+    margin-bottom: var(--gap);
   }
-  .say {
-    display: flex;
-    align-items: center;
-    gap: var(--s4);
-    margin-top: var(--s6);
-    max-width: 760px;
+  /* ── Pixel scenes in «Как мы работали», ported from the main site (scenes/*.astro there):
+     tools/case-psb/scenes.js writes them, runScene below switches data-state on a timer and
+     these rules do the rest. Everything is placed in % of the stage width (cqi), so a scene
+     scales as one picture. Colours are the pause's: a dark stage, a lighter desk, gold for
+     what glows; things inside have pixel corners (.px-clip) instead of round ones ── */
+  .sprites {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
   }
-  .say img {
-    flex: none;
-    width: 56px;
-    height: 56px;
-    border-radius: var(--r-ctl);
-    image-rendering: pixelated;
-  }
-  .say .kick {
-    margin-bottom: var(--s1);
-  }
-  .say p:last-child {
-    font-size: var(--fs-title);
-    line-height: 1.4;
-  }
-
-  /* Design: each solution reads as the main site's: a small stepper and «Решение 1 из 4», the
-     name and its aim; the problem and what we did side by side; one scene, the phones with the
-     changes beside them; the options dropped on the way; the test result in big numbers */
-  .sol-h {
-    display: flex;
-    align-items: center;
-    gap: var(--s3);
-    margin-bottom: var(--s3);
-  }
-  .sol-h .kick {
-    margin: 0;
-  }
-  .stepper {
-    display: flex;
-    gap: var(--s1);
-  }
-  .stepper a {
-    display: grid;
-    place-items: center;
-    width: 24px;
-    height: 24px;
-    border-radius: var(--r-ctl);
-    background: var(--fill-2);
-    font-size: var(--fs-cap);
-    color: var(--ink-3);
-    text-decoration: none;
-  }
-  .stepper a:hover {
+  .toon {
+    --s-card: #18212b;
+    --s-raised: #24303c;
+    --s-desk: #1b242e;
+    --s-desk-top: #2b3743;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    container-type: inline-size;
     color: var(--ink);
   }
-  .stepper a.on {
+  .toon .sprite {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .toon .px-clip {
+    --px-step: 0.8cqi;
+    clip-path: polygon(0 calc(var(--px-step) * 2), var(--px-step) calc(var(--px-step) * 2), var(--px-step) var(--px-step), calc(var(--px-step) * 2) var(--px-step), calc(var(--px-step) * 2) 0, calc(100% - var(--px-step) * 2) 0, calc(100% - var(--px-step) * 2) var(--px-step), calc(100% - var(--px-step)) var(--px-step), calc(100% - var(--px-step)) calc(var(--px-step) * 2), 100% calc(var(--px-step) * 2), 100% calc(100% - var(--px-step) * 2), calc(100% - var(--px-step)) calc(100% - var(--px-step) * 2), calc(100% - var(--px-step)) calc(100% - var(--px-step)), calc(100% - var(--px-step) * 2) calc(100% - var(--px-step)), calc(100% - var(--px-step) * 2) 100%, calc(var(--px-step) * 2) 100%, calc(var(--px-step) * 2) calc(100% - var(--px-step)), var(--px-step) calc(100% - var(--px-step)), var(--px-step) calc(100% - var(--px-step) * 2), 0 calc(100% - var(--px-step) * 2));
+  }
+  .toon .desk {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    height: 13cqi;
+    background: linear-gradient(var(--s-desk-top) 0.8cqi, var(--s-desk) 0.8cqi);
+  }
+  .toon .guy {
+    position: absolute;
+    bottom: 7cqi;
+    z-index: 2;
+    width: 30cqi;
+  }
+  .toon .face {
+    position: absolute;
+    inset: 0;
+  }
+  /* Blink now and then; each hero on its own beat */
+  .toon .happy {
+    animation: eyes-open 4.2s steps(1, end) infinite;
+  }
+  .toon .blink {
+    animation: eyes-shut 4.2s steps(1, end) infinite;
+  }
+  .toon .b .happy,
+  .toon .b .blink {
+    animation-delay: -1.7s;
+  }
+  @keyframes eyes-open {
+    94% {
+      opacity: 0;
+    }
+  }
+  @keyframes eyes-shut {
+    0% {
+      opacity: 0;
+    }
+    94% {
+      opacity: 1;
+    }
+  }
+  .toon .arm {
+    position: absolute;
+    z-index: 3;
+    width: 4.4cqi;
+    bottom: 15cqi;
+    transform-origin: 50% 100%;
+    opacity: 0;
+  }
+
+  /* Team: the two argue, show the result, the senior comes down with a review */
+  .team .a {
+    left: 8cqi;
+  }
+  .team .b {
+    right: 8cqi;
+  }
+  .team .sad {
+    opacity: 0;
+  }
+  .team:is([data-state='sad'], [data-state='leave']) .guy .sad {
+    opacity: 1;
+  }
+  .team:is([data-state='sad'], [data-state='leave']) .guy :is(.happy, .blink) {
+    visibility: hidden;
+  }
+  .team[data-state='fight'] .a {
+    animation: shake 0.24s steps(2, end) infinite;
+  }
+  .team[data-state='fight'] .b {
+    animation: shake 0.24s steps(2, end) infinite reverse;
+  }
+  @keyframes shake {
+    0% {
+      transform: translate(0.6cqi, 0);
+    }
+    50% {
+      transform: translate(-0.6cqi, -0.6cqi);
+    }
+    100% {
+      transform: translate(0.6cqi, 0);
+    }
+  }
+  .team .cloud {
+    position: absolute;
+    left: 50%;
+    bottom: 9cqi;
+    z-index: 3;
+    width: 60cqi;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.3s steps(3, end);
+  }
+  .team[data-state='fight'] .cloud {
+    transform: translateX(-50%) scale(1);
+  }
+  .team[data-state='fight'] .cloud > .sprite {
+    animation: churn 0.5s steps(2, end) infinite;
+  }
+  @keyframes churn {
+    50% {
+      transform: scaleX(-1) translateY(-0.8cqi);
+    }
+  }
+  .team .puff {
+    position: absolute;
+    width: 6cqi;
+    animation: puff 0.9s steps(3, end) infinite;
+  }
+  .team .p1 {
+    left: -6cqi;
+    top: 2cqi;
+  }
+  .team .p2 {
+    right: -5cqi;
+    top: -2cqi;
+    animation-delay: -0.3s;
+  }
+  .team .p3 {
+    left: 40%;
+    top: -7cqi;
+    animation-delay: -0.6s;
+  }
+  @keyframes puff {
+    0% {
+      transform: translate(0, 0) scale(0.6);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(0, -5cqi) scale(1.2);
+      opacity: 0;
+    }
+  }
+  .team .swear {
+    position: absolute;
+    top: -12cqi;
+    font: 700 9cqi/1 var(--pixel);
+    color: var(--ink);
+    animation: swear 0.6s steps(1, end) infinite;
+  }
+  .team .s1 {
+    left: 10cqi;
+  }
+  .team .s2 {
+    left: 27cqi;
+    top: -16cqi;
+    animation-delay: -0.2s;
+  }
+  .team .s3 {
+    left: 42cqi;
+    animation-delay: -0.4s;
+  }
+  @keyframes swear {
+    50% {
+      transform: translateY(-1.2cqi) rotate(-8deg);
+    }
+  }
+  .team .prop-phone {
+    position: absolute;
+    z-index: 3;
+    left: 34cqi;
+    bottom: 19cqi;
+    width: 8cqi;
+    transform: rotate(-8deg);
+    opacity: 0;
+    transition: opacity 0.2s steps(2, end);
+  }
+  .team .arm {
+    transition: opacity 0.2s steps(2, end);
+  }
+  .team .arm-a {
+    left: 27cqi;
+    transform: rotate(50deg);
+  }
+  .team .arm-b {
+    left: 68.6cqi;
+    transform: rotate(-58deg);
+  }
+  .team[data-state]:not([data-state='fight']) :is(.arm, .prop-phone) {
+    opacity: 1;
+  }
+  .team .elder {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 5;
+    width: 17cqi;
+    transform: translate(-50%, -130%);
+    transition: transform 0.45s steps(5, end);
+  }
+  .team:is([data-state='review'], [data-state='sad']) .elder {
+    transform: translate(-50%, 6cqi);
+  }
+  .team .quest {
+    position: absolute;
+    left: 50%;
+    top: -6cqi;
+    width: 2.6cqi;
+    transform: translateX(-50%);
+    animation: bob 0.8s steps(2, end) infinite;
+  }
+  @keyframes bob {
+    50% {
+      translate: 0 -0.8cqi;
+    }
+  }
+  .team .arm-s {
+    position: absolute;
+    top: 64%;
+    width: 3.4cqi;
+  }
+  .team .arm-s.left {
+    left: -1.6cqi;
+    transform: rotate(-30deg);
+  }
+  .team .arm-s.right {
+    right: -1.6cqi;
+    transform: rotate(30deg);
+  }
+  .team[data-state='review'] .arm-s {
+    animation: wave 0.4s steps(1, end) infinite;
+  }
+  @keyframes wave {
+    50% {
+      translate: 0 -1cqi;
+    }
+  }
+  .team .elder .face {
+    opacity: 0;
+  }
+  .team[data-state='review'] .elder .talk {
+    animation: talk 0.3s steps(1, end) infinite;
+  }
+  @keyframes talk {
+    50% {
+      opacity: 1;
+    }
+  }
+  /* The game dialog box: light, so it reads on the dark stage; its name in gold */
+  .team .dialog {
+    position: absolute;
+    left: 50%;
+    top: 26cqi;
+    z-index: 6;
+    width: 72cqi;
+    padding: 2.4cqi 3.2cqi 2.8cqi;
     background: var(--ink);
     color: var(--bg);
-    font-weight: 500;
+    transform: translate(-50%, 2cqi);
+    opacity: 0;
+    transition: opacity 0.2s steps(2, end), transform 0.2s steps(2, end);
   }
-  .sol .lead {
-    margin-bottom: var(--s6);
+  .team:is([data-state='review'], [data-state='sad']) .dialog {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
+  .team .dialog-label {
+    display: block;
+    margin-bottom: 0.8cqi;
+    font: 700 max(13px, 3.4cqi)/1 var(--pixel);
+    color: #8a6513;
+  }
+  .team .dialog-text {
+    min-height: 2lh;
+    font-size: max(12px, 3.6cqi);
+    line-height: 1.35;
+  }
+
+  /* Bench: a chest of bank ideas between the two, the loot goes to one of them in turn */
+  .bench .guy {
+    width: 28cqi;
+  }
+  .bench .a {
+    left: 4cqi;
+  }
+  .bench .b {
+    right: 4cqi;
+  }
+  .bench[data-state='got'][data-to='a'] .a,
+  .bench[data-state='got'][data-to='b'] .b {
+    animation: hop 0.5s steps(3, end);
+  }
+  @keyframes hop {
+    50% {
+      transform: translateY(-2.4cqi);
+    }
+  }
+  .bench .arm-a {
+    left: 22cqi;
+    transform: rotate(35deg);
+  }
+  .bench .arm-b {
+    left: 73cqi;
+    transform: rotate(-35deg);
+  }
+  .bench[data-to='a']:is([data-state='take'], [data-state='got']) .arm-a,
+  .bench[data-to='b']:is([data-state='take'], [data-state='got']) .arm-b {
+    opacity: 1;
+  }
+  .bench .chest {
+    position: absolute;
+    left: 50%;
+    bottom: 12.4cqi;
+    z-index: 5;
+    width: 20cqi;
+    transform: translateX(-50%);
+  }
+  .bench .chest .open {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .bench:is([data-state='open'], [data-state='rise']) .chest .open {
+    opacity: 1;
+  }
+  .bench:is([data-state='open'], [data-state='rise']) .chest .shut {
+    opacity: 0;
+  }
+  .bench .glint {
+    position: absolute;
+    z-index: 5;
+    width: 1.2cqi;
+    height: 1.2cqi;
+    background: var(--gold);
+    opacity: 0;
+  }
+  .bench .g1 {
+    left: 43cqi;
+    bottom: 24cqi;
+  }
+  .bench .g2 {
+    left: 55cqi;
+    bottom: 26cqi;
+  }
+  .bench .g3 {
+    left: 50cqi;
+    bottom: 29cqi;
+  }
+  .bench:is([data-state='open'], [data-state='rise']) .glint {
+    animation: glint 0.6s steps(2, end) infinite;
+  }
+  .bench[data-state] .g2 {
+    animation-delay: -0.2s;
+  }
+  .bench[data-state] .g3 {
+    animation-delay: -0.4s;
+  }
+  @keyframes glint {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-3cqi);
+    }
+  }
+  .bench .loot {
+    position: absolute;
+    z-index: 6;
+    left: 50cqi;
+    top: 52cqi;
+    display: grid;
+    place-items: center;
+    width: 12cqi;
+    height: 12cqi;
+    border-radius: 22%;
+    overflow: hidden;
+    transform: translate(-50%, 0) scale(0.4);
+    opacity: 0;
+    transition: left 0.45s steps(5, end), top 0.45s steps(5, end), transform 0.45s steps(5, end), opacity 0.2s steps(2, end);
+  }
+  .bench .loot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .bench .loot.tile {
+    background: #fff;
+  }
+  .bench .loot.tile img {
+    width: 66%;
+    height: 66%;
+  }
+  .bench[data-state='open'] .loot {
+    transition: none;
+  }
+  .bench[data-state='rise'] .loot {
+    top: 9cqi;
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  .bench[data-state='take'] .loot {
+    top: 40cqi;
+    transform: translate(-50%, 0) scale(0.7);
+    opacity: 1;
+  }
+  .bench[data-to='a']:is([data-state='take'], [data-state='got']) .loot {
+    left: 30cqi;
+  }
+  .bench[data-to='b']:is([data-state='take'], [data-state='got']) .loot {
+    left: 70cqi;
+  }
+  .bench[data-state='got'] .loot {
+    top: 46cqi;
+    transform: translate(-50%, 0) scale(0.4);
+    opacity: 0;
+  }
+  /* The loot's tooltip, as in an MMO: what it is and what it gives */
+  .bench .tooltip {
+    --px-step: 0.6cqi;
+    position: absolute;
+    left: 50%;
+    top: 24cqi;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4cqi;
+    padding: 1.4cqi 3cqi 1.8cqi;
+    background: var(--s-raised);
+    white-space: nowrap;
+    transform: translate(-50%, 1.6cqi);
+    opacity: 0;
+    transition: opacity 0.2s steps(2, end), transform 0.2s steps(2, end);
+  }
+  .bench[data-state='rise'] .tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition-delay: 0.3s;
+  }
+  .bench .tooltip-bank {
+    font: 700 max(13px, 3.2cqi)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .bench .tooltip-idea {
+    font-size: max(13px, 3.8cqi);
+    font-weight: 600;
+  }
+
+  /* Testing: the prototype's research flow, a card at a time, then the session replay */
+  .testing {
+    --fs-xs: max(10px, 2.3cqi);
+    --fs-s: max(11px, 2.8cqi);
+    --fs-m: max(13px, 3.6cqi);
+    --fs-l: max(16px, 5cqi);
+  }
+  .testing .tcard {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6cqi;
+    width: 58cqi;
+    padding: 4cqi;
+    background: var(--s-card);
+    transform: translate(-50%, calc(-50% + 2cqi));
+    opacity: 0;
+    transition: opacity 0.25s steps(3, end), transform 0.25s steps(3, end);
+  }
+  .testing .session {
+    position: absolute;
+    inset: 6cqi;
+    display: flex;
+    gap: 3cqi;
+    justify-content: center;
+    opacity: 0;
+  }
+  .testing[data-state='start'] .start,
+  .testing[data-state='task'] .task,
+  .testing[data-state='seq'] .seq,
+  .testing[data-state='summary'] .summary,
+  .testing[data-state='done'] .done {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  /* Fades in only: on the way out the replay would visibly rewind */
+  .testing[data-state='session'] .session {
+    opacity: 1;
+    transition: opacity 0.25s steps(3, end);
+  }
+  .testing .kicker {
+    font: 700 var(--fs-s)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .testing .card-title {
+    font-size: var(--fs-l);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+  .testing .card-text {
+    font-size: var(--fs-m);
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .testing .field-label {
+    margin-top: 1cqi;
+    font-size: var(--fs-s);
+    color: var(--ink-3);
+  }
+  .testing .field {
+    --px-step: 0.5cqi;
+    display: flex;
+    align-items: center;
+    height: 8cqi;
+    padding: 0 2.4cqi;
+    background: var(--s-raised);
+    font-size: var(--fs-m);
+  }
+  .testing .caret {
+    width: 0.4cqi;
+    height: 4cqi;
+    margin-left: 0.3cqi;
+    background: var(--gold);
+    animation: caret 0.8s steps(1, end) infinite;
+  }
+  @keyframes caret {
+    50% {
+      opacity: 0;
+    }
+  }
+  .testing .sbtn {
+    --px-step: 0.6cqi;
+    display: grid;
+    place-items: center;
+    height: 8cqi;
+    margin-top: 1cqi;
+    background: var(--gold);
+    color: var(--gold-ink);
+    font: 700 var(--fs-m)/1 var(--pixel);
+  }
+  .testing .mini-phone {
+    position: relative;
+    flex: none;
+    width: 30cqi;
+    background: #000;
+  }
+  .testing .shot {
+    position: absolute;
+    inset: 1cqi;
+    width: calc(100% - 2cqi);
+    height: calc(100% - 2cqi);
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+  }
+  .testing .shot.on {
+    opacity: 1;
+  }
+  .testing .log {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2cqi;
+    flex: 1 1 auto;
+    max-width: 52cqi;
+    padding: 3cqi;
+    background: var(--s-card);
+  }
+  .testing .timer {
+    font-size: var(--fs-l);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: var(--gold);
+  }
+  .testing .tline {
+    position: relative;
+    height: 0.8cqi;
+    background: var(--s-raised);
+  }
+  .testing .tline-fill {
+    position: absolute;
+    inset: 0 100% 0 0;
+    background: var(--gold);
+  }
+  .testing[data-state='session'] .tline-fill {
+    animation: fill 4.4s linear forwards;
+  }
+  @keyframes fill {
+    to {
+      right: 0;
+    }
+  }
+  .testing .log ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4cqi;
+    margin: 0.6cqi 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Rows apart by a fill, not a rule */
+  .testing .log li {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 1.4cqi;
+    align-items: baseline;
+    padding: 0.9cqi 1.2cqi;
+    background: rgb(255 255 255 / 0.03);
+    font-size: var(--fs-xs);
+    white-space: nowrap;
+    opacity: 0;
+  }
+  .testing .log li.on {
+    opacity: 1;
+  }
+  .testing .log-t {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+  }
+  .testing .log-kind {
+    font-family: var(--pixel);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .testing .log-kind:is(.start, .finish) {
+    color: var(--gold);
+  }
+  .testing .log-what {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .testing .seq .card-title {
+    font-size: var(--fs-m);
+    line-height: 1.35;
+  }
+  .testing .scale {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1cqi;
+  }
+  .testing .pick {
+    --px-step: 0.5cqi;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background: var(--s-raised);
+    font-size: var(--fs-m);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .testing .pick.on {
+    background: var(--gold);
+    color: var(--gold-ink);
+  }
+  .testing .scale-ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
+  .testing .summary {
+    width: 78cqi;
+  }
+  .testing table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-s);
+  }
+  .testing :is(th, td) {
+    padding: 1.2cqi 1cqi 1.2cqi 0;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .testing tbody tr:nth-child(odd) {
+    background: rgb(255 255 255 / 0.03);
+  }
+  .testing th {
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    color: var(--ink-3);
+  }
+  .testing td:first-child {
+    padding-left: 1cqi;
+  }
+  .testing td:nth-child(n + 2) {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--gold);
+  }
+  .testing .sbar {
+    display: block;
+    width: 10cqi;
+    height: 0.6cqi;
+    margin-top: 0.4cqi;
+    background: linear-gradient(var(--gold), var(--gold)) 0 0 / 0 100% no-repeat var(--s-raised);
+  }
+  .testing[data-state='summary'] .sbar {
+    background-size: var(--v) 100%;
+    transition: background-size 0.9s steps(8, end);
+  }
+  .testing .done {
+    align-items: flex-start;
+  }
+  .testing .check {
+    --px-step: 0.6cqi;
+    display: grid;
+    place-items: center;
+    width: 10cqi;
+    height: 10cqi;
+    background: var(--gold);
+    color: var(--gold-ink);
+  }
+  .testing .check svg {
+    width: 6cqi;
+    height: 6cqi;
+  }
+  /* The pixel gauntlet of the main site's cursor; the script aims it at what is tapped */
+  .testing .cursor {
+    position: absolute;
+    z-index: 10;
+    left: 86%;
+    top: 86%;
+    width: 5cqi;
+    height: auto;
+    image-rendering: pixelated;
+    transition: left 0.4s steps(5, end), top 0.4s steps(5, end);
+  }
+  .testing .cursor.press {
+    animation: press 0.25s steps(2, end);
+  }
+  @keyframes press {
+    50% {
+      transform: scale(0.82) translateY(0.4cqi);
+    }
+  }
+  .testing:is([data-state='summary'], [data-state='done']) .cursor {
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .testing .cursor {
+      display: none;
+    }
+  }
+
+  /* The takeaway, said by the party from the scenes: the two sprites and a bubble beside them */
+  .say {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--s4);
+    margin: var(--s6) 0 0;
+    max-width: 820px;
+  }
+  .party {
+    display: flex;
+    gap: var(--s1);
+    flex: none;
+  }
+  .member {
+    position: relative;
+    width: 56px;
+  }
+  .member .sprite {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .member .face {
+    position: absolute;
+    inset: 0;
+  }
+  .bubble {
+    margin: 0;
+    padding: var(--pad);
+    border-radius: var(--r) var(--r) var(--r) var(--s1);
+    background: var(--fill-2);
+  }
+  .bubble .kick {
+    margin-bottom: var(--s2);
+  }
+  .bubble p:last-child {
+    font-size: var(--fs-title);
+    line-height: 1.45;
+  }
+
+  /* Design: each solution under «Решение 1 из 4», its name and aim; the problem and what we
+     did on one card, two columns; the phones with the changes beside them; the options dropped
+     on the way; the test result on a card */
   .ps {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s7);
-    margin-bottom: var(--s6);
+    margin-bottom: var(--gap);
     color: var(--ink-2);
   }
   .ps .prose {
@@ -2318,6 +3040,11 @@
     padding: var(--s7) var(--s7) var(--s6);
     border-radius: var(--r);
     background: var(--fill);
+  }
+  .duo .ch-k {
+    font: 700 var(--fs-px)/1 var(--pixel);
+    letter-spacing: 0;
+    text-transform: none;
   }
   .duo-m {
     display: flex;
@@ -2378,7 +3105,7 @@
   .vars-row {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s5);
+    gap: var(--gap);
   }
   .var {
     display: grid;
@@ -2406,10 +3133,11 @@
     color: var(--ink);
   }
   .var-tag {
+    font: 700 var(--fs-px)/1 var(--pixel);
     color: var(--ink-3);
   }
   .var.yes .var-tag {
-    color: var(--green);
+    color: var(--gold);
   }
   /* The test result: a line on what it means, then the numbers large */
   .outcome {
@@ -2417,7 +3145,7 @@
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--s2) var(--s7);
     align-items: start;
-    margin-top: var(--s6);
+    margin-top: var(--gap);
   }
   .outcome .kick {
     grid-column: 1 / -1;
@@ -2570,7 +3298,10 @@
   .bars {
     display: grid;
     gap: var(--s4);
-    margin-bottom: var(--s6);
+    margin-bottom: var(--gap);
+  }
+  .bars .kick {
+    margin-bottom: 0;
   }
   .bar {
     display: grid;
@@ -2653,8 +3384,8 @@
 
   @media (max-width: 860px) {
     .intro,
-    .how,
-    .qs li,
+    .cs .box.chapter,
+    .qs ol,
     .grid.two,
     .grid.three,
     .sub-h,
@@ -2702,8 +3433,21 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--s5) var(--s4);
     }
-    .qs li {
-      gap: var(--s1);
+    .cs .box.chapter {
+      gap: 0;
+      padding: 0;
+    }
+    .say {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s3);
+    }
+    .bubble {
+      border-radius: var(--s1) var(--r) var(--r) var(--r);
+    }
+    .chapter-copy {
+      padding: var(--pad);
+      order: 2;
     }
     .nums {
       flex-wrap: wrap;
@@ -2878,55 +3622,76 @@
       <!-- The PSB case, the only open one. Built by tools/case-psb/build.js from its data.js:
            edit those and run `node tools/case-psb/build.js`, not this block -->
       <!-- case:psb -->
-<nav class="toc" aria-label="Части кейса"><a href="#c-overview">Обзор</a><a href="#c-process">Исследование</a><a href="#c-home">Дизайн</a><a href="#c-testing">Тестирование</a><a href="#c-outcome">Выводы</a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
-  <div class="kpi"><div><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
+  <div class="kpi"><div class="box"><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
   <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
-  <div class="intro"><div><p class="kick">Вступление</p><div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div></div><aside class="about">
-    <div><p class="kick">Команда</p><p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>2 продуктовых дизайнера</span></p></div>
-    <div><p class="kick">Проект</p><p class="pills"><span class="pill">Финтех</span><span class="pill">B2C</span><span class="pill">Мобильное приложение</span><span class="pill">Концепт 2026</span></p></div>
-    <div><p class="kick">Инструменты</p><p class="pills"><span class="pill tool"><img src="img/tools/figma.svg" alt="" />Figma</span><span class="pill tool"><img src="img/tools/claude.svg" alt="" />Claude</span><span class="pill tool"><img src="img/tools/codex.svg" alt="" />Codex</span><span class="pill tool"><img src="img/tools/mobbin.svg" alt="" />Mobbin</span><span class="pill tool"><img src="img/tools/rive.svg" alt="" />Rive</span></p></div>
+  <div class="intro"><div><p class="kick">Вступление</p><div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div></div><aside class="box about">
+    <div><p class="kick">Отряд</p><p class="team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>2 продуктовых дизайнера</p></div>
+    <div><p class="kick">Проект</p><p>Финтех, B2C, Мобильное приложение, Концепт 2026</p></div>
+    <div><p class="kick">Инструменты</p><p class="tools"><span><img src="img/tools/figma.svg" alt="" />Figma</span><span><img src="img/tools/claude.svg" alt="" />Claude</span><span><img src="img/tools/codex.svg" alt="" />Codex</span><span><img src="img/tools/mobbin.svg" alt="" />Mobbin</span><span><img src="img/tools/rive.svg" alt="" />Rive</span></p></div>
   </aside></div>
-  <div class="qs"><p class="kick">Проблемы и решения</p><ol><li><a class="qc" href="#c-home">Главная</a><p class="was">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</p><p>Баланс, частые действия и история наверху, а предложения банка можно закрыть</p></li><li><a class="qc" href="#c-card-data">Данные карты</a><p class="was">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</p><p>Их можно посмотреть и скопировать на одном экране, без кода из СМС</p></li><li><a class="qc" href="#c-cashback">Подключение кешбэка</a><p class="was">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</p><p>Одна кнопка рядом с условиями, и сразу выбор категорий</p></li><li><a class="qc" href="#c-categories">Кешбэк после подключения</a><p class="was">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</p><p>Их можно выбрать на месяц вперёд и поменять до его начала</p></li></ol></div>
+  <div class="qs"><h3 class="sub">Проблемы и решения</h3><ol><li><a class="box qc" href="#c-home"><span class="qn">Решение 1</span><b>Главная</b><span class="was">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</span><span class="now">Баланс, частые действия и история наверху, а предложения банка можно закрыть</span></a></li><li><a class="box qc" href="#c-card-data"><span class="qn">Решение 2</span><b>Данные карты</b><span class="was">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</span><span class="now">Их можно посмотреть и скопировать на одном экране, без кода из СМС</span></a></li><li><a class="box qc" href="#c-cashback"><span class="qn">Решение 3</span><b>Подключение кешбэка</b><span class="was">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</span><span class="now">Одна кнопка рядом с условиями, и сразу выбор категорий</span></a></li><li><a class="box qc" href="#c-categories"><span class="qn">Решение 4</span><b>Кешбэк после подключения</b><span class="was">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</span><span class="now">Их можно выбрать на месяц вперёд и поменять до его начала</span></a></li></ol></div>
 </section>
-<p class="part"><span>Финальные экраны</span></p>
 <section class="ch" id="c-screens">
   <h2>Финальные экраны</h2>
   <p class="lead">Экраны рабочего прототипа, на котором проходил юзабилити-тест: каждый открывает свой сценарий, а внутри всё приложение целиком.</p>
   <div class="stage wide"><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Главная" loading="lazy" decoding="async" /></div></div><figcaption>Главная</figcaption></figure><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/race/card-data.webp" alt="Данные карты" loading="lazy" decoding="async" /></div></div><figcaption>Данные карты</figcaption></figure><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/cb-off.webp" alt="Подключение кешбэка" loading="lazy" decoding="async" /></div></div><figcaption>Подключение кешбэка</figcaption></figure></div>
   <div class="kit"><p>Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.</p><div class="kit-links"><a class="btn" href="https://www.figma.com/design/CzUlWtfXzInfjatugJLjQ1/PSB-Bank-Redesign-Concept?node-id=0-1" target="_blank" rel="noopener">UI-кит в Figma</a><a class="btn" href="https://www.figma.com/design/CzUlWtfXzInfjatugJLjQ1/PSB-Bank-Redesign-Concept?node-id=25-284" target="_blank" rel="noopener">Проект в Figma</a></div></div>
 </section>
-<p class="part"><span>Исследование</span></p>
 <section class="ch" id="c-process">
   <h2>Как мы работали</h2>
-  <div class="how"><div class="grid"><div class="tile"><p class="n">[01]</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="tile"><p class="n">[02]</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="tile"><p class="n">[03]</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="tile"><p class="n">[04]</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div>
-  <figure class="walk"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video><figcaption>Прохождение прототипа на телефоне</figcaption></figure></div>
+  <div class="chapters"><article class="box chapter"><div class="chapter-copy"><p class="n">01</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="chapter-media"><div class="toon team" data-scene="team" role="img" aria-label="Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»">
+  <div class="desk"></div>
+  <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-sad"/></svg></div>
+  <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-sad"/></svg></div>
+  <div class="arm arm-a"><svg class="sprite" viewBox="0 0 4 7" aria-hidden="true" focusable="false"><use href="#spr-arm-sword"/></svg></div>
+  <div class="prop-phone"><svg class="sprite" viewBox="0 0 8 12" aria-hidden="true" focusable="false"><use href="#spr-phone"/></svg></div>
+  <div class="arm arm-b"><svg class="sprite" viewBox="0 0 4 7" aria-hidden="true" focusable="false"><use href="#spr-arm-mage"/></svg></div>
+  <div class="cloud"><svg class="sprite" viewBox="0 0 44 22" aria-hidden="true" focusable="false"><use href="#spr-cloud"/></svg><span class="puff p1"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p2"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p3"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="swear s1">#</span><span class="swear s2">!</span><span class="swear s3">@</span></div>
+  <div class="elder"><span class="quest"><svg class="sprite" viewBox="0 0 4 9" aria-hidden="true" focusable="false"><use href="#spr-quest"/></svg></span><span class="arm-s left"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><span class="arm-s right"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder"/></svg><svg class="sprite face angry" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-angry"/></svg><svg class="sprite face talk" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-talk"/></svg></div>
+  <div class="dialog px-clip" aria-hidden="true"><span class="dialog-label">Ревью сеньора</span><p class="dialog-text"><span data-type-ru="Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?" data-type-en="Cards above the account, and the balance is tiny. Do you even get what you’ve made?"></span></p></div>
+</div></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">02</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="chapter-media"><div class="toon bench" data-scene="bench" data-banks-ru="[{&quot;name&quot;:&quot;Сбер&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Флип карты&quot;},{&quot;name&quot;:&quot;Ozon Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Копирование иконкой&quot;},{&quot;name&quot;:&quot;Т-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Акцент на скорости&quot;},{&quot;name&quot;:&quot;Альфа-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Кешбэк в таббаре&quot;},{&quot;name&quot;:&quot;Райффайзен&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Кешбэк в бейдже&quot;}]" data-banks-en="[{&quot;name&quot;:&quot;Sber&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Card flip&quot;},{&quot;name&quot;:&quot;Ozon Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Copy icon&quot;},{&quot;name&quot;:&quot;T-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Focus on speed&quot;},{&quot;name&quot;:&quot;Alfa-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Cashback in the tab bar&quot;},{&quot;name&quot;:&quot;Raiffeisen&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Cashback in a badge&quot;}]" role="img" aria-label="Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже">
+  <div class="desk"></div>
+  <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg></div>
+  <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg></div>
+  <div class="arm arm-a"><svg class="sprite" viewBox="0 0 4 7" aria-hidden="true" focusable="false"><use href="#spr-arm-sword"/></svg></div>
+  <div class="arm arm-b"><svg class="sprite" viewBox="0 0 4 7" aria-hidden="true" focusable="false"><use href="#spr-arm-mage"/></svg></div>
+  <div class="chest"><svg class="sprite shut" viewBox="0 0 16 8" aria-hidden="true" focusable="false"><use href="#spr-chest"/></svg><svg class="sprite open" viewBox="0 0 16 8" aria-hidden="true" focusable="false"><use href="#spr-chest-open"/></svg></div>
+  <span class="glint g1"></span><span class="glint g2"></span><span class="glint g3"></span>
+  <span class="loot tile" data-loot aria-hidden="true"><img src="img/psb/banks/sber.svg" alt="" data-logo /></span>
+  <div class="tooltip px-clip" aria-hidden="true"><span class="tooltip-bank" data-bank></span><span class="tooltip-idea" data-idea></span></div>
+</div></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">03</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="chapter-media"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div></article><article class="box chapter"><div class="chapter-copy"><p class="n">04</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div><div class="chapter-media"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
+  <div class="tcard start px-clip"><span class="kicker">Юзабилити-тест ПСБ</span><span class="card-title">Начать тест</span><span class="field-label">Ваше имя</span><span class="field px-clip" data-target="field"><span data-type-ru="Участник 12" data-type-en="Participant 12"></span><i class="caret"></i></span><span class="sbtn px-clip" data-target="start">Начать тест</span></div>
+  <div class="tcard task px-clip"><span class="kicker">Задание</span><span class="card-title">Первое подключение кешбэка</span><span class="card-text">Подключите кешбэк и выберите три категории на этот месяц.</span><span class="sbtn px-clip" data-target="go">Старт</span></div>
+  <div class="session"><div class="mini-phone px-clip"><img class="shot on" src="img/psb/scene/cb-off.webp" alt="" loading="lazy" decoding="async" data-screen="0" /><img class="shot" src="img/psb/scene/cb-connect.webp" alt="" loading="lazy" decoding="async" data-screen="1" /><img class="shot" src="img/psb/scene/success.webp" alt="" loading="lazy" decoding="async" data-screen="2" /></div><div class="log px-clip"><span class="kicker">Повтор сессии</span><span class="timer" data-timer>+00:00.0</span><span class="tline"><span class="tline-fill"></span></span><ol><li data-row="0"><span class="log-t">+00:00.0</span><span class="log-kind start">start</span><span class="log-what">Первое подключение кешбэка</span></li><li data-row="1"><span class="log-t">+00:04.3</span><span class="log-kind tap">tap</span><span class="log-what">Хочу подключить</span></li><li data-row="2"><span class="log-t">+00:08.1</span><span class="log-kind tap">tap</span><span class="log-what">7% Деливери</span></li><li data-row="3"><span class="log-t">+00:11.1</span><span class="log-kind tap">tap</span><span class="log-what">3% На бензин</span></li><li data-row="4"><span class="log-t">+00:14.1</span><span class="log-kind tap">tap</span><span class="log-what">Подключить</span></li><li data-row="5"><span class="log-t">+00:18.3</span><span class="log-kind finish">finish</span><span class="log-what">Кешбэк подключён</span></li></ol></div></div>
+  <div class="tcard seq px-clip"><span class="card-title">Насколько легко было выполнить задание?</span><span class="scale"><span class="pick px-clip" data-pick="1">1</span><span class="pick px-clip" data-pick="2">2</span><span class="pick px-clip" data-pick="3">3</span><span class="pick px-clip" data-pick="4">4</span><span class="pick px-clip" data-pick="5">5</span><span class="pick px-clip" data-pick="6">6</span><span class="pick px-clip" data-pick="7">7</span></span><span class="scale-ends"><span>Очень сложно</span><span>Очень легко</span></span></div>
+  <div class="tcard summary px-clip"><span class="kicker">Саммари по сессиям</span><span class="card-title">30 клиентов ПСБ, 3 задания</span><table><thead><tr><th>Сценарий</th><th>Завершили</th><th>First click</th><th>SEQ</th></tr></thead><tbody><tr><td>Подключить кешбэк</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,5" data-final-en="6.5">6,5</span></td></tr><tr><td>Выбрать категории</td><td><span data-count="30">30</span>/30</td><td><span data-count="100">100</span>%<span class="sbar" style="--v:100%"></span></td><td><span data-final-ru="6,7" data-final-en="6.7">6,7</span></td></tr><tr><td>Скопировать данные карты</td><td><span data-count="30">30</span>/30</td><td><span data-count="83">83</span>%<span class="sbar" style="--v:83%"></span></td><td><span data-final-ru="6,0" data-final-en="6.0">6,0</span></td></tr></tbody></table></div>
+  <div class="tcard done px-clip"><span class="check px-clip" aria-hidden="true"><svg viewBox="0 0 12 12" shape-rendering="crispEdges"><path fill="currentColor" d="M1 6h2v2H1zM2 7h2v2H2zM3 8h2v2H3zM5 7h2v2H5zM6 6h2v2H6zM7 5h2v2H7zM8 4h2v2H8zM9 3h2v2H9zM4 9h2v1H4z"/></svg></span><span class="card-title">Тест завершён</span><span class="card-text">Запись сохранена. Спасибо за участие!</span></div>
+  <img class="cursor" src="img/psb/scene/gauntlet.png" alt="" width="32" height="32" data-cursor />
+</div></div></article></div>
   <div class="sub-h"><h3>Критерии успеха</h3><p>До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.</p></div>
-  <div class="grid three"><div class="tile"><p class="kick">Первый клик</p><p class="big">Человек сразу начинает с правильного действия</p></div><div class="tile"><p class="kick">Время</p><p class="big">Новый путь занимает меньше времени, чем исходный</p></div><div class="tile"><p class="kick">Лёгкость</p><p class="big">Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
+  <div class="grid three"><div class="box tile"><p class="kick">Первый клик</p><p class="big">Человек сразу начинает с правильного действия</p></div><div class="box tile"><p class="kick">Время</p><p class="big">Новый путь занимает меньше времени, чем исходный</p></div><div class="box tile"><p class="kick">Лёгкость</p><p class="big">Путь кажется простым и понятным, оценка по шкале SEQ</p></div></div>
 </section>
 <section class="ch" id="c-interviews">
   <h2>Что показали интервью</h2>
   <p class="lead">Когда масштаб был выбран, мы поговорили с тремя клиентами ПСБ, чтобы сопоставить свои предположения с их опытом.</p>
   <div class="film"><video class="talk" controls playsinline preload="none" data-src-ru="img/psb/interviews.ru.mp4" data-src-en="img/psb/interviews.en.mp4" data-poster-ru="img/psb/interviews-poster.ru.webp" data-poster-en="img/psb/interviews-poster.en.webp" src="img/psb/interviews.ru.mp4" poster="img/psb/interviews-poster.ru.webp" aria-label="Фрагменты интервью"></video></div>
-  <div class="grid three"><div class="tile"><p class="n">[01]</p><h3>Похожие названия сбивали с толку</h3><p>Кешбэк подключался через «Бонусный счёт», а «Кешбэк и скидки» открывал список партнёров.</p></div><div class="tile"><p class="n">[02]</p><h3>Данные карты искали вне приложения</h3><p>Лояльный клиент искал данные своей карты не в приложении: он достал её из кошелька.</p></div><div class="tile"><p class="n">[03]</p><h3>Не сразу верилось, что это банк</h3><p>Экраны выглядели собранными по шаблону, и один участник при первом знакомстве засомневался, что перед ним настоящее приложение банка.</p></div></div>
-  <div class="say"><img src="img/tools/team-mage.svg" alt="" /><div><p class="kick">Вывод</p><p>Одного сокращения пути было недостаточно. Нужно было сделать понятным весь процесс: где найти нужное, как выполнить действие и увидеть результат.</p></div></div>
+  <div class="grid three"><div class="box tile"><p class="n">01</p><h3>Похожие названия сбивали с толку</h3><p>Кешбэк подключался через «Бонусный счёт», а «Кешбэк и скидки» открывал список партнёров.</p></div><div class="box tile"><p class="n">02</p><h3>Данные карты искали вне приложения</h3><p>Лояльный клиент искал данные своей карты не в приложении: он достал её из кошелька.</p></div><div class="box tile"><p class="n">03</p><h3>Не сразу верилось, что это банк</h3><p>Экраны выглядели собранными по шаблону, и один участник при первом знакомстве засомневался, что перед ним настоящее приложение банка.</p></div></div>
+  <figure class="say"><div class="party" aria-hidden="true"><span class="member"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-calm"/></svg></span><span class="member"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-calm"/></svg></span></div><blockquote class="bubble"><p class="kick">Вывод</p><p>Одного сокращения пути было недостаточно. Нужно было сделать понятным весь процесс: где найти нужное, как выполнить действие и увидеть результат.</p></blockquote></figure>
 </section>
-<p class="part"><span>Дизайн</span></p>
 <section class="ch sol" id="c-home">
-  <div class="sol-h"><nav class="stepper" aria-label="Решения"><a class="on" aria-current="step" href="#c-home">1</a><a href="#c-card-data">2</a><a href="#c-cashback">3</a><a href="#c-categories">4</a></nav><p class="kick">Решение 1 из 4</p></div>
-  <h2>Главная страница</h2>
+  <p class="kick">Решение 1 из 4</p><h2>Главная страница</h2>
   <p class="lead">Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.</p>
-  <div class="ps"><div><p class="kick">Проблема</p><div class="prose"><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div></div></div>
+  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="pair"><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/cb-01.webp" alt="Было" loading="lazy" decoding="async" /></div></div><figcaption>Было</figcaption></figure><figure><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Стало" loading="lazy" decoding="async" /></div></div><figcaption>Стало</figcaption></figure></div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Баланс</span><p class="ch-now">«Всего на счетах» наверху, рядом бейдж кешбэка</p><p class="ch-was"><span>Было:</span> «Всего доступно средств» в отдельной карточке</p></li><li><span class="ch-k">Карты и счета</span><p class="ch-now">Карты внутри своих счетов</p><p class="ch-was"><span>Было:</span> Два отдельных списка</p></li><li><span class="ch-k">Частые действия</span><p class="ch-now">QR, перевод, по номеру и пополнение под счетами</p><p class="ch-was"><span>Было:</span> Нет на главной</p></li><li><span class="ch-k">Предложения банка</span><p class="ch-now">Баннеры сверху, их можно закрыть</p><p class="ch-was"><span>Было:</span> Вес как у продуктов, среди счетов и карт</p></li><li><span class="ch-k">Кешбэк</span><p class="ch-now">Бейдж у баланса и вкладка «Выгода»</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» в конце главной</p></li><li><span class="ch-k">История</span><p class="ch-now">На главной, сразу под действиями</p><p class="ch-was"><span>Было:</span> Отдельная вкладка, у каждой карты своя</p></li></ul></div>
-  <div class="vars"><p class="kick">Варианты главной</p><div class="vars-row"><figure class="var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/rejected-barrel.webp" alt="Барабан карт" loading="lazy" decoding="async" /></div></div><figcaption><b>Барабан карт</b><span class="var-tag">Отказались</span><span class="var-note">Мой вариант. Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.</span></figcaption></figure><figure class="var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/home-iter-euro.webp" alt="Европейский стандарт" loading="lazy" decoding="async" /></div></div><figcaption><b>Европейский стандарт</b><span class="var-tag">Отказались</span><span class="var-note">Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.</span></figcaption></figure><figure class="var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Привычная иерархия" loading="lazy" decoding="async" /></div></div><figcaption><b>Привычная иерархия</b><span class="var-tag">Выбрали</span><span class="var-note">Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.</span></figcaption></figure></div></div>
-  <div class="outcome"><p class="kick">Результат теста</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="nums"><div><b>63%</b><span>нашли кешбэк через вкладку «Выгода»</span></div><div><b>37%</b><span>через бейдж у баланса: второй вход не остался незамеченным</span></div></div></div>
+  <div class="vars"><p class="kick">Варианты главной</p><div class="vars-row"><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/rejected-barrel.webp" alt="Барабан карт" loading="lazy" decoding="async" /></div></div><figcaption><b>Барабан карт</b><span class="var-tag">Отказались</span><span class="var-note">Мой вариант. Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.</span></figcaption></figure><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/home-iter-euro.webp" alt="Европейский стандарт" loading="lazy" decoding="async" /></div></div><figcaption><b>Европейский стандарт</b><span class="var-tag">Отказались</span><span class="var-note">Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.</span></figcaption></figure><figure class="box var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Привычная иерархия" loading="lazy" decoding="async" /></div></div><figcaption><b>Привычная иерархия</b><span class="var-tag">Выбрали</span><span class="var-note">Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.</span></figcaption></figure></div></div>
+  <div class="box outcome"><p class="kick">Результат теста</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="nums"><div><b>63%</b><span>нашли кешбэк через вкладку «Выгода»</span></div><div><b>37%</b><span>через бейдж у баланса: второй вход не остался незамеченным</span></div></div></div>
 </section>
 <section class="ch sol" id="c-card-data">
-  <div class="sol-h"><nav class="stepper" aria-label="Решения"><a href="#c-home">1</a><a class="on" aria-current="step" href="#c-card-data">2</a><a href="#c-cashback">3</a><a href="#c-categories">4</a></nav><p class="kick">Решение 2 из 4</p></div>
-  <h2>Данные карты</h2>
+  <p class="kick">Решение 2 из 4</p><h2>Данные карты</h2>
   <p class="lead">Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.</p>
-  <div class="ps"><div><p class="kick">Проблема</p><div class="prose"><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div></div></div>
+  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race>
     <div class="lanes"><div class="lane" data-lane data-sec="42" data-steps="7">
         <p class="lane-h">Было</p>
@@ -2944,13 +3709,12 @@
     <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">Карта внутри счёта, данные на ней</p><p class="ch-was"><span>Было:</span> Третья вкладка в карточке карты</p></li><li><span class="ch-k">CVV</span><p class="ch-now">Сразу, вместе с номером и сроком</p><p class="ch-was"><span>Было:</span> Только по коду из СМС, даже после входа по биометрии</p></li><li><span class="ch-k">Выход из приложения</span><p class="ch-now">Не нужен</p><p class="ch-was"><span>Было:</span> В сообщения за кодом: сам он не подставлялся</p></li><li><span class="ch-k">Копирование</span><p class="ch-now">Кнопка у каждого поля и плашка «Скопировано»</p><p class="ch-was"><span>Было:</span> Удержать поле, пока внизу не появится подсказка</p></li></ul></div>
   
-  <div class="outcome"><p class="kick">Результат теста</p><p>Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>67%</b><span>прошли без единой ошибки</span></div><div><b>6,0<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
+  <div class="box outcome"><p class="kick">Результат теста</p><p>Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>67%</b><span>прошли без единой ошибки</span></div><div><b>6,0<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
 </section>
 <section class="ch sol" id="c-cashback">
-  <div class="sol-h"><nav class="stepper" aria-label="Решения"><a href="#c-home">1</a><a href="#c-card-data">2</a><a class="on" aria-current="step" href="#c-cashback">3</a><a href="#c-categories">4</a></nav><p class="kick">Решение 3 из 4</p></div>
-  <h2>Подключение кешбэка</h2>
+  <p class="kick">Решение 3 из 4</p><h2>Подключение кешбэка</h2>
   <p class="lead">Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.</p>
-  <div class="ps"><div><p class="kick">Проблема</p><div class="prose"><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div></div></div>
+  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race>
     <div class="lanes"><div class="lane" data-lane data-sec="105" data-steps="12">
         <p class="lane-h">Было</p>
@@ -2968,13 +3732,12 @@
     <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">«Выгода» в таббаре и бейдж у баланса</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» внизу главной</p></li><li><span class="ch-k">Выход из приложения</span><p class="ch-now">Не нужен</p><p class="ch-was"><span>Было:</span> В почту за письмом, в браузер по ссылке</p></li><li><span class="ch-k">Согласия</span><p class="ch-now">Одна кнопка рядом с условиями</p><p class="ch-was"><span>Было:</span> Два переключателя и экран, который не открыть</p></li><li><span class="ch-k">Категории</span><p class="ch-now">Сразу, кнопка считает выбранные</p><p class="ch-was"><span>Было:</span> Отдельно, после подключения</p></li><li><span class="ch-k">После подключения</span><p class="ch-now">Кешбэк сразу виден у баланса</p><p class="ch-was"><span>Было:</span> Главная как раньше, пока не перезайдёшь</p></li></ul></div>
   
-  <div class="outcome"><p class="kick">Результат теста</p><p>Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>63%</b><span>прошли без единой ошибки</span></div><div><b>6,5<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
+  <div class="box outcome"><p class="kick">Результат теста</p><p>Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.</p><div class="nums"><div><b>83%</b><span>сразу начали с правильного действия</span></div><div><b>63%</b><span>прошли без единой ошибки</span></div><div><b>6,5<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
 </section>
 <section class="ch sol" id="c-categories">
-  <div class="sol-h"><nav class="stepper" aria-label="Решения"><a href="#c-home">1</a><a href="#c-card-data">2</a><a href="#c-cashback">3</a><a class="on" aria-current="step" href="#c-categories">4</a></nav><p class="kick">Решение 4 из 4</p></div>
-  <h2>Кешбэк после подключения</h2>
+  <p class="kick">Решение 4 из 4</p><h2>Кешбэк после подключения</h2>
   <p class="lead">Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.</p>
-  <div class="ps"><div><p class="kick">Проблема</p><div class="prose"><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div></div></div>
+  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race>
     <div class="lanes"><div class="lane" data-lane data-sec="28.7" data-steps="7">
         <p class="lane-h">Было</p>
@@ -2991,17 +3754,15 @@
       </div></div>
     <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
   </div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Где найти</span><p class="ch-now">«Выгода» в таббаре</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» в конце главной</p></li><li><span class="ch-k">Напоминание</span><p class="ch-now">Плашка «Категории на октябрь» с кнопкой «Выбрать»</p><p class="ch-was"><span>Было:</span> Нет, о новом месяце нужно помнить самому</p></li><li><span class="ch-k">Когда выбирать</span><p class="ch-now">Заранее, и поменять до начала месяца</p><p class="ch-was"><span>Было:</span> Каждый месяц, когда он уже начался</p></li><li><span class="ch-k">Подтверждение</span><p class="ch-now">Кнопка «Подключить» под категориями</p><p class="ch-was"><span>Было:</span> Отдельный экран с юридическими формулировками</p></li></ul></div>
-  <div class="vars"><p class="kick">Варианты блока статистики</p><div class="vars-row"><figure class="var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-2-line.webp" alt="График по месяцам" loading="lazy" decoding="async" /></div></div><figcaption><b>График по месяцам</b><span class="var-tag">Отказались</span><span class="var-note">Выглядел красиво, но не объяснял, за что начислен кешбэк.</span></figcaption></figure><figure class="var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-3-pics.webp" alt="Категории картинками" loading="lazy" decoding="async" /></div></div><figcaption><b>Категории картинками</b><span class="var-tag">Отказались</span><span class="var-note">Понятно, но занимает полэкрана, и выбору на следующий месяц не хватает места.</span></figcaption></figure><figure class="var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-1-month.webp" alt="Полоса по категориям" loading="lazy" decoding="async" /></div></div><figcaption><b>Полоса по категориям</b><span class="var-tag">Выбрали</span><span class="var-note">Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.</span></figcaption></figure></div></div>
-  <div class="outcome"><p class="kick">Результат теста</p><p>Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.</p><div class="nums"><div><b>100%</b><span>сразу начали с правильного действия</span></div><div><b>90%</b><span>прошли без единой ошибки</span></div><div><b>6,7<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
+  <div class="vars"><p class="kick">Варианты блока статистики</p><div class="vars-row"><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-2-line.webp" alt="График по месяцам" loading="lazy" decoding="async" /></div></div><figcaption><b>График по месяцам</b><span class="var-tag">Отказались</span><span class="var-note">Выглядел красиво, но не объяснял, за что начислен кешбэк.</span></figcaption></figure><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-3-pics.webp" alt="Категории картинками" loading="lazy" decoding="async" /></div></div><figcaption><b>Категории картинками</b><span class="var-tag">Отказались</span><span class="var-note">Понятно, но занимает полэкрана, и выбору на следующий месяц не хватает места.</span></figcaption></figure><figure class="box var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/iter-benefit-1-month.webp" alt="Полоса по категориям" loading="lazy" decoding="async" /></div></div><figcaption><b>Полоса по категориям</b><span class="var-tag">Выбрали</span><span class="var-note">Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.</span></figcaption></figure></div></div>
+  <div class="box outcome"><p class="kick">Результат теста</p><p>Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.</p><div class="nums"><div><b>100%</b><span>сразу начали с правильного действия</span></div><div><b>90%</b><span>прошли без единой ошибки</span></div><div><b>6,7<small> из 7</small></b><span>оценка лёгкости</span></div></div></div>
 </section>
-<p class="part"><span>Тестирование</span></p>
 <section class="ch" id="c-testing">
   <h2>Тестирование с 30 клиентами</h2>
   <p class="lead">Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.</p>
   <div data-play>
-    <p class="kick">Медианное время на задачу</p>
-    <div class="bars"><div class="bar"><p>Подключение кешбэка</p><div class="bar-t"><i class="was" style="width:100.0%"><span>105 с</span></i><i class="now" style="--to:21.9%"><span>23 с</span></i></div></div><div class="bar"><p>Данные карты</p><div class="bar-t"><i class="was" style="width:40.0%"><span>42 с</span></i><i class="now" style="--to:16.2%"><span>17 с</span></i></div></div><div class="bar"><p>Выбор категорий</p><div class="bar-t"><i class="was" style="width:27.3%"><span>28,7 с</span></i><i class="now" style="--to:13.3%"><span>14 с</span></i></div></div></div>
-    <div class="grid three"><div class="tile tf"><p class="kick">Подключение кешбэка</p><p class="tf-big"><b>5</b> шагов</p><p class="tf-was"><span class="down">−58%</span><span>было 12</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,5 из 7</b><span>оценка лёгкости</span></div></div></div><div class="tile tf"><p class="kick">Данные карты</p><p class="tf-big"><b>4</b> шага</p><p class="tf-was"><span class="down">−43%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,0 из 7</b><span>оценка лёгкости</span></div></div></div><div class="tile tf"><p class="kick">Выбор категорий</p><p class="tf-big"><b>6</b> шагов</p><p class="tf-was"><span class="down">−14%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">100</span>%</b><span>first click</span></div><div><b>6,7 из 7</b><span>оценка лёгкости</span></div></div></div></div>
+    <div class="box bars"><p class="kick">Медианное время на задачу</p><div class="bar"><p>Подключение кешбэка</p><div class="bar-t"><i class="was" style="width:100.0%"><span>105 с</span></i><i class="now" style="--to:21.9%"><span>23 с</span></i></div></div><div class="bar"><p>Данные карты</p><div class="bar-t"><i class="was" style="width:40.0%"><span>42 с</span></i><i class="now" style="--to:16.2%"><span>17 с</span></i></div></div><div class="bar"><p>Выбор категорий</p><div class="bar-t"><i class="was" style="width:27.3%"><span>28,7 с</span></i><i class="now" style="--to:13.3%"><span>14 с</span></i></div></div></div>
+    <div class="grid three"><div class="box tile tf"><p class="kick">Подключение кешбэка</p><p class="tf-big"><b>5</b> шагов</p><p class="tf-was"><span class="down">−58%</span><span>было 12</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,5 из 7</b><span>оценка лёгкости</span></div></div></div><div class="box tile tf"><p class="kick">Данные карты</p><p class="tf-big"><b>4</b> шага</p><p class="tf-was"><span class="down">−43%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,0 из 7</b><span>оценка лёгкости</span></div></div></div><div class="box tile tf"><p class="kick">Выбор категорий</p><p class="tf-big"><b>6</b> шагов</p><p class="tf-was"><span class="down">−14%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">100</span>%</b><span>first click</span></div><div><b>6,7 из 7</b><span>оценка лёгкости</span></div></div></div></div>
   </div>
   <p class="aside">Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.</p>
 </section>
@@ -3009,14 +3770,14 @@
   <h2>Что сказал сеньор</h2>
   <div class="film"><video class="talk" controls playsinline preload="none" data-src-ru="img/psb/review.ru.mp4" data-src-en="img/psb/review.en.mp4" data-poster-ru="img/psb/review-poster.ru.webp" data-poster-en="img/psb/review-poster.en.webp" src="img/psb/review.ru.mp4" poster="img/psb/review-poster.ru.webp" aria-label="Ревью кейса от сеньор-дизайнера"></video></div>
 </section>
-<p class="part"><span>Выводы</span></p>
 <section class="ch" id="c-outcome">
   <h2>Опыт, который я получил</h2>
   <div class="prose"><p>Проект стал для меня новым опытом во многих отношениях. Мы прекрасно сработались с коллегой и освоили вайбкодинг — отличный инструмент для проверки гипотез. Прототипы в Figma сильно ограничены и то и дело ломаются, а здесь можно собрать живой прототип и получить данные о том, как им пользуются люди. Это расширяет возможности для проверки гипотез и ускоряет итерации.</p><p>Пока я работал над дизайном и изучал конкурентов, вспомнил давний холивар: что важнее, UX или UI? На этом проекте я убедился, что они важны в равной степени. Без хорошего визуала человек может просто не дойти до самых продуманных решений. А с одним визуалом, без сопровождения на всём пути, он не доберётся до результата.</p><p>Отдельное спасибо Игорю Плющу: он делился опытом и ревьюил проект.</p></div>
   <div class="sub-h"><h3>Что бы я ещё протестировал</h3></div>
-  <div class="grid three"><div class="tile"><h3>Вход в кешбэк</h3><p>В тесте кешбэк искали по заданию, а в жизни на него натыкаются случайно. Стоит проверить, заметят ли его сами, и, если подключение в приоритете, попробовать на главной баннер с выгодой.</p></div><div class="tile"><h3>Данные карты</h3><p>Сравнить переворот карты с блоком данных под ней. Участникам старшей возрастной группы переворот, похоже, давался сложнее, особенно тем, у кого ПСБ единственный банк.</p></div><div class="tile"><h3>Подключение кешбэка</h3><p>Часть участников по пути первым делом цепляла плитки предложений. Можно ослабить их визуальный вес и проверить это в следующих итерациях.</p></div></div>
+  <div class="grid three"><div class="box tile"><h3>Вход в кешбэк</h3><p>В тесте кешбэк искали по заданию, а в жизни на него натыкаются случайно. Стоит проверить, заметят ли его сами, и, если подключение в приоритете, попробовать на главной баннер с выгодой.</p></div><div class="box tile"><h3>Данные карты</h3><p>Сравнить переворот карты с блоком данных под ней. Участникам старшей возрастной группы переворот, похоже, давался сложнее, особенно тем, у кого ПСБ единственный банк.</p></div><div class="box tile"><h3>Подключение кешбэка</h3><p>Часть участников по пути первым делом цепляла плитки предложений. Можно ослабить их визуальный вес и проверить это в следующих итерациях.</p></div></div>
 </section>
 </div>
+<svg class="sprites" aria-hidden="true" focusable="false"><symbol id="spr-swordsman" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="9" y="1" width="2" height="1" fill="#8a5d3b"/><rect x="12" y="1" width="2" height="1" fill="#8a5d3b"/><rect x="7" y="2" width="10" height="1" fill="#8a5d3b"/><rect x="18" y="2" width="1" height="1" fill="#8a5d3b"/><rect x="6" y="3" width="14" height="1" fill="#8a5d3b"/><rect x="5" y="4" width="16" height="1" fill="#8a5d3b"/><rect x="5" y="5" width="15" height="1" fill="#8a5d3b"/><rect x="20" y="5" width="1" height="1" fill="#6b4529"/><rect x="4" y="6" width="16" height="1" fill="#8a5d3b"/><rect x="20" y="6" width="1" height="1" fill="#6b4529"/><rect x="4" y="7" width="3" height="1" fill="#8a5d3b"/><rect x="7" y="7" width="1" height="1" fill="#f1d5b8"/><rect x="8" y="7" width="5" height="1" fill="#8a5d3b"/><rect x="13" y="7" width="1" height="1" fill="#f1d5b8"/><rect x="14" y="7" width="5" height="1" fill="#8a5d3b"/><rect x="19" y="7" width="2" height="1" fill="#6b4529"/><rect x="4" y="8" width="2" height="1" fill="#8a5d3b"/><rect x="6" y="8" width="3" height="1" fill="#f1d5b8"/><rect x="9" y="8" width="2" height="1" fill="#8a5d3b"/><rect x="11" y="8" width="5" height="1" fill="#f1d5b8"/><rect x="16" y="8" width="3" height="1" fill="#8a5d3b"/><rect x="19" y="8" width="2" height="1" fill="#6b4529"/><rect x="4" y="9" width="2" height="1" fill="#8a5d3b"/><rect x="6" y="9" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="9" width="2" height="1" fill="#8a5d3b"/><rect x="19" y="9" width="1" height="1" fill="#6b4529"/><rect x="4" y="10" width="1" height="1" fill="#8a5d3b"/><rect x="5" y="10" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="10" width="1" height="1" fill="#e2bc98"/><rect x="18" y="10" width="1" height="1" fill="#8a5d3b"/><rect x="19" y="10" width="1" height="1" fill="#6b4529"/><rect x="4" y="11" width="1" height="1" fill="#8a5d3b"/><rect x="5" y="11" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="11" width="1" height="1" fill="#e2bc98"/><rect x="18" y="11" width="1" height="1" fill="#8a5d3b"/><rect x="19" y="11" width="1" height="1" fill="#6b4529"/><rect x="5" y="12" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="12" width="2" height="1" fill="#e2bc98"/><rect x="6" y="13" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="13" width="1" height="1" fill="#e2bc98"/><rect x="20" y="13" width="1" height="1" fill="#c9ced6"/><rect x="6" y="14" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="14" width="1" height="1" fill="#e2bc98"/><rect x="19" y="14" width="1" height="1" fill="#c9ced6"/><rect x="20" y="14" width="1" height="1" fill="#9aa3b0"/><rect x="7" y="15" width="10" height="1" fill="#f1d5b8"/><rect x="18" y="15" width="1" height="1" fill="#9c7a3c"/><rect x="19" y="15" width="1" height="1" fill="#9aa3b0"/><rect x="9" y="16" width="6" height="1" fill="#f1d5b8"/><rect x="18" y="16" width="1" height="1" fill="#7d6030"/><rect x="7" y="17" width="7" height="1" fill="#cc9097"/><rect x="14" y="17" width="3" height="1" fill="#b0737c"/><rect x="6" y="18" width="9" height="1" fill="#cc9097"/><rect x="15" y="18" width="3" height="1" fill="#b0737c"/><rect x="5" y="19" width="10" height="1" fill="#cc9097"/><rect x="15" y="19" width="4" height="1" fill="#b0737c"/><rect x="5" y="20" width="10" height="1" fill="#cc9097"/><rect x="15" y="20" width="4" height="1" fill="#b0737c"/><rect x="4" y="21" width="12" height="1" fill="#cc9097"/><rect x="16" y="21" width="4" height="1" fill="#b0737c"/><rect x="3" y="22" width="4" height="1" fill="#cc9097"/><rect x="7" y="22" width="4" height="1" fill="#9c7a3c"/><rect x="11" y="22" width="2" height="1" fill="#d6ae55"/><rect x="13" y="22" width="4" height="1" fill="#9c7a3c"/><rect x="17" y="22" width="4" height="1" fill="#b0737c"/><rect x="3" y="23" width="13" height="1" fill="#cc9097"/><rect x="16" y="23" width="5" height="1" fill="#b0737c"/><rect x="3" y="24" width="13" height="1" fill="#cc9097"/><rect x="16" y="24" width="5" height="1" fill="#b0737c"/><rect x="3" y="25" width="13" height="1" fill="#cc9097"/><rect x="16" y="25" width="5" height="1" fill="#b0737c"/></symbol><symbol id="spr-swordsman-happy" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="9" y="11" width="1" height="1" fill="#29251e"/><rect x="14" y="11" width="1" height="1" fill="#29251e"/><rect x="9" y="12" width="1" height="1" fill="#29251e"/><rect x="14" y="12" width="1" height="1" fill="#29251e"/><rect x="7" y="13" width="1" height="1" fill="#e3a99c"/><rect x="16" y="13" width="1" height="1" fill="#e3a99c"/><rect x="11" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="13" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="12" y="15" width="1" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-swordsman-blink" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="9" y="12" width="1" height="1" fill="#29251e"/><rect x="14" y="12" width="1" height="1" fill="#29251e"/><rect x="7" y="13" width="1" height="1" fill="#e3a99c"/><rect x="16" y="13" width="1" height="1" fill="#e3a99c"/><rect x="11" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="13" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="12" y="15" width="1" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-swordsman-sad" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="9" y="9" width="1" height="1" fill="#29251e"/><rect x="14" y="9" width="1" height="1" fill="#29251e"/><rect x="8" y="10" width="1" height="1" fill="#29251e"/><rect x="15" y="10" width="1" height="1" fill="#29251e"/><rect x="9" y="11" width="1" height="1" fill="#29251e"/><rect x="14" y="11" width="1" height="1" fill="#29251e"/><rect x="9" y="12" width="1" height="1" fill="#29251e"/><rect x="14" y="12" width="1" height="1" fill="#29251e"/><rect x="16" y="13" width="1" height="1" fill="#8fb2d6"/><rect x="12" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="16" y="14" width="1" height="1" fill="#8fb2d6"/><rect x="11" y="15" width="1" height="1" fill="#9c5a4a"/><rect x="13" y="15" width="1" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-mage" viewBox="0 0 24 32" shape-rendering="crispEdges"><rect x="15" y="0" width="2" height="1" fill="#3a6ea5"/><rect x="13" y="1" width="1" height="1" fill="#4f81b6"/><rect x="14" y="1" width="2" height="1" fill="#3a6ea5"/><rect x="12" y="2" width="2" height="1" fill="#4f81b6"/><rect x="14" y="2" width="1" height="1" fill="#3a6ea5"/><rect x="11" y="3" width="3" height="1" fill="#4f81b6"/><rect x="14" y="3" width="1" height="1" fill="#3a6ea5"/><rect x="10" y="4" width="4" height="1" fill="#4f81b6"/><rect x="14" y="4" width="1" height="1" fill="#3a6ea5"/><rect x="9" y="5" width="5" height="1" fill="#4f81b6"/><rect x="14" y="5" width="2" height="1" fill="#3a6ea5"/><rect x="8" y="6" width="7" height="1" fill="#4f81b6"/><rect x="15" y="6" width="1" height="1" fill="#3a6ea5"/><rect x="7" y="7" width="8" height="1" fill="#4f81b6"/><rect x="15" y="7" width="2" height="1" fill="#3a6ea5"/><rect x="6" y="8" width="10" height="1" fill="#d6ae55"/><rect x="16" y="8" width="2" height="1" fill="#b38f3d"/><rect x="3" y="9" width="16" height="1" fill="#4f81b6"/><rect x="19" y="9" width="2" height="1" fill="#3a6ea5"/><rect x="1" y="10" width="20" height="1" fill="#4f81b6"/><rect x="21" y="10" width="2" height="1" fill="#3a6ea5"/><rect x="2" y="11" width="20" height="1" fill="#3a6ea5"/><rect x="4" y="12" width="17" height="1" fill="#fbf8f1"/><rect x="21" y="12" width="1" height="1" fill="#ddd5c3"/><rect x="3" y="13" width="5" height="1" fill="#fbf8f1"/><rect x="8" y="13" width="1" height="1" fill="#ddd5c3"/><rect x="9" y="13" width="6" height="1" fill="#fbf8f1"/><rect x="15" y="13" width="1" height="1" fill="#ddd5c3"/><rect x="16" y="13" width="5" height="1" fill="#fbf8f1"/><rect x="21" y="13" width="1" height="1" fill="#ddd5c3"/><rect x="3" y="14" width="3" height="1" fill="#fbf8f1"/><rect x="6" y="14" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="14" width="2" height="1" fill="#e2bc98"/><rect x="19" y="14" width="2" height="1" fill="#fbf8f1"/><rect x="21" y="14" width="1" height="1" fill="#ddd5c3"/><rect x="3" y="15" width="2" height="1" fill="#fbf8f1"/><rect x="5" y="15" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="15" width="2" height="1" fill="#e2bc98"/><rect x="20" y="15" width="1" height="1" fill="#fbf8f1"/><rect x="21" y="15" width="1" height="1" fill="#ddd5c3"/><rect x="3" y="16" width="2" height="1" fill="#fbf8f1"/><rect x="5" y="16" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="16" width="2" height="1" fill="#e2bc98"/><rect x="20" y="16" width="1" height="1" fill="#fbf8f1"/><rect x="21" y="16" width="1" height="1" fill="#ddd5c3"/><rect x="3" y="17" width="2" height="1" fill="#fbf8f1"/><rect x="5" y="17" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="17" width="2" height="1" fill="#e2bc98"/><rect x="20" y="17" width="2" height="1" fill="#ddd5c3"/><rect x="3" y="18" width="2" height="1" fill="#fbf8f1"/><rect x="5" y="18" width="12" height="1" fill="#f1d5b8"/><rect x="17" y="18" width="2" height="1" fill="#e2bc98"/><rect x="20" y="18" width="2" height="1" fill="#ddd5c3"/><rect x="3" y="19" width="2" height="1" fill="#fbf8f1"/><rect x="6" y="19" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="19" width="1" height="1" fill="#e2bc98"/><rect x="20" y="19" width="2" height="1" fill="#ddd5c3"/><rect x="3" y="20" width="3" height="1" fill="#fbf8f1"/><rect x="6" y="20" width="11" height="1" fill="#f1d5b8"/><rect x="17" y="20" width="1" height="1" fill="#e2bc98"/><rect x="19" y="20" width="1" height="1" fill="#fbf8f1"/><rect x="20" y="20" width="2" height="1" fill="#ddd5c3"/><rect x="4" y="21" width="2" height="1" fill="#fbf8f1"/><rect x="7" y="21" width="10" height="1" fill="#f1d5b8"/><rect x="19" y="21" width="2" height="1" fill="#ddd5c3"/><rect x="4" y="22" width="2" height="1" fill="#fbf8f1"/><rect x="9" y="22" width="6" height="1" fill="#f1d5b8"/><rect x="19" y="22" width="2" height="1" fill="#ddd5c3"/><rect x="4" y="23" width="1" height="1" fill="#fbf8f1"/><rect x="7" y="23" width="10" height="1" fill="#d6ae55"/><rect x="20" y="23" width="1" height="1" fill="#ddd5c3"/><rect x="6" y="24" width="9" height="1" fill="#8fb2d6"/><rect x="15" y="24" width="3" height="1" fill="#6f97c4"/><rect x="5" y="25" width="10" height="1" fill="#8fb2d6"/><rect x="15" y="25" width="4" height="1" fill="#6f97c4"/><rect x="4" y="26" width="7" height="1" fill="#8fb2d6"/><rect x="11" y="26" width="2" height="1" fill="#d6ae55"/><rect x="13" y="26" width="3" height="1" fill="#8fb2d6"/><rect x="16" y="26" width="4" height="1" fill="#6f97c4"/><rect x="3" y="27" width="8" height="1" fill="#8fb2d6"/><rect x="11" y="27" width="2" height="1" fill="#d6ae55"/><rect x="13" y="27" width="3" height="1" fill="#8fb2d6"/><rect x="16" y="27" width="5" height="1" fill="#6f97c4"/><rect x="2" y="28" width="15" height="1" fill="#8fb2d6"/><rect x="17" y="28" width="5" height="1" fill="#6f97c4"/><rect x="2" y="29" width="15" height="1" fill="#8fb2d6"/><rect x="17" y="29" width="5" height="1" fill="#6f97c4"/><rect x="2" y="30" width="15" height="1" fill="#8fb2d6"/><rect x="17" y="30" width="5" height="1" fill="#6f97c4"/><rect x="2" y="31" width="15" height="1" fill="#8fb2d6"/><rect x="17" y="31" width="5" height="1" fill="#6f97c4"/></symbol><symbol id="spr-mage-happy" viewBox="0 0 24 32" shape-rendering="crispEdges"><rect x="9" y="17" width="1" height="1" fill="#29251e"/><rect x="14" y="17" width="1" height="1" fill="#29251e"/><rect x="9" y="18" width="1" height="1" fill="#29251e"/><rect x="14" y="18" width="1" height="1" fill="#29251e"/><rect x="7" y="19" width="1" height="1" fill="#e3a99c"/><rect x="16" y="19" width="1" height="1" fill="#e3a99c"/><rect x="11" y="20" width="2" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-mage-blink" viewBox="0 0 24 32" shape-rendering="crispEdges"><rect x="9" y="18" width="1" height="1" fill="#29251e"/><rect x="14" y="18" width="1" height="1" fill="#29251e"/><rect x="7" y="19" width="1" height="1" fill="#e3a99c"/><rect x="16" y="19" width="1" height="1" fill="#e3a99c"/><rect x="11" y="20" width="2" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-mage-sad" viewBox="0 0 24 32" shape-rendering="crispEdges"><rect x="9" y="15" width="1" height="1" fill="#29251e"/><rect x="14" y="15" width="1" height="1" fill="#29251e"/><rect x="8" y="16" width="1" height="1" fill="#29251e"/><rect x="15" y="16" width="1" height="1" fill="#29251e"/><rect x="9" y="17" width="1" height="1" fill="#29251e"/><rect x="14" y="17" width="1" height="1" fill="#29251e"/><rect x="9" y="18" width="1" height="1" fill="#29251e"/><rect x="14" y="18" width="1" height="1" fill="#29251e"/><rect x="16" y="19" width="1" height="1" fill="#8fb2d6"/><rect x="11" y="20" width="2" height="1" fill="#9c5a4a"/><rect x="16" y="20" width="1" height="1" fill="#8fb2d6"/><rect x="10" y="21" width="1" height="1" fill="#9c5a4a"/><rect x="13" y="21" width="1" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-arm-sword" viewBox="0 0 4 7" shape-rendering="crispEdges"><rect x="1" y="0" width="2" height="1" fill="#f1d5b8"/><rect x="0" y="1" width="4" height="1" fill="#f1d5b8"/><rect x="0" y="2" width="4" height="1" fill="#cc9097"/><rect x="0" y="3" width="4" height="1" fill="#cc9097"/><rect x="0" y="4" width="4" height="1" fill="#b0737c"/><rect x="0" y="5" width="4" height="1" fill="#b0737c"/><rect x="0" y="6" width="4" height="1" fill="#b0737c"/></symbol><symbol id="spr-phone" viewBox="0 0 8 12" shape-rendering="crispEdges"><rect x="1" y="0" width="6" height="1" fill="#3d382f"/><rect x="0" y="1" width="3" height="1" fill="#3d382f"/><rect x="3" y="1" width="2" height="1" fill="#29251e"/><rect x="5" y="1" width="3" height="1" fill="#3d382f"/><rect x="0" y="2" width="1" height="1" fill="#3d382f"/><rect x="1" y="2" width="6" height="1" fill="#8fb2d6"/><rect x="7" y="2" width="1" height="1" fill="#3d382f"/><rect x="0" y="3" width="1" height="1" fill="#3d382f"/><rect x="1" y="3" width="1" height="1" fill="#8fb2d6"/><rect x="2" y="3" width="4" height="1" fill="#f7f3ea"/><rect x="6" y="3" width="1" height="1" fill="#8fb2d6"/><rect x="7" y="3" width="1" height="1" fill="#3d382f"/><rect x="0" y="4" width="1" height="1" fill="#3d382f"/><rect x="1" y="4" width="6" height="1" fill="#8fb2d6"/><rect x="7" y="4" width="1" height="1" fill="#3d382f"/><rect x="0" y="5" width="1" height="1" fill="#3d382f"/><rect x="1" y="5" width="1" height="1" fill="#8fb2d6"/><rect x="2" y="5" width="2" height="1" fill="#f7f3ea"/><rect x="4" y="5" width="3" height="1" fill="#8fb2d6"/><rect x="7" y="5" width="1" height="1" fill="#3d382f"/><rect x="0" y="6" width="1" height="1" fill="#3d382f"/><rect x="1" y="6" width="6" height="1" fill="#8fb2d6"/><rect x="7" y="6" width="1" height="1" fill="#3d382f"/><rect x="0" y="7" width="1" height="1" fill="#3d382f"/><rect x="1" y="7" width="1" height="1" fill="#8fb2d6"/><rect x="2" y="7" width="4" height="1" fill="#f7f3ea"/><rect x="6" y="7" width="1" height="1" fill="#8fb2d6"/><rect x="7" y="7" width="1" height="1" fill="#3d382f"/><rect x="0" y="8" width="1" height="1" fill="#3d382f"/><rect x="1" y="8" width="6" height="1" fill="#8fb2d6"/><rect x="7" y="8" width="1" height="1" fill="#3d382f"/><rect x="0" y="9" width="1" height="1" fill="#3d382f"/><rect x="1" y="9" width="1" height="1" fill="#8fb2d6"/><rect x="2" y="9" width="2" height="1" fill="#f7f3ea"/><rect x="4" y="9" width="3" height="1" fill="#8fb2d6"/><rect x="7" y="9" width="1" height="1" fill="#3d382f"/><rect x="0" y="10" width="1" height="1" fill="#3d382f"/><rect x="1" y="10" width="6" height="1" fill="#8fb2d6"/><rect x="7" y="10" width="1" height="1" fill="#3d382f"/><rect x="1" y="11" width="6" height="1" fill="#3d382f"/></symbol><symbol id="spr-arm-mage" viewBox="0 0 4 7" shape-rendering="crispEdges"><rect x="1" y="0" width="2" height="1" fill="#f1d5b8"/><rect x="0" y="1" width="4" height="1" fill="#f1d5b8"/><rect x="0" y="2" width="4" height="1" fill="#d6ae55"/><rect x="0" y="3" width="4" height="1" fill="#8fb2d6"/><rect x="0" y="4" width="4" height="1" fill="#8fb2d6"/><rect x="0" y="5" width="4" height="1" fill="#6f97c4"/><rect x="0" y="6" width="4" height="1" fill="#6f97c4"/></symbol><symbol id="spr-cloud" viewBox="0 0 44 22" shape-rendering="crispEdges"><rect x="24" y="0" width="6" height="1" fill="#fbf8f1"/><rect x="14" y="1" width="6" height="1" fill="#fbf8f1"/><rect x="22" y="1" width="10" height="1" fill="#fbf8f1"/><rect x="12" y="2" width="21" height="1" fill="#fbf8f1"/><rect x="11" y="3" width="23" height="1" fill="#fbf8f1"/><rect x="10" y="4" width="24" height="1" fill="#fbf8f1"/><rect x="10" y="5" width="14" height="1" fill="#fbf8f1"/><rect x="24" y="5" width="11" height="1" fill="#e9e2d3"/><rect x="9" y="6" width="24" height="1" fill="#e9e2d3"/><rect x="33" y="6" width="6" height="1" fill="#fbf8f1"/><rect x="5" y="7" width="6" height="1" fill="#fbf8f1"/><rect x="11" y="7" width="8" height="1" fill="#e9e2d3"/><rect x="19" y="7" width="6" height="1" fill="#fbf8f1"/><rect x="25" y="7" width="7" height="1" fill="#e9e2d3"/><rect x="32" y="7" width="8" height="1" fill="#fbf8f1"/><rect x="4" y="8" width="8" height="1" fill="#fbf8f1"/><rect x="12" y="8" width="5" height="1" fill="#e9e2d3"/><rect x="17" y="8" width="10" height="1" fill="#fbf8f1"/><rect x="27" y="8" width="4" height="1" fill="#e9e2d3"/><rect x="31" y="8" width="10" height="1" fill="#fbf8f1"/><rect x="3" y="9" width="10" height="1" fill="#fbf8f1"/><rect x="13" y="9" width="3" height="1" fill="#e9e2d3"/><rect x="16" y="9" width="12" height="1" fill="#fbf8f1"/><rect x="28" y="9" width="2" height="1" fill="#e9e2d3"/><rect x="30" y="9" width="12" height="1" fill="#fbf8f1"/><rect x="2" y="10" width="12" height="1" fill="#fbf8f1"/><rect x="14" y="10" width="1" height="1" fill="#e9e2d3"/><rect x="15" y="10" width="28" height="1" fill="#fbf8f1"/><rect x="1" y="11" width="28" height="1" fill="#fbf8f1"/><rect x="29" y="11" width="14" height="1" fill="#e9e2d3"/><rect x="1" y="12" width="9" height="1" fill="#e9e2d3"/><rect x="10" y="12" width="4" height="1" fill="#fbf8f1"/><rect x="14" y="12" width="16" height="1" fill="#e9e2d3"/><rect x="30" y="12" width="4" height="1" fill="#fbf8f1"/><rect x="34" y="12" width="9" height="1" fill="#e9e2d3"/><rect x="1" y="13" width="7" height="1" fill="#e9e2d3"/><rect x="8" y="13" width="8" height="1" fill="#fbf8f1"/><rect x="16" y="13" width="12" height="1" fill="#e9e2d3"/><rect x="28" y="13" width="8" height="1" fill="#fbf8f1"/><rect x="36" y="13" width="7" height="1" fill="#e9e2d3"/><rect x="1" y="14" width="7" height="1" fill="#e9e2d3"/><rect x="8" y="14" width="8" height="1" fill="#fbf8f1"/><rect x="16" y="14" width="12" height="1" fill="#e9e2d3"/><rect x="28" y="14" width="8" height="1" fill="#fbf8f1"/><rect x="36" y="14" width="7" height="1" fill="#e9e2d3"/><rect x="1" y="15" width="42" height="1" fill="#e9e2d3"/><rect x="1" y="16" width="36" height="1" fill="#e9e2d3"/><rect x="37" y="16" width="5" height="1" fill="#cbc1ab"/><rect x="2" y="17" width="5" height="1" fill="#cbc1ab"/><rect x="7" y="17" width="30" height="1" fill="#e9e2d3"/><rect x="37" y="17" width="4" height="1" fill="#cbc1ab"/><rect x="3" y="18" width="4" height="1" fill="#cbc1ab"/><rect x="7" y="18" width="30" height="1" fill="#e9e2d3"/><rect x="37" y="18" width="3" height="1" fill="#cbc1ab"/><rect x="4" y="19" width="35" height="1" fill="#cbc1ab"/><rect x="5" y="20" width="31" height="1" fill="#cbc1ab"/><rect x="10" y="21" width="4" height="1" fill="#cbc1ab"/><rect x="17" y="21" width="10" height="1" fill="#cbc1ab"/><rect x="30" y="21" width="4" height="1" fill="#cbc1ab"/></symbol><symbol id="spr-puff" viewBox="0 0 4 4" shape-rendering="crispEdges"><rect x="1" y="0" width="2" height="1" fill="#fbf8f1"/><rect x="0" y="1" width="3" height="1" fill="#fbf8f1"/><rect x="3" y="1" width="1" height="1" fill="#e9e2d3"/><rect x="0" y="2" width="1" height="1" fill="#fbf8f1"/><rect x="1" y="2" width="2" height="1" fill="#e9e2d3"/><rect x="3" y="2" width="1" height="1" fill="#cbc1ab"/><rect x="1" y="3" width="2" height="1" fill="#cbc1ab"/></symbol><symbol id="spr-quest" viewBox="0 0 4 9" shape-rendering="crispEdges"><rect x="1" y="0" width="2" height="1" fill="#d6ae55"/><rect x="0" y="1" width="4" height="1" fill="#d6ae55"/><rect x="0" y="2" width="4" height="1" fill="#d6ae55"/><rect x="0" y="3" width="4" height="1" fill="#d6ae55"/><rect x="1" y="4" width="2" height="1" fill="#d6ae55"/><rect x="1" y="5" width="2" height="1" fill="#d6ae55"/><rect x="1" y="7" width="2" height="1" fill="#d6ae55"/><rect x="1" y="8" width="2" height="1" fill="#d6ae55"/></symbol><symbol id="spr-arm-elder" viewBox="0 0 4 6" shape-rendering="crispEdges"><rect x="1" y="0" width="2" height="1" fill="#f1d5b8"/><rect x="0" y="1" width="4" height="1" fill="#f1d5b8"/><rect x="0" y="2" width="4" height="1" fill="#b7a6d2"/><rect x="0" y="3" width="4" height="1" fill="#b7a6d2"/><rect x="0" y="4" width="4" height="1" fill="#9a87bd"/><rect x="0" y="5" width="4" height="1" fill="#9a87bd"/></symbol><symbol id="spr-elder" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="8" y="2" width="8" height="1" fill="#b7a6d2"/><rect x="6" y="3" width="12" height="1" fill="#b7a6d2"/><rect x="18" y="3" width="1" height="1" fill="#9a87bd"/><rect x="5" y="4" width="13" height="1" fill="#b7a6d2"/><rect x="18" y="4" width="2" height="1" fill="#9a87bd"/><rect x="4" y="5" width="15" height="1" fill="#b7a6d2"/><rect x="19" y="5" width="2" height="1" fill="#9a87bd"/><rect x="4" y="6" width="15" height="1" fill="#b7a6d2"/><rect x="19" y="6" width="2" height="1" fill="#9a87bd"/><rect x="3" y="7" width="4" height="1" fill="#b7a6d2"/><rect x="7" y="7" width="9" height="1" fill="#f1d5b8"/><rect x="16" y="7" width="1" height="1" fill="#e2bc98"/><rect x="17" y="7" width="2" height="1" fill="#b7a6d2"/><rect x="19" y="7" width="2" height="1" fill="#9a87bd"/><rect x="21" y="7" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="8" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="8" width="10" height="1" fill="#f1d5b8"/><rect x="16" y="8" width="2" height="1" fill="#e2bc98"/><rect x="18" y="8" width="1" height="1" fill="#b7a6d2"/><rect x="19" y="8" width="2" height="1" fill="#9a87bd"/><rect x="21" y="8" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="9" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="9" width="10" height="1" fill="#f1d5b8"/><rect x="16" y="9" width="2" height="1" fill="#e2bc98"/><rect x="18" y="9" width="1" height="1" fill="#b7a6d2"/><rect x="19" y="9" width="2" height="1" fill="#9a87bd"/><rect x="21" y="9" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="10" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="10" width="10" height="1" fill="#f1d5b8"/><rect x="16" y="10" width="2" height="1" fill="#e2bc98"/><rect x="18" y="10" width="1" height="1" fill="#b7a6d2"/><rect x="19" y="10" width="2" height="1" fill="#9a87bd"/><rect x="21" y="10" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="11" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="11" width="10" height="1" fill="#f1d5b8"/><rect x="16" y="11" width="2" height="1" fill="#e2bc98"/><rect x="18" y="11" width="1" height="1" fill="#b7a6d2"/><rect x="19" y="11" width="2" height="1" fill="#9a87bd"/><rect x="21" y="11" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="12" width="4" height="1" fill="#b7a6d2"/><rect x="7" y="12" width="9" height="1" fill="#f1d5b8"/><rect x="16" y="12" width="1" height="1" fill="#e2bc98"/><rect x="17" y="12" width="2" height="1" fill="#b7a6d2"/><rect x="19" y="12" width="2" height="1" fill="#9a87bd"/><rect x="21" y="12" width="1" height="1" fill="#7f6ca6"/><rect x="3" y="13" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="13" width="12" height="1" fill="#fbf8f1"/><rect x="18" y="13" width="1" height="1" fill="#ddd5c3"/><rect x="19" y="13" width="2" height="1" fill="#9a87bd"/><rect x="21" y="13" width="1" height="1" fill="#7f6ca6"/><rect x="5" y="14" width="13" height="1" fill="#fbf8f1"/><rect x="18" y="14" width="1" height="1" fill="#ddd5c3"/><rect x="5" y="15" width="13" height="1" fill="#fbf8f1"/><rect x="18" y="15" width="1" height="1" fill="#ddd5c3"/><rect x="4" y="16" width="1" height="1" fill="#b7a6d2"/><rect x="5" y="16" width="12" height="1" fill="#fbf8f1"/><rect x="17" y="16" width="2" height="1" fill="#ddd5c3"/><rect x="19" y="16" width="1" height="1" fill="#9a87bd"/><rect x="4" y="17" width="2" height="1" fill="#b7a6d2"/><rect x="6" y="17" width="11" height="1" fill="#fbf8f1"/><rect x="17" y="17" width="1" height="1" fill="#ddd5c3"/><rect x="18" y="17" width="2" height="1" fill="#9a87bd"/><rect x="3" y="18" width="3" height="1" fill="#b7a6d2"/><rect x="6" y="18" width="10" height="1" fill="#fbf8f1"/><rect x="16" y="18" width="2" height="1" fill="#ddd5c3"/><rect x="18" y="18" width="3" height="1" fill="#9a87bd"/><rect x="2" y="19" width="5" height="1" fill="#b7a6d2"/><rect x="7" y="19" width="9" height="1" fill="#fbf8f1"/><rect x="16" y="19" width="1" height="1" fill="#ddd5c3"/><rect x="17" y="19" width="5" height="1" fill="#9a87bd"/><rect x="2" y="20" width="5" height="1" fill="#b7a6d2"/><rect x="7" y="20" width="8" height="1" fill="#fbf8f1"/><rect x="15" y="20" width="2" height="1" fill="#ddd5c3"/><rect x="17" y="20" width="5" height="1" fill="#9a87bd"/><rect x="1" y="21" width="7" height="1" fill="#b7a6d2"/><rect x="8" y="21" width="6" height="1" fill="#fbf8f1"/><rect x="14" y="21" width="2" height="1" fill="#ddd5c3"/><rect x="16" y="21" width="1" height="1" fill="#b7a6d2"/><rect x="17" y="21" width="6" height="1" fill="#9a87bd"/><rect x="1" y="22" width="8" height="1" fill="#b7a6d2"/><rect x="9" y="22" width="4" height="1" fill="#fbf8f1"/><rect x="13" y="22" width="2" height="1" fill="#ddd5c3"/><rect x="15" y="22" width="2" height="1" fill="#b7a6d2"/><rect x="17" y="22" width="6" height="1" fill="#9a87bd"/><rect x="1" y="23" width="9" height="1" fill="#b7a6d2"/><rect x="10" y="23" width="2" height="1" fill="#fbf8f1"/><rect x="12" y="23" width="2" height="1" fill="#ddd5c3"/><rect x="14" y="23" width="3" height="1" fill="#b7a6d2"/><rect x="17" y="23" width="6" height="1" fill="#9a87bd"/><rect x="1" y="24" width="16" height="1" fill="#b7a6d2"/><rect x="17" y="24" width="6" height="1" fill="#9a87bd"/><rect x="1" y="25" width="16" height="1" fill="#b7a6d2"/><rect x="17" y="25" width="6" height="1" fill="#9a87bd"/></symbol><symbol id="spr-elder-angry" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="7" y="8" width="2" height="1" fill="#a39a88"/><rect x="15" y="8" width="2" height="1" fill="#a39a88"/><rect x="8" y="9" width="3" height="1" fill="#a39a88"/><rect x="13" y="9" width="3" height="1" fill="#a39a88"/><rect x="9" y="10" width="1" height="1" fill="#29251e"/><rect x="14" y="10" width="1" height="1" fill="#29251e"/><rect x="9" y="11" width="1" height="1" fill="#29251e"/><rect x="14" y="11" width="1" height="1" fill="#29251e"/></symbol><symbol id="spr-elder-talk" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="7" y="8" width="2" height="1" fill="#a39a88"/><rect x="15" y="8" width="2" height="1" fill="#a39a88"/><rect x="8" y="9" width="3" height="1" fill="#a39a88"/><rect x="13" y="9" width="3" height="1" fill="#a39a88"/><rect x="9" y="10" width="1" height="1" fill="#29251e"/><rect x="14" y="10" width="1" height="1" fill="#29251e"/><rect x="9" y="11" width="1" height="1" fill="#29251e"/><rect x="14" y="11" width="1" height="1" fill="#29251e"/><rect x="11" y="13" width="2" height="1" fill="#9c5a4a"/><rect x="10" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="11" y="14" width="2" height="1" fill="#29251e"/><rect x="13" y="14" width="1" height="1" fill="#9c5a4a"/><rect x="11" y="15" width="2" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-chest" viewBox="0 0 16 8" shape-rendering="crispEdges"><rect x="2" y="0" width="12" height="1" fill="#7d6030"/><rect x="1" y="1" width="1" height="1" fill="#7d6030"/><rect x="2" y="1" width="12" height="1" fill="#9c7a3c"/><rect x="14" y="1" width="1" height="1" fill="#7d6030"/><rect x="0" y="2" width="1" height="1" fill="#7d6030"/><rect x="1" y="2" width="14" height="1" fill="#9c7a3c"/><rect x="15" y="2" width="1" height="1" fill="#7d6030"/><rect x="0" y="3" width="7" height="1" fill="#7d6030"/><rect x="7" y="3" width="2" height="1" fill="#d6ae55"/><rect x="9" y="3" width="7" height="1" fill="#7d6030"/><rect x="0" y="4" width="7" height="1" fill="#3d382f"/><rect x="7" y="4" width="2" height="1" fill="#b38f3d"/><rect x="9" y="4" width="7" height="1" fill="#3d382f"/><rect x="0" y="5" width="7" height="1" fill="#9c7a3c"/><rect x="7" y="5" width="2" height="1" fill="#d6ae55"/><rect x="9" y="5" width="7" height="1" fill="#9c7a3c"/><rect x="0" y="6" width="16" height="1" fill="#9c7a3c"/><rect x="0" y="7" width="16" height="1" fill="#7d6030"/></symbol><symbol id="spr-chest-open" viewBox="0 0 16 8" shape-rendering="crispEdges"><rect x="1" y="0" width="14" height="1" fill="#7d6030"/><rect x="0" y="1" width="1" height="1" fill="#7d6030"/><rect x="1" y="1" width="14" height="1" fill="#29251e"/><rect x="15" y="1" width="1" height="1" fill="#7d6030"/><rect x="0" y="2" width="1" height="1" fill="#7d6030"/><rect x="1" y="2" width="13" height="1" fill="#d6ae55"/><rect x="14" y="2" width="1" height="1" fill="#b38f3d"/><rect x="15" y="2" width="1" height="1" fill="#7d6030"/><rect x="0" y="3" width="16" height="1" fill="#7d6030"/><rect x="0" y="4" width="7" height="1" fill="#3d382f"/><rect x="7" y="4" width="2" height="1" fill="#b38f3d"/><rect x="9" y="4" width="7" height="1" fill="#3d382f"/><rect x="0" y="5" width="7" height="1" fill="#9c7a3c"/><rect x="7" y="5" width="2" height="1" fill="#d6ae55"/><rect x="9" y="5" width="7" height="1" fill="#9c7a3c"/><rect x="0" y="6" width="16" height="1" fill="#9c7a3c"/><rect x="0" y="7" width="16" height="1" fill="#7d6030"/></symbol><symbol id="spr-swordsman-calm" viewBox="0 0 24 26" shape-rendering="crispEdges"><rect x="9" y="11" width="1" height="1" fill="#29251e"/><rect x="14" y="11" width="1" height="1" fill="#29251e"/><rect x="9" y="12" width="1" height="1" fill="#29251e"/><rect x="14" y="12" width="1" height="1" fill="#29251e"/><rect x="7" y="13" width="1" height="1" fill="#e3a99c"/><rect x="16" y="13" width="1" height="1" fill="#e3a99c"/><rect x="12" y="14" width="1" height="1" fill="#9c5a4a"/></symbol><symbol id="spr-mage-calm" viewBox="0 0 24 32" shape-rendering="crispEdges"><rect x="9" y="17" width="1" height="1" fill="#29251e"/><rect x="14" y="17" width="1" height="1" fill="#29251e"/><rect x="9" y="18" width="1" height="1" fill="#29251e"/><rect x="14" y="18" width="1" height="1" fill="#29251e"/><rect x="7" y="19" width="1" height="1" fill="#e3a99c"/><rect x="16" y="19" width="1" height="1" fill="#e3a99c"/><rect x="11" y="20" width="1" height="1" fill="#9c5a4a"/></symbol></svg>
 <!-- /case:psb -->
     </div>
   </div>
@@ -3487,12 +4248,6 @@
       'Квест:': 'Quest:',
       // The PSB case body, written by tools/case-psb/build.js
       // case:psb
-      "Части кейса": "Parts of the case",
-      "Обзор": "Overview",
-      "Исследование": "Research",
-      "Дизайн": "Design",
-      "Тестирование": "Testing",
-      "Выводы": "Takeaways",
       "с": "s",
       "Подключение кешбэка": "Activating cashback",
       "вместо 105 с, 5 шагов вместо 12": "instead of 105 s, 5 steps instead of 12",
@@ -3504,14 +4259,18 @@
       "из 7": "of 7",
       "Оценка лёгкости": "Ease score",
       "SEQ, среднее по задачам": "SEQ, average across tasks",
+      "Решение 1": "Solution 1",
       "Главная": "Home",
       "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
       "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
+      "Решение 2": "Solution 2",
       "Данные карты": "Card details",
       "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
       "Их можно посмотреть и скопировать на одном экране, без кода из СМС": "They can be viewed and copied on one screen, with no text message code",
+      "Решение 3": "Solution 3",
       "12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение": "12 steps through email and a browser, and the activated cashback didn’t show up until you reopened the app",
       "Одна кнопка рядом с условиями, и сразу выбор категорий": "One button next to the terms, and straight on to choosing categories",
+      "Решение 4": "Solution 4",
       "Кешбэк после подключения": "Cashback after activation",
       "Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало": "Categories had to be chosen every month, and the app never reminded you",
       "Их можно выбрать на месяц вперёд и поменять до его начала": "They can be chosen a month ahead and changed before it starts",
@@ -3521,7 +4280,7 @@
       "Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.": "The cashback terms are good, but activation took 12 steps: jumps to a browser and a mail app, email confirmation, several consents, and at the end it still wasn’t clear whether it had worked.",
       "Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.": "Other flows had their difficulties too: account details are buried deep in the menu, the history is split by card, and viewing the CVV takes a code from a text message even after biometric login.",
       "Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.": "Each of these decisions makes sense on its own, but together they make simple actions harder than they need to be. I set out to find where exactly the difficulties arise and how to make these flows easier.",
-      "Команда": "Team",
+      "Отряд": "Party",
       "2 продуктовых дизайнера": "2 product designers",
       "Проект": "Project",
       "Финтех": "Fintech",
@@ -3534,6 +4293,39 @@
       "Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.": "The screens are built from a UI kit: every component has a spec with its variants, sizes and states.",
       "UI-кит в Figma": "UI kit in Figma",
       "Проект в Figma": "Figma file",
+      "Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»": "Two designers argue, show the mockup to the senior, and the answer is: “Cards above the account, and the balance is tiny. Do you even get what you’ve made?”",
+      "Ревью сеньора": "Senior review",
+      "Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже": "We compared five banks: Sber — card flip, Ozon Bank — copy icon, T-Bank — focus on speed, Alfa-Bank — cashback in the tab bar, Raiffeisen — cashback in a badge",
+      "Прохождение прототипа на телефоне": "Going through the prototype on a phone",
+      "Первое подключение кешбэка": "First cashback activation",
+      "Хочу подключить": "I want to activate",
+      "7% Деливери": "7% Delivery",
+      "3% На бензин": "3% Fuel",
+      "Подключить": "Activate",
+      "Кешбэк подключён": "Cashback activated",
+      "Подключить кешбэк": "Activate cashback",
+      "6,5": "6.5",
+      "Выбрать категории": "Choose categories",
+      "6,7": "6.7",
+      "Скопировать данные карты": "Copy card details",
+      "6,0": "6.0",
+      "Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу": "The test prototype: a participant enters a name and gets a task, every tap goes into the session log, at the end they rate how easy the task was, and the results add up to a table",
+      "Юзабилити-тест ПСБ": "PSB usability test",
+      "Начать тест": "Start the test",
+      "Ваше имя": "Your name",
+      "Задание": "Task",
+      "Подключите кешбэк и выберите три категории на этот месяц.": "Activate cashback and choose three categories for this month.",
+      "Старт": "Start",
+      "Повтор сессии": "Session replay",
+      "Насколько легко было выполнить задание?": "How easy was the task?",
+      "Очень сложно": "Very hard",
+      "Очень легко": "Very easy",
+      "Саммари по сессиям": "Session summary",
+      "30 клиентов ПСБ, 3 задания": "30 PSB customers, 3 tasks",
+      "Сценарий": "Flow",
+      "Завершили": "Completed",
+      "Тест завершён": "Test complete",
+      "Запись сохранена. Спасибо за участие!": "The recording is saved. Thank you for taking part!",
       "Как мы работали": "How we worked",
       "Дизайнили вдвоём, проверяли у сеньора": "Designed as a pair, reviewed by a senior designer",
       "Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.": "While one of us proposed a concept, the other looked for its weak spots, then we swapped roles. We showed the result to a senior designer and, when needed, reworked it based on the feedback.",
@@ -3543,7 +4335,6 @@
       "Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.": "We vibe-coded a prototype for quick testing: it lets you go through the flows on a phone, activate cashback, choose categories and open card details.",
       "Видели путь, а не только финал": "We saw the path, not just the finish",
       "Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.": "The prototype logged what participants did: taps, scrolling, screen transitions, the start and the end of each task.",
-      "Прохождение прототипа на телефоне": "Going through the prototype on a phone",
       "Критерии успеха": "Success criteria",
       "До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.": "Before the redesign we gave five of the bank’s customers a clickable copy of the original screens and watched where they went wrong and how long the tasks took. Activating cashback caused the most trouble. We measured the new design by three signs.",
       "Первый клик": "First click",
@@ -3567,7 +4358,6 @@
       "Стало": "After",
       "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
       "через бейдж у баланса: второй вход не остался незамеченным": "through the badge by the balance: the second way in got noticed",
-      "Решения": "Solutions",
       "Решение 1 из 4": "Solution 1 of 4",
       "Главная страница": "Home screen",
       "Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.": "Everyday tasks and bank offers should be visible at the same time without competing with each other.",
@@ -3627,7 +4417,6 @@
       "Ещё раз": "Replay",
       "сразу начали с правильного действия": "started with the right action",
       "прошли без единой ошибки": "finished without a single error",
-      "6,0": "6.0",
       "оценка лёгкости": "ease score",
       "Решение 2 из 4": "Solution 2 of 4",
       "Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.": "Viewing and copying card details should be a simple, clear action right after opening the app.",
@@ -3660,8 +4449,6 @@
       "«Хочу подключить» в «Выгоде»": "“I want to activate” in “Benefits”",
       "Выбор трёх категорий": "Choosing three categories",
       "Отметил три": "Ticked three",
-      "Кешбэк подключён": "Cashback activated",
-      "6,5": "6.5",
       "Решение 3 из 4": "Solution 3 of 4",
       "Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.": "Cashback is the most popular loyalty program at Russian banks, and activating it should be no harder than reading the terms.",
       "Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».": "One person in the test of the old app gave up searching: “Cashback and discounts” held only a list of partners, and the cashback itself hid in the “Bonus account”.",
@@ -3689,7 +4476,6 @@
       "Главная, вкладка «Выгода»": "Home, the “Benefits” tab",
       "«Категории на октябрь»": "“Categories for October”",
       "Категории выбраны": "Categories chosen",
-      "6,7": "6.7",
       "Решение 4 из 4": "Solution 4 of 4",
       "Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.": "Cashback should pay off every month, not only after the first activation.",
       "В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.": "In an interview someone told us they forget to choose categories at the start of the month, and sometimes can’t find cashback at all. The app never reminded them, and the choose button was easy to miss.",
@@ -6177,7 +6963,6 @@
       () => {
         document.body.classList.add('playing', 'landed');
         window.scrollTo(0, 0);
-        caseBody.spy();
         if (t.veil) t.veil.style.visibility = 'hidden';
       },
       t.anims.length ? LAND_AT : 0,
@@ -6284,31 +7069,10 @@
     if (phone.matches) tabs[cur()].scrollIntoView({ inline: 'nearest', block: 'nearest' });
   });
 
-  /* ── The case body: the chapter in view lit in the contents, options to flip through, films in
-     the page's language, the walkthrough playing only while it is on screen ── */
+  /* ── The case body: the problem cards lead to their solutions, films in the page's language,
+     the walkthrough and the pixel scenes playing only while they are on screen ── */
   const caseBody = (() => {
-    // The bar lives in the body: the case rises in with a transform, which would pin a fixed bar
-    // to the case instead of the screen
-    document.body.append(document.querySelector('.toc'));
-    const tocLinks = [...document.querySelectorAll('.toc a')];
-    // The parts of the case in the bar at the bottom: each link leads to the first chapter of
-    // its part, and the lit one is the last part whose start has passed a third of the screen
-    const parts = tocLinks.map((a) => document.querySelector(a.hash));
-    const spy = () => {
-      if (!document.body.classList.contains('playing')) return;
-      const line = innerHeight / 3;
-      let on = 0;
-      parts.forEach((p, i) => p && p.getBoundingClientRect().top <= line && (on = i));
-      tocLinks.forEach((a, i) => a.classList.toggle('on', i === on));
-    };
-    addEventListener('scroll', spy, { passive: true });
-    tocLinks.forEach((a) =>
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-      }),
-    );
-    // Quests in the overview lead to their solution the same way
+    // The problem cards in the overview lead to their solution, smoothly
     document.querySelectorAll('.qc').forEach((a) =>
       a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -6342,6 +7106,220 @@
       }),
     );
     loops.forEach((v) => seen.observe(v));
+
+    /* Pixel scenes (.toon, ported from the main site's scripts/scenes.ts): a scene is a list of
+       states; the root's data-state switches on a timer and the CSS does the rest. A scene loops
+       only while it is on screen; with reduced motion it stays on its `still` state */
+    const lang = () => (i18n.isEn() ? 'en' : 'ru');
+    function typeOut(el, perChar = 32) {
+      if (!el) return;
+      const text = el.dataset['type' + (lang() === 'en' ? 'En' : 'Ru')] || '';
+      (el._t || []).forEach(clearTimeout);
+      el.textContent = '';
+      el._t = [...text].map((_, n) => setTimeout(() => (el.textContent = text.slice(0, n + 1)), n * perChar));
+    }
+    function runScene(root, steps, still) {
+      if (reduceMotion.matches) {
+        root.dataset.state = still;
+        root.querySelectorAll('[data-type-ru]').forEach((el) => (el.textContent = el.dataset['type' + (lang() === 'en' ? 'En' : 'Ru')]));
+        steps.find((s) => s.state === still)?.enter?.();
+        return;
+      }
+      let i = 0,
+        timer,
+        playing = false;
+      const play = () => {
+        const step = steps[i];
+        root.dataset.state = step.state;
+        step.enter?.();
+        timer = setTimeout(() => {
+          i = (i + 1) % steps.length;
+          play();
+        }, step.ms);
+      };
+      root.dataset.state = steps[0].state;
+      new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting === playing) return;
+          playing = e.isIntersecting;
+          clearTimeout(timer);
+          if (playing) play();
+        },
+        { threshold: 0.3 },
+      ).observe(root);
+    }
+
+    // The pair argue, show the result, the senior comes down with a review, they get sad
+    document.querySelectorAll('[data-scene="team"]').forEach((root) => {
+      const line = root.querySelector('[data-type-ru]');
+      runScene(
+        root,
+        [
+          { state: 'fight', ms: 2600 },
+          { state: 'show', ms: 1400 },
+          { state: 'review', ms: 3600, enter: () => typeOut(line, 38) },
+          { state: 'sad', ms: 2200 },
+          { state: 'leave', ms: 900 },
+        ],
+        'sad',
+      );
+    });
+
+    // A chest of bank ideas: each bank's icon rises with its tooltip, the two take turns
+    document.querySelectorAll('[data-scene="bench"]').forEach((root) => {
+      const banks = () => JSON.parse(root.dataset['banks' + (lang() === 'en' ? 'En' : 'Ru')]);
+      const loot = root.querySelector('[data-loot]'),
+        logo = root.querySelector('[data-logo]'),
+        bank = root.querySelector('[data-bank]'),
+        idea = root.querySelector('[data-idea]');
+      // Every logo loaded up front, so a swap never shows an empty tile
+      banks().forEach((b) => (new Image().src = b.logo));
+      const set = (i) => {
+        const b = banks()[i];
+        logo.src = b.logo;
+        loot.classList.toggle('tile', b.tile);
+        bank.textContent = b.name;
+        idea.textContent = b.idea;
+        root.dataset.to = i % 2 ? 'b' : 'a';
+      };
+      set(0);
+      runScene(
+        root,
+        banks().flatMap((_, i) => [
+          { state: 'open', ms: 500, enter: () => set(i) },
+          { state: 'rise', ms: 2000 },
+          { state: 'take', ms: 600 },
+          { state: 'got', ms: 600 },
+        ]),
+        'rise',
+      );
+    });
+
+    // The test: sign in, the task, a session replay with every tap logged, the ease rating,
+    // the summary. Taps as fractions of the 804×1748 screen exports
+    document.querySelectorAll('[data-scene="testing"]').forEach((root) => {
+      const TAPS = { want: [0.5, 0.514], delivery: [0.925, 0.79], fuel: [0.925, 0.862], connect: [0.5, 0.918], ok: [0.5, 0.898] };
+      const SCREEN = { w: 804, h: 1748 };
+      // The gauntlet's fingertip (hotspot 10, 2 of 32); the 18.3-second session plays in 4.3 s
+      const HOT = { x: 10 / 32, y: 2 / 32 },
+        SPEED = 4.26;
+      const q = (sel) => root.querySelector(sel);
+      const name = q('[data-type-ru]'),
+        timer = q('[data-timer]'),
+        cursor = q('[data-cursor]');
+      const screens = [...root.querySelectorAll('[data-screen]')],
+        rows = [...root.querySelectorAll('[data-row]')];
+      let timers = [],
+        tick;
+      const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+      const reset = () => {
+        timers.forEach(clearTimeout);
+        timers = [];
+        clearInterval(tick);
+      };
+      const point = (x, y) => {
+        const w = cursor.offsetWidth;
+        cursor.style.left = `${x - w * HOT.x}px`;
+        cursor.style.top = `${y - w * HOT.y}px`;
+      };
+      const toElement = (el) => {
+        if (!el) return;
+        const r = el.getBoundingClientRect(),
+          s = root.getBoundingClientRect();
+        point(r.left - s.left + r.width / 2, r.top - s.top + r.height / 2);
+      };
+      // The screen fills the phone with object-fit: cover from the top
+      const toScreen = ([fx, fy]) => {
+        const r = screens[0].getBoundingClientRect(),
+          s = root.getBoundingClientRect();
+        const k = Math.max(r.width / SCREEN.w, r.height / SCREEN.h);
+        const dx = (r.width - SCREEN.w * k) / 2;
+        point(r.left - s.left + dx + fx * SCREEN.w * k, r.top - s.top + fy * SCREEN.h * k);
+      };
+      const rest = () => point(root.clientWidth * 0.86, root.clientHeight * 0.86);
+      const press = () => {
+        cursor.classList.remove('press');
+        void cursor.offsetWidth;
+        cursor.classList.add('press');
+      };
+      const show = (i) => screens.forEach((el, n) => el.classList.toggle('on', n === i));
+      const logRow = (i) => rows[i]?.classList.add('on');
+      const finals = () => root.querySelectorAll('[data-final-ru]').forEach((el) => (el.textContent = el.dataset['final' + (lang() === 'en' ? 'En' : 'Ru')]));
+      const start = () => {
+        reset();
+        rest();
+        name.textContent = '';
+        at(150, () => toElement(q('[data-target="field"]')));
+        at(550, press);
+        at(650, () => typeOut(name, 60));
+        at(1500, () => toElement(q('[data-target="start"]')));
+        at(2000, press);
+      };
+      const task = () => {
+        reset();
+        at(300, () => toElement(q('[data-target="go"]')));
+        at(900, press);
+      };
+      const session = () => {
+        reset();
+        show(0);
+        rows.forEach((r) => r.classList.remove('on'));
+        logRow(0);
+        const t0 = performance.now();
+        tick = setInterval(() => {
+          const sec = Math.min(18.3, ((performance.now() - t0) / 1000) * SPEED);
+          timer.textContent = `+00:${sec.toFixed(1).padStart(4, '0')}`;
+        }, 50);
+        at(300, () => toScreen(TAPS.want));
+        at(1000, () => (press(), logRow(1)));
+        at(1150, () => show(1));
+        at(1450, () => toScreen(TAPS.delivery));
+        at(1900, () => (press(), logRow(2)));
+        at(2150, () => toScreen(TAPS.fuel));
+        at(2600, () => (press(), logRow(3)));
+        at(2850, () => toScreen(TAPS.connect));
+        at(3300, () => (press(), logRow(4)));
+        at(3450, () => show(2));
+        at(3850, () => toScreen(TAPS.ok));
+        at(4300, () => (press(), logRow(5)));
+      };
+      const seq = () => {
+        reset();
+        const six = q('[data-pick="6"]');
+        six.classList.remove('on');
+        at(300, () => toElement(six));
+        at(800, () => (press(), six.classList.add('on')));
+      };
+      const count = () => {
+        reset();
+        if (reduceMotion.matches) return finals();
+        rest();
+        root.querySelectorAll('[data-count]').forEach((el) => {
+          const to = +el.dataset.count,
+            t0 = performance.now();
+          const step = () => {
+            const p = Math.min(1, (performance.now() - t0) / 900);
+            el.textContent = String(Math.round(to * p));
+            if (p < 1) requestAnimationFrame(step);
+          };
+          step();
+        });
+        root.querySelectorAll('[data-final-ru]').forEach((el) => (el.textContent = lang() === 'en' ? '0.0' : '0,0'));
+        at(900, finals);
+      };
+      runScene(
+        root,
+        [
+          { state: 'start', ms: 2500, enter: start },
+          { state: 'task', ms: 1500, enter: task },
+          { state: 'session', ms: 4900, enter: session },
+          { state: 'seq', ms: 1800, enter: seq },
+          { state: 'summary', ms: 2800, enter: count },
+          { state: 'done', ms: 1600, enter: reset },
+        ],
+        'summary',
+      );
+    });
 
     // Gauges and numbers play once when their block comes into view ([data-play]): the bars move
     // from the old value to the new one, the numbers count to the figure the page holds
@@ -6466,7 +7444,7 @@
     function stop() {
       [...films, ...loops].forEach((v) => v.pause());
     }
-    return { spy, filmsLang, stop };
+    return { filmsLang, stop };
   })();
   document.getElementById('back').addEventListener('click', caseBody.stop);
   addEventListener('keydown', (e) => e.key === 'Escape' && caseBody.stop());

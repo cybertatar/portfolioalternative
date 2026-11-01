@@ -5,12 +5,14 @@
 // <!-- /case:psb -->, and its English entries between // case:psb and // /case:psb in the
 // dictionary. Every text is one text node, so the dictionary can find it whole.
 //
-// The layout follows the co-author's version of the case (psb-portfolio-preview): one wide
-// column, five parts named by a pill between them and in a floating bar at the bottom. Each
-// solution is one scene as on the main site: the phones with the changes beside them.
+// The layout is the menu's own: a heading over each chapter, what belongs together grouped on
+// a card that differs from the page by fill alone (no strokes), long reading left on the page,
+// and the pixel scenes of the main site in «Как мы работали». Each solution is one scene: the phones with the
+// changes beside them.
 const fs = require('fs');
 const path = require('path');
 const D = require('./data.js');
+const S = require('./scenes.js');
 
 const PAGE = path.join(__dirname, '../../sketches/pause.html');
 const en = new Map();
@@ -36,16 +38,8 @@ const secText = (x) => (Array.isArray(x) ? x[1] : typeof x === 'object' ? x : t(
 const steps = (n) => t(`${n} ${n % 10 === 1 && n % 100 !== 11 ? 'шаг' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'шага' : 'шагов'}`, `${n} ${n === 1 ? 'step' : 'steps'}`);
 const nn = (i) => String(i + 1).padStart(2, '0');
 
-// The five parts of the case: the bar at the bottom and the pills between them
-const PARTS = [
-  ['overview', t('Обзор', 'Overview')],
-  ['process', t('Исследование', 'Research')],
-  ['home', t('Дизайн', 'Design')],
-  ['testing', t('Тестирование', 'Testing')],
-  ['outcome', t('Выводы', 'Takeaways')],
-];
-const part = (label) => `<p class="part"><span>${L(label)}</span></p>`;
-
+// A chapter opens with its title on the left and the lead (gold pixel eyebrows over chapters
+// were turned down by the owner, the centred part chips were the co-author's)
 const head = (id, s) =>
   `<section class="ch" id="c-${id}">
   <h2>${L(s.title)}</h2>${s.lead ? `\n  <p class="lead">${L(s.lead)}</p>` : ''}`;
@@ -58,13 +52,13 @@ const phone = (inner, cls = '') => `<div class="ph${cls}"><img class="body" src=
 const phoneOf = (src, alt) => phone(`<img src="${src}" alt="${L(alt)}" loading="lazy" decoding="async" />`);
 
 /* ── Overview ── */
+// Who, what kind of project and with what: a card beside the intro, a row each
 function about(a) {
-  const pill = (x) => `<span class="pill">${L(x)}</span>`;
-  return `<aside class="about">
-    <div>${kicker(t('Команда', 'Team'))}<p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>${L(a.team)}</span></p></div>
-    <div>${kicker(t('Проект', 'Project'))}<p class="pills">${a.project.map(pill).join('')}</p></div>
-    <div>${kicker(t('Инструменты', 'Tools'))}<p class="pills">${a.tools
-      .map(([icon, name]) => `<span class="pill tool"><img src="img/tools/${icon}.svg" alt="" />${L(name)}</span>`)
+  return `<aside class="box about">
+    <div>${kicker(t('Отряд', 'Party'))}<p class="team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>${L(a.team)}</p></div>
+    <div>${kicker(t('Проект', 'Project'))}<p>${a.project.map((x) => L(x)).join(', ')}</p></div>
+    <div>${kicker(t('Инструменты', 'Tools'))}<p class="tools">${a.tools
+      .map(([icon, name]) => `<span><img src="img/tools/${icon}.svg" alt="" />${L(name)}</span>`)
       .join('')}</p></div>
   </aside>`;
 }
@@ -74,19 +68,19 @@ function about(a) {
 // one line per solution, leading to it
 function overview(o) {
   const nums = o.stats
-    .map(([n, unit, what, detail]) => `<div><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><p>${L(what)}</p><span>${L(detail)}</span></div>`)
+    .map(([n, unit, what, detail]) => `<div class="box"><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><p>${L(what)}</p><span>${L(detail)}</span></div>`)
     .join('');
   const quests = o.quests
     .map(
-      ([id, name, problem, fix]) =>
-        `<li><a class="qc" href="#c-${id}">${L(name)}</a><p class="was">${L(problem)}</p><p>${L(fix)}</p></li>`,
+      ([id, name, problem, fix], i) =>
+        `<li><a class="box qc" href="#c-${id}"><span class="qn">${L(t(`Решение ${i + 1}`, `Solution ${i + 1}`))}</span><b>${L(name)}</b><span class="was">${L(problem)}</span><span class="now">${L(fix)}</span></a></li>`,
     )
     .join('');
   return `<section class="ch" id="c-overview">
   <div class="kpi">${nums}</div>
   <p class="aside">${L(o.statsNote)}</p>
   <div class="intro"><div>${kicker(t('Вступление', 'Intro'))}${prose(o.prose)}</div>${about(o.about)}</div>
-  <div class="qs">${kicker(t('Проблемы и решения', 'Problems and solutions'))}<ol>${quests}</ol></div>
+  <div class="qs"><h3 class="sub">${L(t('Проблемы и решения', 'Problems and solutions'))}</h3><ol>${quests}</ol></div>
 </section>`;
 }
 
@@ -100,14 +94,24 @@ function screens(s) {
 }
 
 /* ── Research ── */
+// How we worked: a card per step, its text beside a picture of it, as on the main site: the
+// pixel scenes for the pair and the senior, the banks and the test, the walkthrough film for
+// the prototype
 function processSec(p) {
   const [vsrc, vposter, vlabel] = p.video;
   const c = p.criteria;
+  const media = [
+    S.team(L),
+    S.bench(L),
+    `<video class="loop" src="${vsrc}" poster="${vposter}" muted loop playsinline preload="none" aria-label="${L(vlabel)}"></video>`,
+    S.testing(L),
+  ];
   return `${head('process', p)}
-  <div class="how"><div class="grid">${p.steps.map(([title, text], i) => `<div class="tile"><p class="n">[${nn(i)}]</p><h3>${L(title)}</h3><p>${L(text)}</p></div>`).join('')}</div>
-  <figure class="walk"><video class="loop" src="${vsrc}" poster="${vposter}" muted loop playsinline preload="none" aria-label="${L(vlabel)}"></video><figcaption>${L(vlabel)}</figcaption></figure></div>
+  <div class="chapters">${p.steps
+    .map(([title, text], i) => `<article class="box chapter"><div class="chapter-copy"><p class="n">${nn(i)}</p><h3>${L(title)}</h3><p>${L(text)}</p></div><div class="chapter-media">${media[i]}</div></article>`)
+    .join('')}</div>
   <div class="sub-h"><h3>${L(c.title)}</h3><p>${L(c.lead)}</p></div>
-  <div class="grid three">${c.items.map(([k, v]) => `<div class="tile">${kicker(k)}<p class="big">${L(v)}</p></div>`).join('')}</div>
+  <div class="grid three">${c.items.map(([k, v]) => `<div class="box tile">${kicker(k)}<p class="big">${L(v)}</p></div>`).join('')}</div>
 </section>`;
 }
 
@@ -118,8 +122,8 @@ const video = ([name, label]) =>
 function interviews(s) {
   return `${head('interviews', s)}
   ${video(s.video)}
-  <div class="grid three">${s.findings.map(([h, p], i) => `<div class="tile"><p class="n">[${nn(i)}]</p><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
-  <div class="say"><img src="img/tools/team-mage.svg" alt="" /><div>${kicker(s.say[0])}<p>${L(s.say[1])}</p></div></div>
+  <div class="grid three">${s.findings.map(([h, p], i) => `<div class="box tile"><p class="n">${nn(i)}</p><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
+  <figure class="say">${S.party()}<blockquote class="bubble">${kicker(s.say[0])}<p>${L(s.say[1])}</p></blockquote></figure>
 </section>`;
 }
 
@@ -165,7 +169,7 @@ function variants(v) {
   return `<div class="vars">${kicker(v.title)}<div class="vars-row">${v.items
     .map(
       ([src, name, note, chosen]) =>
-        `<figure class="var${chosen ? ' yes' : ''}">${phoneOf(src, name)}<figcaption><b>${L(name)}</b><span class="var-tag">${L(chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'))}</span><span class="var-note">${L(note)}</span></figcaption></figure>`,
+        `<figure class="box var${chosen ? ' yes' : ''}">${phoneOf(src, name)}<figcaption><b>${L(name)}</b><span class="var-tag">${L(chosen ? t('Выбрали', 'Chosen') : t('Отказались', 'Dropped'))}</span><span class="var-note">${L(note)}</span></figcaption></figure>`,
     )
     .join('')}</div></div>`;
 }
@@ -181,12 +185,6 @@ function changes(rs) {
     .join('')}</ul>`;
 }
 
-function stepper(i) {
-  return `<nav class="stepper" aria-label="${L(t('Решения', 'Solutions'))}">${D.solutions
-    .map((s, k) => `<a${k === i ? ' class="on" aria-current="step"' : ''} href="#c-${s.id}">${k + 1}</a>`)
-    .join('')}</nav>`;
-}
-
 // A solution: its name and aim; the problem and what we did side by side; one scene, the
 // phones (a race, or before and after) with the changes beside them; the options dropped on
 // the way; the test result in big numbers
@@ -199,13 +197,12 @@ function solution(s, i) {
     .map(([n, unit, what]) => `<div><b>${L(num(n))}${unit ? `<small> ${L(unit)}</small>` : ''}</b><span>${L(what)}</span></div>`)
     .join('')}</div>`;
   return `<section class="ch sol" id="c-${s.id}">
-  <div class="sol-h">${stepper(i)}<p class="kick">${L(t(`Решение ${i + 1} из ${D.solutions.length}`, `Solution ${i + 1} of ${D.solutions.length}`))}</p></div>
-  <h2>${L(s.title)}</h2>
+  ${kicker(t(`Решение ${i + 1} из ${D.solutions.length}`, `Solution ${i + 1} of ${D.solutions.length}`))}<h2>${L(s.title)}</h2>
   <p class="lead">${L(s.lead)}</p>
-  <div class="ps"><div>${kicker(t('Проблема', 'Problem'))}<div class="prose">${paras(s.problem)}</div></div><div>${kicker(t('Решение', 'Solution'))}<div class="prose">${paras(s.solution)}</div></div></div>
+  <div class="box ps"><div>${kicker(t('Проблема', 'Problem'))}<div class="prose">${paras(s.problem)}</div></div><div>${kicker(t('Решение', 'Solution'))}<div class="prose">${paras(s.solution)}</div></div></div>
   <div class="duo"><div class="duo-m">${media}</div>${changes(s.rows)}</div>
   ${s.variants ? variants(s.variants) : ''}
-  <div class="outcome">${kicker(t('Результат теста', 'Test result'))}<p>${L(s.result)}</p>${stats}</div>
+  <div class="box outcome">${kicker(t('Результат теста', 'Test result'))}<p>${L(s.result)}</p>${stats}</div>
 </section>`;
 }
 
@@ -225,13 +222,12 @@ function testing(s) {
   const cards = s.flows
     .map((f) => {
       const [was, now] = f.steps;
-      return `<div class="tile tf">${kicker(f.name)}<p class="tf-big"><b>${now}</b> ${L(word(now))}</p><p class="tf-was"><span class="down">−${Math.round((1 - now / was) * 100)}%</span><span>${L(t(`было ${was}`, `was ${was}`))}</span></p><div class="tf-more"><div><b><span data-count-from="0">${f.fcs}</span>%</b><span>first click</span></div><div><b>${L(f.seq[1])} ${L(t('из 7', 'of 7'))}</b><span>${L(t('оценка лёгкости', 'ease score'))}</span></div></div></div>`;
+      return `<div class="box tile tf">${kicker(f.name)}<p class="tf-big"><b>${now}</b> ${L(word(now))}</p><p class="tf-was"><span class="down">−${Math.round((1 - now / was) * 100)}%</span><span>${L(t(`было ${was}`, `was ${was}`))}</span></p><div class="tf-more"><div><b><span data-count-from="0">${f.fcs}</span>%</b><span>first click</span></div><div><b>${L(f.seq[1])} ${L(t('из 7', 'of 7'))}</b><span>${L(t('оценка лёгкости', 'ease score'))}</span></div></div></div>`;
     })
     .join('');
   return `${head('testing', s)}
   <div data-play>
-    ${kicker(t('Медианное время на задачу', 'Median time per task'))}
-    <div class="bars">${bars}</div>
+    <div class="box bars">${kicker(t('Медианное время на задачу', 'Median time per task'))}${bars}</div>
     <div class="grid three">${cards}</div>
   </div>
   <p class="aside">${L(s.note)}</p>
@@ -245,30 +241,22 @@ const review = (s) => `${head('review', s)}
 const outcome = (s) => `${head('outcome', s)}
   ${prose(s.prose)}
   <div class="sub-h"><h3>${L(s.nextTitle)}</h3></div>
-  <div class="grid three">${s.next.map(([h, p]) => `<div class="tile"><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
+  <div class="grid three">${s.next.map(([h, p]) => `<div class="box tile"><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
 </section>`;
 
-// The floating bar at the bottom: the five parts, the one in view lit
-const toc = () =>
-  `<nav class="toc" aria-label="${L(t('Части кейса', 'Parts of the case'))}">${PARTS.map(([id, label]) => `<a href="#c-${id}">${L(label)}</a>`).join('')}</nav>`;
-
 const body = [
-  toc(),
   `<div class="cs">`,
   overview(D.overview),
-  part(t('Финальные экраны', 'Final screens')),
   screens(D.screens),
-  part(PARTS[1][1]),
   processSec(D.process),
   interviews(D.interviews),
-  part(PARTS[2][1]),
   ...D.solutions.map(solution),
-  part(PARTS[3][1]),
   testing(D.testing),
   review(D.review),
-  part(PARTS[4][1]),
   outcome(D.outcome),
   `</div>`,
+  // after every scene, so it holds each sprite they used
+  S.symbols(),
 ].join('\n');
 
 const dict = [...en]
