@@ -645,12 +645,21 @@
     background: var(--gold-soft);
   }
   /* Computer: the row's own background is the quest's world, full on the left under the product's
-     logo and fading out where the text begins (the text never sits on a sharp world). The row
-     names the product, says in a phrase what it is, and the ready case adds its main result */
+     logo and fading out across the row. The row names the product and says in a phrase what it
+     is. Every row is one height: the phrase stays on one line.
+     The selected row is not tinted gold (gold over a world went muddy): its world comes alive in
+     full colour, while the other rows keep theirs dim and nearly grey; hover wakes it halfway */
   @media (min-width: 861px) {
     .q {
+      height: calc(56px + 2 * var(--s2));
       overflow: hidden;
       isolation: isolate;
+    }
+    .q:hover {
+      background: var(--fill);
+    }
+    .q[aria-selected='true'] {
+      background: var(--fill-2);
     }
     .q .glimpse {
       position: absolute;
@@ -659,13 +668,25 @@
       width: 100%;
       height: 100%;
       border-radius: 0;
-      /* Slightly dimmed, so a white logo holds even on a light sky (Mouette) */
-      filter: brightness(0.8);
+      filter: saturate(0.2) brightness(0.55);
+      transition: filter 0.25s ease;
       /* Whole under the logo, then a long ease-out fade across most of the row: no visible edge,
          and under the text only a faint trace of the world is left */
       -webkit-mask-image: var(--row-melt);
       mask-image: var(--row-melt);
       --row-melt: linear-gradient(90deg, rgb(0 0 0 / 1) 0, rgb(0 0 0 / 0.92) 12%, rgb(0 0 0 / 0.75) 20%, rgb(0 0 0 / 0.55) 28%, rgb(0 0 0 / 0.38) 37%, rgb(0 0 0 / 0.24) 47%, rgb(0 0 0 / 0.13) 58%, rgb(0 0 0 / 0.06) 70%, rgb(0 0 0 / 0.02) 84%, rgb(0 0 0 / 0) 100%);
+    }
+    .q:hover .glimpse {
+      filter: saturate(0.6) brightness(0.7);
+    }
+    /* Slightly dimmed even when alive, so a white logo holds on a light sky (Mouette) */
+    .q[aria-selected='true'] .glimpse {
+      filter: brightness(0.85);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .q .glimpse {
+        transition: none;
+      }
     }
     .q .logo {
       grid-area: 1 / 1;
@@ -696,23 +717,20 @@
     .q-name i.open {
       color: var(--green);
     }
-    .q-what,
-    .q-hook {
+    .q-what {
       display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       font-size: var(--fs-cap);
       line-height: 1.35;
       color: var(--ink-2);
-    }
-    .q-hook {
-      margin-top: var(--s1);
-      color: var(--gold);
     }
   }
   @media (max-width: 860px) {
     .q .logo,
     .q-name,
-    .q-what,
-    .q-hook {
+    .q-what {
       display: none;
     }
   }
@@ -3222,10 +3240,9 @@
       'ПСБ': 'PSB',
       'WB Банк': 'WB Bank',
       'Редизайн приложения банка': 'A bank app redesign',
-      'Кешбэк в 4 раза быстрее': 'Cashback 4× faster',
       'VPN как Mini App в Telegram': 'A VPN as a Telegram Mini App',
       'Копилка в банковском приложении': 'A moneybox in a banking app',
-      'Интернет-магазин одежды для ателье': 'An online clothing store for a tailoring studio',
+      'Интернет-магазин одежды для ателье': 'A tailoring studio’s online store',
       'В эти края пути нет. Кейс под NDA.': 'There is no road to these lands. This case is under NDA.',
       'Открыть кейс': 'Open case',
       'Пока закрыт': 'Locked for now',
@@ -4964,10 +4981,9 @@
       area: 'Финтех',
       year: '2026',
       st: 'Готов',
-      // The computer's list row: the product, what it is in a phrase, the main result
+      // The computer's list row: the product and what it is in a phrase
       name: 'ПСБ',
       what: 'Редизайн приложения банка',
-      hook: 'Кешбэк в 4 раза быстрее',
       logo: 24,
       icon: ['quest', 3],
       sub: 'Переосмыслили ключевые сценарии в мобильном приложении банка вдвоём с коллегой и проверили их юзабилити-тестом на 30 клиентах.',
@@ -5182,7 +5198,6 @@
       `<img class="logo" src="img/logos/${q.id}.svg" style="--logo-w:${q.logo}px" alt="">` +
         `<div><span class="q-name">${q.name}<i class="${q.open ? 'open' : ''}">${q.st}</i></span>` +
         `<span class="q-what">${q.what}</span>` +
-        (q.hook ? `<span class="q-hook">${q.hook}</span>` : '') +
         `<b>${q.title}</b><small>${tags(q)}<i class="${q.open ? 'open' : ''}">${q.st}</i></small>` +
         // Phone only: the row is the whole quest card, so it carries the summary and the way in
         `<p class="q-sub">${q.sub}</p>` +
