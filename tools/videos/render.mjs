@@ -1,5 +1,5 @@
 /**
- * Renders the PSB case films in the pause menu's look, in Russian and English:
+ * Renders the PSB case films in the site's look, in Russian and English:
  *
  *   node tools/videos/render.mjs interviews <interviews.ru.mp4 of the main site>
  *   node tools/videos/render.mjs review <review.ru.mp4 of the main site>
