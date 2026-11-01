@@ -2177,133 +2177,74 @@
     display: none;
   }
 
-  /* How we worked: one card, a quest log. The steps are listed on the left, the open one shows
-     its text; the rows sit `--inset` in from the card's edge, so the text is `--pad` from it and the
-     rows' corners follow the card's. The list starts at the top, like a list does, and the
-     arrows' hint sits at its foot, as under the quests. On the right the steps' pictures lie side
-     by side on a strip that scrolls: a swipe, a step in the list or the arrows turn it, each
-     picture tilting away as a page does */
-  .cs .box.journal {
+  /* How we worked, told as the page scrolls: the steps run down the left as plain text, each one
+     `--step-h` tall with its text in the middle; the picture on the right stays put in the middle
+     of the screen while they pass, and changes as the next step reaches the middle. The step being
+     told is bright with its gold number, the rest stay quiet; the picture that leaves slips up and
+     melts, the next one rises into its place */
+  .story {
+    --step-h: 70vh;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
-    padding: 0;
-    overflow: hidden;
+    gap: var(--s7);
   }
-  .journal-steps {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s1);
-    padding: var(--inset);
-  }
-  .journal-step {
-    border-radius: var(--r-in);
-    transition: background-color 0.25s;
-  }
-  .journal-step:has(.journal-tab:hover):not([data-open]) {
-    background: var(--fill);
-  }
-  .journal-step[data-open] {
-    background: var(--fill-2);
-  }
-  .journal-tab {
+  .story-step {
+    min-height: var(--step-h);
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: baseline;
-    gap: var(--s3);
-    width: 100%;
-    padding: var(--pad-in);
-    border-radius: var(--r-in);
-    text-align: left;
-    font-size: var(--fs-title);
-    line-height: 1.3;
-    color: var(--ink-2);
-    transition: color 0.25s;
-  }
-  .journal-step[data-open] .journal-tab {
-    color: var(--ink);
-  }
-  .journal-step[data-open] .n {
-    color: var(--gold);
-  }
-  /* The text opens and closes by its height: a row of the grid going from nothing to its own */
-  .journal-text {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
-  }
-  .journal-step[data-open] .journal-text {
-    grid-template-rows: 1fr;
-  }
-  .journal-text > div {
-    min-height: 0;
-    overflow: hidden;
-  }
-  .journal-text p {
-    padding: 0 var(--pad-in) var(--pad-in);
+    align-content: center;
+    gap: var(--s2);
     color: var(--ink-2);
     line-height: 1.55;
-    opacity: 0;
-    transition: opacity 0.25s;
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
   }
-  .journal-step[data-open] .journal-text p {
+  .story-step[data-on] {
     opacity: 1;
-    transition-delay: 0.1s;
   }
-  .journal .qkeys {
-    padding: var(--pad-in);
+  .story-step h3 {
+    margin: 0 0 var(--s1);
+    color: var(--ink);
+    font-size: var(--fs-h3);
+    line-height: 1.2;
   }
-  .journal-view {
-    display: grid;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    background: rgb(0 0 0 / 0.28);
+  .story-step .n {
+    transition: color 0.4s ease;
   }
-  .journal-view::-webkit-scrollbar {
-    display: none;
+  .story-step[data-on] .n {
+    color: var(--gold);
   }
-  .journal-view:focus {
-    outline: none;
-  }
-  .journal-track {
-    display: flex;
-  }
-  .journal-slide {
-    flex: 0 0 100%;
+  .story-stage {
+    position: sticky;
+    top: calc((100vh - var(--step-h)) / 2);
+    height: var(--step-h);
     display: grid;
     align-items: center;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
   }
-  .journal-slide .loop {
+  .story-slide {
+    grid-area: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--r);
+    background: var(--fill);
+    opacity: 0;
+    transform: translateY(var(--s6)) scale(0.97);
+    transition:
+      opacity 0.5s ease,
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+    pointer-events: none;
+  }
+  .story-slide[data-past] {
+    transform: translateY(calc(-1 * var(--s6))) scale(0.97);
+  }
+  .story-slide[data-on] {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .story-slide .loop {
     display: block;
     width: 100%;
-    height: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-  }
-  /* A page turning: the picture leaving tilts away and dims, the one coming in straightens up.
-     Driven by the strip's own scroll, so a swipe turns it under the finger */
-  @supports (animation-timeline: view()) {
-    .journal-slide > * {
-      animation: page-turn linear both;
-      animation-timeline: view(inline);
-    }
-  }
-  @keyframes page-turn {
-    0% {
-      transform: perspective(1400px) translateX(-12%) rotateY(-28deg) scale(0.86);
-      opacity: 0.2;
-    }
-    50% {
-      transform: none;
-      opacity: 1;
-    }
-    100% {
-      transform: perspective(1400px) translateX(12%) rotateY(28deg) scale(0.86);
-      opacity: 0.2;
-    }
   }
   .film video {
     display: block;
@@ -3724,7 +3665,6 @@
 
   @media (max-width: 860px) {
     .intro,
-    .cs .box.journal,
     .qs ol,
     .grid.two,
     .grid.three,
@@ -3769,12 +3709,49 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--s5) var(--s4);
     }
-    /* Phone: the picture on top, a swipe turns it; the steps under it */
-    .journal-view {
-      order: -1;
+    /* Phone: the picture sticks under the back button, the steps scroll up under it and fade into
+       the page at its foot */
+    .story {
+      --step-h: auto;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
     }
-    .journal .qkeys {
-      display: none;
+    .story-media {
+      order: -1;
+      position: sticky;
+      top: var(--hud-h, 64px);
+      z-index: 1;
+      align-self: start;
+      padding-bottom: var(--s4);
+      background: var(--bg);
+    }
+    /* The page's own colour above the picture up to the screen's top, so the steps never show
+       between the back button and the picture; under it they fade in */
+    .story-media::before,
+    .story-media::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+    }
+    .story-media::before {
+      bottom: 100%;
+      height: var(--hud-h, 64px);
+      background: var(--bg);
+    }
+    .story-media::after {
+      top: 100%;
+      height: var(--s6);
+      background: linear-gradient(var(--bg), transparent);
+    }
+    .story-stage {
+      position: static;
+    }
+    .story-step {
+      min-height: 45vh;
+      align-content: start;
+      padding-top: var(--s6);
     }
     .say {
       flex-direction: column;
@@ -3984,11 +3961,9 @@
 </section>
 <section class="ch" id="c-process">
   <h2>Как мы работали</h2>
-  <div class="box journal" data-journal>
-    <div class="journal-steps"><div class="journal-step" data-open><h3><button type="button" class="journal-tab" aria-controls="jr-0" aria-expanded="true"><span class="n">01</span><span>Дизайнили вдвоём, проверяли у сеньора</span></button></h3><div class="journal-text"><div><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-1" aria-expanded="false"><span class="n">02</span><span>Выбрали четыре направления</span></button></h3><div class="journal-text"><div><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-2" aria-expanded="false"><span class="n">03</span><span>Не только макеты</span></button></h3><div class="journal-text"><div><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div></div></div><div class="journal-step"><h3><button type="button" class="journal-tab" aria-controls="jr-3" aria-expanded="false"><span class="n">04</span><span>Видели путь, а не только финал</span></button></h3><div class="journal-text"><div><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div></div>
-      <div class="qkeys" aria-hidden="true"><p><span class="keys"><span class="key arrow">←</span><span class="key arrow">→</span></span>Листать шаги</p></div>
-    </div>
-    <div class="journal-view" tabindex="-1"><div class="journal-track"><div class="journal-slide" id="jr-0" role="group" aria-label="Дизайнили вдвоём, проверяли у сеньора"><div class="toon team" data-scene="team" role="img" aria-label="Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»">
+  <div class="story" data-story>
+    <div class="story-steps"><div class="story-step" data-on><p class="n">01</p><h3>Дизайнили вдвоём, проверяли у сеньора</h3><p>Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.</p></div><div class="story-step"><p class="n">02</p><h3>Выбрали четыре направления</h3><p>Разобрали исходные сценарии и сравнили их в пяти банках. У каждого взяли лучшее и сосредоточились на главной, данных карты, подключении кешбэка и выборе категорий.</p></div><div class="story-step"><p class="n">03</p><h3>Не только макеты</h3><p>Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.</p></div><div class="story-step"><p class="n">04</p><h3>Видели путь, а не только финал</h3><p>Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.</p></div></div>
+    <div class="story-media"><div class="story-stage"><div class="story-slide" data-on><div class="toon team" data-scene="team" role="img" aria-label="Двое дизайнеров спорят, показывают макет сеньору, он отвечает: «Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?»">
   <div class="desk"></div>
   <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-sad"/></svg></div>
   <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg><svg class="sprite face sad" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-sad"/></svg></div>
@@ -3998,7 +3973,7 @@
   <div class="cloud"><svg class="sprite" viewBox="0 0 44 22" aria-hidden="true" focusable="false"><use href="#spr-cloud"/></svg><span class="puff p1"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p2"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="puff p3"><svg class="sprite" viewBox="0 0 4 4" aria-hidden="true" focusable="false"><use href="#spr-puff"/></svg></span><span class="swear s1">#</span><span class="swear s2">!</span><span class="swear s3">@</span></div>
   <div class="elder"><span class="quest"><svg class="sprite" viewBox="0 0 4 9" aria-hidden="true" focusable="false"><use href="#spr-quest"/></svg></span><span class="arm-s left"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><span class="arm-s right"><svg class="sprite" viewBox="0 0 4 6" aria-hidden="true" focusable="false"><use href="#spr-arm-elder"/></svg></span><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder"/></svg><svg class="sprite face angry" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-angry"/></svg><svg class="sprite face talk" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-elder-talk"/></svg></div>
   <div class="dialog px-clip" aria-hidden="true"><span class="dialog-label">Ревью сеньора</span><p class="dialog-text"><span data-type-ru="Карты над счётом, а сумма счёта мелкая. Сам понял, что сделал-то?" data-type-en="Cards above the account, and the balance is tiny. Do you even get what you’ve made?"></span></p></div>
-</div></div><div class="journal-slide" id="jr-1" role="group" aria-label="Выбрали четыре направления"><div class="toon bench" data-scene="bench" data-banks-ru="[{&quot;name&quot;:&quot;Сбер&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Флип карты&quot;},{&quot;name&quot;:&quot;Ozon Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Копирование иконкой&quot;},{&quot;name&quot;:&quot;Т-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Акцент на скорости&quot;},{&quot;name&quot;:&quot;Альфа-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Кешбэк в таббаре&quot;},{&quot;name&quot;:&quot;Райффайзен&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Кешбэк в бейдже&quot;}]" data-banks-en="[{&quot;name&quot;:&quot;Sber&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Card flip&quot;},{&quot;name&quot;:&quot;Ozon Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Copy icon&quot;},{&quot;name&quot;:&quot;T-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Focus on speed&quot;},{&quot;name&quot;:&quot;Alfa-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Cashback in the tab bar&quot;},{&quot;name&quot;:&quot;Raiffeisen&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Cashback in a badge&quot;}]" role="img" aria-label="Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже">
+</div></div><div class="story-slide" aria-hidden="true"><div class="toon bench" data-scene="bench" data-banks-ru="[{&quot;name&quot;:&quot;Сбер&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Флип карты&quot;},{&quot;name&quot;:&quot;Ozon Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Копирование иконкой&quot;},{&quot;name&quot;:&quot;Т-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Акцент на скорости&quot;},{&quot;name&quot;:&quot;Альфа-Банк&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Кешбэк в таббаре&quot;},{&quot;name&quot;:&quot;Райффайзен&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Кешбэк в бейдже&quot;}]" data-banks-en="[{&quot;name&quot;:&quot;Sber&quot;,&quot;logo&quot;:&quot;img/psb/banks/sber.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Card flip&quot;},{&quot;name&quot;:&quot;Ozon Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/ozon.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Copy icon&quot;},{&quot;name&quot;:&quot;T-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/tbank.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Focus on speed&quot;},{&quot;name&quot;:&quot;Alfa-Bank&quot;,&quot;logo&quot;:&quot;img/psb/banks/alfa.svg&quot;,&quot;tile&quot;:true,&quot;idea&quot;:&quot;Cashback in the tab bar&quot;},{&quot;name&quot;:&quot;Raiffeisen&quot;,&quot;logo&quot;:&quot;img/psb/banks/raiffeisen.svg&quot;,&quot;tile&quot;:false,&quot;idea&quot;:&quot;Cashback in a badge&quot;}]" role="img" aria-label="Сравнили пять банков: Сбер — флип карты, Ozon Банк — копирование иконкой, Т-Банк — акцент на скорости, Альфа-Банк — кешбэк в таббаре, Райффайзен — кешбэк в бейдже">
   <div class="desk"></div>
   <div class="guy a"><svg class="sprite" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman"/></svg><svg class="sprite face happy" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 26" aria-hidden="true" focusable="false"><use href="#spr-swordsman-blink"/></svg></div>
   <div class="guy b"><svg class="sprite" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage"/></svg><svg class="sprite face happy" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-happy"/></svg><svg class="sprite face blink" viewBox="0 0 24 32" aria-hidden="true" focusable="false"><use href="#spr-mage-blink"/></svg></div>
@@ -4008,7 +3983,7 @@
   <span class="glint g1"></span><span class="glint g2"></span><span class="glint g3"></span>
   <span class="loot tile" data-loot aria-hidden="true"><img src="img/psb/banks/sber.svg" alt="" data-logo /></span>
   <div class="tooltip px-clip" aria-hidden="true"><span class="tooltip-bank" data-bank></span><span class="tooltip-idea" data-idea></span></div>
-</div></div><div class="journal-slide" id="jr-2" role="group" aria-label="Не только макеты"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div><div class="journal-slide" id="jr-3" role="group" aria-label="Видели путь, а не только финал"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
+</div></div><div class="story-slide" aria-hidden="true"><video class="loop" src="img/psb/walkthrough.mp4" poster="img/psb/walkthrough-poster.webp" muted loop playsinline preload="none" aria-label="Прохождение прототипа на телефоне"></video></div><div class="story-slide" aria-hidden="true"><div class="toon testing" data-scene="testing" role="img" aria-label="Прототип для теста: участник вводит имя, получает задание, каждое его нажатие записывается в журнал сессии, в конце он оценивает лёгкость задания, а результаты сводятся в таблицу">
   <div class="tcard start px-clip"><span class="kicker">Юзабилити-тест ПСБ</span><span class="card-title">Начать тест</span><span class="field-label">Ваше имя</span><span class="field px-clip" data-target="field"><span data-type-ru="Участник 12" data-type-en="Participant 12"></span><i class="caret"></i></span><span class="sbtn px-clip" data-target="start">Начать тест</span></div>
   <div class="tcard task px-clip"><span class="kicker">Задание</span><span class="card-title">Первое подключение кешбэка</span><span class="card-text">Подключите кешбэк и выберите три категории на этот месяц.</span><span class="sbtn px-clip" data-target="go">Старт</span></div>
   <div class="session"><div class="ph mini-phone"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img class="shot on" src="img/psb/scene/cb-off.webp" alt="" loading="lazy" decoding="async" data-screen="0" /><img class="shot" src="img/psb/scene/cb-connect.webp" alt="" loading="lazy" decoding="async" data-screen="1" /><img class="shot" src="img/psb/scene/success.webp" alt="" loading="lazy" decoding="async" data-screen="2" /></div></div><div class="log px-clip"><span class="kicker">Повтор сессии</span><span class="timer" data-timer>+00:00.0</span><span class="tline"><span class="tline-fill"></span></span><ol><li data-row="0"><span class="log-t">+00:00.0</span><span class="log-kind start">start</span><span class="log-what">Первое подключение кешбэка</span></li><li data-row="1"><span class="log-t">+00:04.3</span><span class="log-kind tap">tap</span><span class="log-what">Хочу подключить</span></li><li data-row="2"><span class="log-t">+00:08.1</span><span class="log-kind tap">tap</span><span class="log-what">7% Деливери</span></li><li data-row="3"><span class="log-t">+00:11.1</span><span class="log-kind tap">tap</span><span class="log-what">3% На бензин</span></li><li data-row="4"><span class="log-t">+00:14.1</span><span class="log-kind tap">tap</span><span class="log-what">Подключить</span></li><li data-row="5"><span class="log-t">+00:18.3</span><span class="log-kind finish">finish</span><span class="log-what">Кешбэк подключён</span></li></ol></div></div>
@@ -4698,7 +4673,6 @@
       "Завайбкодили прототип для быстрого тестирования: в нём можно пройти сценарии на телефоне, подключить кешбэк, выбрать категории и открыть данные карты.": "We vibe-coded a prototype for quick testing: it lets you go through the flows on a phone, activate cashback, choose categories and open card details.",
       "Видели путь, а не только финал": "We saw the path, not just the finish",
       "Прототип сам записывал действия участников: нажатия, прокрутку, переходы между экранами, начало и конец каждого задания.": "The prototype logged what participants did: taps, scrolling, screen transitions, the start and the end of each task.",
-      "Листать шаги": "Flip through the steps",
       "Критерии успеха": "Success criteria",
       "До редизайна мы дали пяти клиентам банка кликабельную копию исходных экранов и посмотрели, где они ошибаются и сколько времени уходит на задачи. Больше всего проблем было с подключением кешбэка. Новое решение мерили по трём признакам.": "Before the redesign we gave five of the bank’s customers a clickable copy of the original screens and watched where they went wrong and how long the tasks took. Activating cashback caused the most trouble. We measured the new design by three signs.",
       "Первый клик": "First click",
@@ -7511,63 +7485,61 @@
     filmsLang();
 
     // The walkthrough loops only while it is seen
+    // A picture of «Как мы работали» that is not the one shown stands still too
+    const idle = (el) => !!el.closest('.story-slide:not([data-on])');
     const loops = [...document.querySelectorAll('video.loop')];
+    const syncLoop = (v) => {
+      if (v._seen && !idle(v) && !reduceMotion.matches) v.play().catch(() => {});
+      else v.pause();
+    };
     const seen = new IntersectionObserver((es) =>
       es.forEach((e) => {
-        if (e.isIntersecting && !reduceMotion.matches) e.target.play().catch(() => {});
-        else e.target.pause();
+        e.target._seen = e.isIntersecting;
+        syncLoop(e.target);
       }),
     );
     loops.forEach((v) => seen.observe(v));
+    document.addEventListener('story-turn', () => loops.forEach(syncLoop));
 
-    /* How we worked, a quest log: a step in the list, a swipe on the strip or the arrows (while
-       the log is mostly in view) turn its pictures; the step whose picture is in place opens.
-       Scenes and the film off the strip are clipped out of view, so they stand still */
-    document.querySelectorAll('[data-journal]').forEach((log) => {
-      const steps = [...log.querySelectorAll('.journal-step')];
-      const view = log.querySelector('.journal-view');
+    /* How we worked, told as the page scrolls: the step crossing the reading line (the middle of
+       the screen; on a phone, the middle of what is left under the stuck picture) lights up and
+       brings its picture; the pictures before it slip up, the ones after wait below */
+    document.querySelectorAll('[data-story]').forEach((story) => {
+      const steps = [...story.querySelectorAll('.story-step')];
+      const slides = [...story.querySelectorAll('.story-slide')];
+      const media = story.querySelector('.story-media');
+      const hud = document.querySelector('.hud');
       let at = 0,
-        aim = null,
-        inView = false;
-      const mark = (i) => {
+        queued = false;
+      const show = (i) => {
         if (i === at) return;
         at = i;
-        steps.forEach((s, k) => {
-          s.toggleAttribute('data-open', k === i);
-          s.querySelector('.journal-tab').setAttribute('aria-expanded', String(k === i));
+        steps.forEach((s, k) => s.toggleAttribute('data-on', k === i));
+        slides.forEach((s, k) => {
+          s.toggleAttribute('data-on', k === i);
+          s.toggleAttribute('data-past', k < i);
+          s.setAttribute('aria-hidden', String(k !== i));
         });
+        document.dispatchEvent(new Event('story-turn'));
       };
-      const go = (i) => {
-        i = Math.max(0, Math.min(steps.length - 1, i));
-        aim = i;
-        mark(i);
-        view.scrollTo({ left: i * view.clientWidth, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      const check = () => {
+        queued = false;
+        if (!document.body.classList.contains('playing')) return;
+        // On a phone the picture sticks just under the back button
+        story.style.setProperty('--hud-h', `${Math.round(hud.getBoundingClientRect().bottom + 8)}px`);
+        const top = phone.matches ? media.getBoundingClientRect().bottom : 0;
+        const line = top + (innerHeight - top) / 2;
+        let i = 0;
+        steps.forEach((s, k) => s.getBoundingClientRect().top < line && (i = k));
+        show(i);
       };
-      steps.forEach((s, k) => s.querySelector('.journal-tab').addEventListener('click', () => go(k)));
-      // A swipe opens the step it lands on; a turn the script started passes over the steps between
-      view.addEventListener(
-        'scroll',
-        () => {
-          const i = Math.round(view.scrollLeft / view.clientWidth);
-          if (aim !== null) {
-            if (i === aim && Math.abs(view.scrollLeft - i * view.clientWidth) < 2) aim = null;
-            return;
-          }
-          mark(i);
-        },
-        { passive: true },
-      );
-      view.addEventListener('scrollend', () => (aim = null));
-      new ResizeObserver(() => (view.scrollLeft = at * view.clientWidth)).observe(view);
-      new IntersectionObserver(([e]) => (inView = e.isIntersecting), { threshold: 0.6 }).observe(log);
-      addEventListener('keydown', (e) => {
-        if (!inView || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
-        if (e.target.closest('input, textarea, video, [contenteditable]')) return;
-        e.preventDefault();
-        go(at + (e.key === 'ArrowRight' ? 1 : -1));
-        // Focus on a step follows the turn, so the ring never sits on a closed one
-        if (log.contains(document.activeElement)) steps[at].querySelector('.journal-tab').focus({ preventScroll: true });
-      });
+      const later = () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(check);
+      };
+      addEventListener('scroll', later, { passive: true });
+      addEventListener('resize', later);
     });
 
     /* Pixel scenes (.toon, ported from the main site's scripts/scenes.ts): a scene is a list of
@@ -7601,15 +7573,22 @@
         }, step.ms);
       };
       root.dataset.state = steps[0].state;
+      let seen = false;
+      const sync = () => {
+        const want = seen && !idle(root);
+        if (want === playing) return;
+        playing = want;
+        clearTimeout(timer);
+        if (playing) play();
+      };
       new IntersectionObserver(
         ([e]) => {
-          if (e.isIntersecting === playing) return;
-          playing = e.isIntersecting;
-          clearTimeout(timer);
-          if (playing) play();
+          seen = e.isIntersecting;
+          sync();
         },
         { threshold: 0.3 },
       ).observe(root);
+      document.addEventListener('story-turn', sync);
     }
 
     // The pair argue, show the result, the senior comes down with a review, they get sad
