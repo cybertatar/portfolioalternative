@@ -79,7 +79,7 @@ function overview(o) {
   const quests = o.quests
     .map(
       ([id, name, problem, fix], i) =>
-        `<li><a class="box qc" href="#c-${id}"><span class="qn">${L(t(`Решение ${i + 1}`, `Solution ${i + 1}`))}</span><b>${L(name)}</b><span class="was">${L(problem)}</span><span class="now">${L(fix)}</span></a></li>`,
+        `<li><a class="box qc" href="#c-${id}"><span class="qn">${L(t(`Решение ${i + 1}`, `Solution ${i + 1}`))}</span><b>${L(name)}</b><span class="qk">${L(t('Было', 'Before'))}</span><span class="was">${L(problem)}</span><span class="qk">${L(t('Стало', 'After'))}</span><span class="now">${L(fix)}</span></a></li>`,
     )
     .join('');
   return `<section class="ch" id="c-overview">

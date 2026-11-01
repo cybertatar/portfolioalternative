@@ -2077,32 +2077,77 @@
     padding: 0;
     list-style: none;
   }
+  /* Each card's parts share the rows of the list (a subgrid), so side by side the titles, the
+     «Было» and the «Стало» lines start level whatever the length of the text beside them. The
+     two lines are labelled like the change list, the label in its own column; the arrow is a
+     key in the corner that steps right on hover */
+  .qs ol {
+    row-gap: var(--gap);
+  }
   .qs li {
     display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
   }
   .qs .qc {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s2);
+    position: relative;
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--s4);
+    row-gap: var(--s2);
     line-height: 1.5;
     color: var(--ink);
     text-decoration: none;
+    text-wrap: pretty;
     transition: background-color 0.2s ease;
   }
   .qs .qc:hover {
     background: var(--fill-2);
+  }
+  .qs .qn,
+  .qs .qc b {
+    grid-column: 1 / -1;
+    padding-right: calc(var(--s6) + var(--s3));
   }
   .qs .qn {
     font: 700 var(--fs-px)/1 var(--pixel);
     color: var(--ink-3);
   }
   .qs .qc b {
-    margin-bottom: var(--s2);
+    margin-bottom: var(--s3);
     font-size: var(--fs-title);
     font-weight: 500;
   }
-  .qs .qc b::after {
-    content: ' →';
+  .qs .qc::after {
+    content: '→';
+    position: absolute;
+    top: var(--pad);
+    right: var(--pad);
+    display: grid;
+    place-items: center;
+    width: var(--s6);
+    height: var(--s6);
+    border-radius: var(--r-ctl);
+    background: var(--fill-2);
+    color: var(--ink-2);
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .qs .qc:hover::after {
+    transform: translateX(var(--s1));
+    background: var(--fill-3);
+    color: var(--ink);
+  }
+  .qs .qk {
+    font-size: var(--fs-cap);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--ink-3);
   }
   .qs .was {
@@ -4034,7 +4079,7 @@
     <div><p class="kick">Проект</p><p>Финтех, B2C, Мобильное приложение, Концепт 2026</p></div>
     <div><p class="kick">Инструменты</p><p class="tools"><span><img src="img/tools/figma.svg" alt="" />Figma</span><span><img src="img/tools/claude.svg" alt="" />Claude</span><span><img src="img/tools/codex.svg" alt="" />Codex</span><span><img src="img/tools/mobbin.svg" alt="" />Mobbin</span><span><img src="img/tools/rive.svg" alt="" />Rive</span></p></div>
   </aside></div>
-  <div class="qs"><h3 class="sub">Проблемы и решения</h3><ol><li><a class="box qc" href="#c-home"><span class="qn">Решение 1</span><b>Главная</b><span class="was">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</span><span class="now">Баланс, частые действия и история наверху, а предложения банка можно закрыть</span></a></li><li><a class="box qc" href="#c-card-data"><span class="qn">Решение 2</span><b>Данные карты</b><span class="was">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</span><span class="now">Их можно посмотреть и скопировать на одном экране, без кода из СМС</span></a></li><li><a class="box qc" href="#c-cashback"><span class="qn">Решение 3</span><b>Подключение кешбэка</b><span class="was">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</span><span class="now">Одна кнопка рядом с условиями, и сразу выбор категорий</span></a></li><li><a class="box qc" href="#c-categories"><span class="qn">Решение 4</span><b>Кешбэк после подключения</b><span class="was">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</span><span class="now">Их можно выбрать на месяц вперёд и поменять до его начала</span></a></li></ol></div>
+  <div class="qs"><h3 class="sub">Проблемы и решения</h3><ol><li><a class="box qc" href="#c-home"><span class="qn">Решение 1</span><b>Главная</b><span class="qk">Было</span><span class="was">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</span><span class="qk">Стало</span><span class="now">Баланс, частые действия и история наверху, а предложения банка можно закрыть</span></a></li><li><a class="box qc" href="#c-card-data"><span class="qn">Решение 2</span><b>Данные карты</b><span class="qk">Было</span><span class="was">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</span><span class="qk">Стало</span><span class="now">Их можно посмотреть и скопировать на одном экране, без кода из СМС</span></a></li><li><a class="box qc" href="#c-cashback"><span class="qn">Решение 3</span><b>Подключение кешбэка</b><span class="qk">Было</span><span class="was">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</span><span class="qk">Стало</span><span class="now">Одна кнопка рядом с условиями, и сразу выбор категорий</span></a></li><li><a class="box qc" href="#c-categories"><span class="qn">Решение 4</span><b>Кешбэк после подключения</b><span class="qk">Было</span><span class="was">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</span><span class="qk">Стало</span><span class="now">Их можно выбрать на месяц вперёд и поменять до его начала</span></a></li></ol></div>
 </section>
 <section class="ch" id="c-screens">
   <h2>Финальные экраны</h2>
@@ -4686,7 +4731,9 @@
       "Оценка лёгкости": "Ease score",
       "SEQ, среднее по задачам": "SEQ, average across tasks",
       "Решение 1": "Solution 1",
+      "Было": "Before",
       "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
+      "Стало": "After",
       "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
       "Решение 2": "Solution 2",
       "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
@@ -4775,8 +4822,6 @@
       "Экраны выглядели собранными по шаблону, и один участник при первом знакомстве засомневался, что перед ним настоящее приложение банка.": "The screens looked put together from a template, and at first sight one participant doubted it was a real banking app.",
       "Вывод": "Takeaway",
       "Одного сокращения пути было недостаточно. Нужно было сделать понятным весь процесс: где найти нужное, как выполнить действие и увидеть результат.": "Shortening the path alone wasn’t enough. The whole process had to make sense: where to find what you need, how to do it and how to see the result.",
-      "Было": "Before",
-      "Стало": "After",
       "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
       "нашли через бейдж у баланса": "found it through the badge by the balance",
       "Решение 1 из 4": "Solution 1 of 4",
