@@ -1454,6 +1454,12 @@
       grid-row: auto;
       margin-top: var(--s2);
     }
+    /* The list is not stretched beside anything here, so each wish takes its own height and the
+       steps between them stay even, a wrapped tag included */
+    .wish .wl {
+      grid-auto-rows: auto;
+      gap: var(--s3);
+    }
   }
   .wish {
     container: wish / inline-size;
@@ -1505,9 +1511,16 @@
     height: 24px;
     margin-top: calc((1.35em - 24px) / 2);
   }
+  /* A wish with a tag: when the tag does not fit beside the words it moves under them, flush
+     with the text rather than indented */
+  .wl li > span:has(.wl-tag) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s2);
+  }
   .wl-tag {
     display: inline-block;
-    margin-left: var(--s2);
     padding: 0 var(--s2);
     border-radius: var(--r-key);
     font-size: var(--fs-cap);
@@ -6632,7 +6645,7 @@
       id: 'wb',
       title: 'WB Bank moneybox concept',
       area: 'Финтех',
-      year: '2025',
+      year: '2026',
       st: 'Кейс позже',
       name: 'WB Банк',
       what: 'Копилка в банковском приложении',
