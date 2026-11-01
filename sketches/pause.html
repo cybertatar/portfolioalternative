@@ -1997,13 +1997,19 @@
   }
   .reading h2 {
     margin: 0 0 var(--s3);
-    font: 500 clamp(26px, 2.2vw, 32px)/1.2 var(--body);
+    font: 500 var(--fs-h2)/1.15 var(--body);
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
   .reading h3 {
     margin: 0;
     font: 500 var(--fs-title)/1.3 var(--body);
+  }
+  /* A chapter's title is one element with its eyebrow («Решение 1 из 4») and its lead: they sit
+     a small step from it, closer than the title group sits to what follows */
+  .reading .kick:has(+ h2),
+  .reading h2:has(+ .lead) {
+    margin-bottom: var(--s2);
   }
   .reading .lead {
     max-width: 56ch;
@@ -2100,9 +2106,6 @@
     gap: var(--s5);
     line-height: 1.5;
   }
-  .about .kick {
-    margin-bottom: var(--s2);
-  }
   .about .team,
   .about .tools span {
     display: flex;
@@ -2144,7 +2147,7 @@
   }
   .kpi b {
     margin-bottom: var(--s2);
-    font: 500 clamp(36px, 3.4vw, 48px)/1 var(--body);
+    font: 500 var(--fs-h2)/1 var(--body);
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
   }
@@ -3236,9 +3239,6 @@
     background: inherit;
     clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 75%, 25% 75%, 25% 50%, 50% 50%, 50% 25%, 75% 25%, 75% 0);
   }
-  .bubble .kick {
-    margin-bottom: var(--s2);
-  }
   .bubble p:last-child {
     font-size: var(--fs-title);
     line-height: 1.45;
@@ -3276,7 +3276,8 @@
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     gap: var(--s7);
     align-items: center;
-    padding: var(--s7) var(--s7) var(--s6);
+    /* No more than the gap to the cards around it (inside ≤ outside) */
+    padding: var(--pad);
     border-radius: var(--r);
     background: var(--fill);
   }
@@ -3388,8 +3389,9 @@
     gap: var(--s2);
     margin-top: var(--gap);
   }
+  /* The caption over the card's text, as far from it as on «Проблема» and «Решение» (12) */
   .outcome .kick {
-    margin: 0;
+    margin: 0 0 var(--s1);
   }
   .outcome > p:not(.kick) {
     max-width: 60ch;
@@ -3411,7 +3413,7 @@
     background: var(--fill);
   }
   .nums b {
-    font: 500 clamp(28px, 2.6vw, 36px)/1 var(--body);
+    font: 500 var(--fs-h3)/1 var(--body);
     letter-spacing: -0.02em;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
@@ -3614,7 +3616,8 @@
   .sw-face {
     position: relative;
     width: min(100%, 220px);
-    margin: var(--s4) 0 var(--s3);
+    /* The crown stands 9px over the face: the caption is 12 from the crown, as from any group */
+    margin: var(--s2) 0 var(--s3);
   }
   /* The crown and the button of a stopwatch, above twelve o'clock */
   .crown {
@@ -3681,7 +3684,7 @@
     font-variant-numeric: tabular-nums;
   }
   .dial.big .dial-c b {
-    font-size: clamp(40px, 3.6vw, 52px);
+    font-size: var(--fs-h2);
     letter-spacing: -0.02em;
   }
   .dial.big .dial-c small {
@@ -3956,9 +3959,6 @@
     }
     .duo {
       gap: var(--s5);
-    }
-    .duo {
-      padding: var(--s5) var(--pad);
     }
     .kpi {
       grid-template-columns: repeat(2, minmax(0, 1fr));
