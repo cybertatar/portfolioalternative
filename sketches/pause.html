@@ -3130,15 +3130,28 @@
   /* Design: each solution under «Решение 1 из 4», its name and aim; the problem and what we
      did on one card, two columns; the phones with the changes beside them; the options dropped
      on the way; the test result on a card */
+  /* Problem and solution: two cards side by side, told apart by fill alone. The problem is the
+     quieter one; the solution sits on the lighter fill in full ink, its label in gold, as the
+     option that won is marked */
   .ps {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s7);
+    gap: var(--gap);
     margin-bottom: var(--gap);
-    color: var(--ink-2);
   }
   .ps .prose {
     gap: var(--s3);
+    text-wrap: pretty;
+  }
+  .ps-was {
+    color: var(--ink-2);
+  }
+  .cs .ps-now {
+    background: var(--fill-2);
+    color: var(--ink);
+  }
+  .ps-now .kick {
+    color: var(--gold);
   }
   /* The scene (.duo): one calm surface, the phones on the left, what changed on the right */
   .duo {
@@ -3821,7 +3834,9 @@
     .vars-row {
       grid-template-columns: minmax(0, 1fr);
     }
-    .ps,
+    .ps {
+      gap: var(--s4);
+    }
     .duo {
       gap: var(--s5);
     }
@@ -4135,7 +4150,7 @@
 <section class="ch sol" id="c-home">
   <p class="kick">Решение 1 из 4</p><h2>Главная страница</h2>
   <p class="lead">Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.</p>
-  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div></div></div>
+  <div class="ps"><div class="box ps-was"><p class="kick">Проблема</p><div class="prose"><p>Повседневные операции, промо и другие продукты банка имели почти одинаковый вес. Историю операций было трудно найти: у каждой карты она своя, на отдельной вкладке.</p><p>В кешбэк было сложно попасть: «Бонусный счёт» лежал в самом конце главной.</p></div></div><div class="box ps-now"><p class="kick">Решение</p><div class="prose"><p>Сохранили привычную модель главной: сгруппировали баланс, действия и историю и показали карты внутри их счетов.</p><p>На главной планировался отдельный блок кешбэка, но вместе с вкладкой и бейджем получалось три входа. Блок убрали и оставили бейдж, чтобы проверить, заметят ли его.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="pair"><figure><figcaption>Было</figcaption><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/cb-01.webp" alt="Было" loading="lazy" decoding="async" /></div></div></figure><figure><figcaption>Стало</figcaption><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Стало" loading="lazy" decoding="async" /></div></div></figure></div></div><ul class="changes" aria-label="Было и стало"><li><span class="ch-k">Баланс</span><p class="ch-now">«Всего на счетах» наверху, рядом бейдж кешбэка</p><p class="ch-was"><span>Было:</span> «Всего доступно средств» в отдельной карточке</p></li><li><span class="ch-k">Карты и счета</span><p class="ch-now">Карты внутри своих счетов</p><p class="ch-was"><span>Было:</span> Два отдельных списка</p></li><li><span class="ch-k">Частые действия</span><p class="ch-now">QR, перевод, по номеру и пополнение под счетами</p><p class="ch-was"><span>Было:</span> Нет на главной</p></li><li><span class="ch-k">Предложения банка</span><p class="ch-now">Баннеры сверху, их можно закрыть</p><p class="ch-was"><span>Было:</span> Вес как у продуктов, среди счетов и карт</p></li><li><span class="ch-k">Кешбэк</span><p class="ch-now">Бейдж у баланса и вкладка «Выгода»</p><p class="ch-was"><span>Было:</span> «Бонусный счёт» в конце главной</p></li><li><span class="ch-k">История</span><p class="ch-now">На главной, сразу под действиями</p><p class="ch-was"><span>Было:</span> Отдельная вкладка, у каждой карты своя</p></li></ul></div>
   <div class="vars"><p class="kick">Варианты главной</p><div class="vars-row"><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/rejected-barrel.webp" alt="Барабан карт" loading="lazy" decoding="async" /></div></div><figcaption><b>Барабан карт</b><span class="var-tag">Отказались</span><span class="var-note">Мой вариант. Карты шли друг за другом, и связь счёт → карта считывалась хуже. Если карт много, нужную найти тяжело.</span></figcaption></figure><figure class="box var"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/iter/home-iter-euro.webp" alt="Европейский стандарт" loading="lazy" decoding="async" /></div></div><figcaption><b>Европейский стандарт</b><span class="var-tag">Отказались</span><span class="var-note">Мастер-счёт и быстрые действия на градиенте, как в европейских необанках. Для клиентов ПСБ непривычно.</span></figcaption></figure><figure class="box var yes"><div class="ph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/main.webp" alt="Привычная иерархия" loading="lazy" decoding="async" /></div></div><figcaption><b>Привычная иерархия</b><span class="var-tag">Выбрали</span><span class="var-note">Баланс, счета с картами внутри, действия и история: всё на первом экране, в привычном порядке.</span></figcaption></figure></div></div>
   <div class="box outcome"><p class="kick">Результат теста</p><p>История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.</p><div class="nums"><div><b>63%</b><span>нашли кешбэк через вкладку «Выгода»</span></div><div><b>37%</b><span>нашли через бейдж у баланса</span></div></div></div>
@@ -4143,7 +4158,7 @@
 <section class="ch sol" id="c-card-data">
   <p class="kick">Решение 2 из 4</p><h2>Данные карты</h2>
   <p class="lead">Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.</p>
-  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div></div></div>
+  <div class="ps"><div class="box ps-was"><p class="kick">Проблема</p><div class="prose"><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div></div><div class="box ps-now"><p class="kick">Решение</p><div class="prose"><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="42" data-steps="7">
         <p class="lane-h">Было</p>
@@ -4166,7 +4181,7 @@
 <section class="ch sol" id="c-cashback">
   <p class="kick">Решение 3 из 4</p><h2>Подключение кешбэка</h2>
   <p class="lead">Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.</p>
-  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div></div></div>
+  <div class="ps"><div class="box ps-was"><p class="kick">Проблема</p><div class="prose"><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div></div><div class="box ps-now"><p class="kick">Решение</p><div class="prose"><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="105" data-steps="12">
         <p class="lane-h">Было</p>
@@ -4189,7 +4204,7 @@
 <section class="ch sol" id="c-categories">
   <p class="kick">Решение 4 из 4</p><h2>Кешбэк после подключения</h2>
   <p class="lead">Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.</p>
-  <div class="box ps"><div><p class="kick">Проблема</p><div class="prose"><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div></div><div><p class="kick">Решение</p><div class="prose"><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div></div></div>
+  <div class="ps"><div class="box ps-was"><p class="kick">Проблема</p><div class="prose"><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div></div><div class="box ps-now"><p class="kick">Решение</p><div class="prose"><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div></div></div>
   <div class="duo"><div class="duo-m"><div class="race" data-race tabindex="-1">
     <div class="lanes"><div class="lane" data-lane data-sec="28.7" data-steps="7">
         <p class="lane-h">Было</p>

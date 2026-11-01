@@ -215,7 +215,7 @@ function solution(s, i) {
   return `<section class="ch sol" id="c-${s.id}">
   ${kicker(t(`Решение ${i + 1} из ${D.solutions.length}`, `Solution ${i + 1} of ${D.solutions.length}`))}<h2>${L(s.title)}</h2>
   <p class="lead">${L(s.lead)}</p>
-  <div class="box ps"><div>${kicker(t('Проблема', 'Problem'))}<div class="prose">${paras(s.problem)}</div></div><div>${kicker(t('Решение', 'Solution'))}<div class="prose">${paras(s.solution)}</div></div></div>
+  <div class="ps"><div class="box ps-was">${kicker(t('Проблема', 'Problem'))}<div class="prose">${paras(s.problem)}</div></div><div class="box ps-now">${kicker(t('Решение', 'Solution'))}<div class="prose">${paras(s.solution)}</div></div></div>
   <div class="duo"><div class="duo-m">${media}</div>${changes(s.rows)}</div>
   ${s.variants ? variants(s.variants) : ''}
   <div class="box outcome">${kicker(t('Результат теста', 'Test result'))}<p>${L(s.result)}</p>${stats}</div>
