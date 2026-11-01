@@ -3294,92 +3294,226 @@
     background: var(--fill-3);
   }
 
-  /* Testing: time per task on one scale, then a card per flow */
-  .bars {
-    display: grid;
-    gap: var(--s4);
-    margin-bottom: var(--gap);
+  /* Testing: a stopwatch per flow. One lap of the dial is two minutes for every flow; the grey
+     arc is the old median time, the gold one winds back from it to the new time once in view
+     ([data-play]); ticks every ten seconds and a crown on top make it a stopwatch. Under it the
+     speed-up, then three small dials in the same language: steps, first click, ease */
+  .sws {
+    align-items: stretch;
   }
-  .bars .kick {
-    margin-bottom: 0;
-  }
-  .bar {
-    display: grid;
-    grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  .sw {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--s4);
+    text-align: center;
   }
-  .bar-t {
-    display: grid;
-    gap: var(--s1);
-    padding-right: 64px;
+  .sw > .kick {
+    align-self: stretch;
+    text-align: left;
   }
-  .bar-t i {
+  .sw-face {
     position: relative;
-    display: block;
-    height: 6px;
-    border-radius: 3px;
-    background: var(--fill-3);
+    width: min(100%, 220px);
+    margin: var(--s4) 0 var(--s3);
   }
-  .bar-t i.now {
-    width: var(--to);
-    background: var(--ink);
-  }
-  .bar-t span {
+  /* The crown and the button of a stopwatch, above twelve o'clock */
+  .crown {
     position: absolute;
-    left: calc(100% + var(--s2));
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: var(--fs-cap);
-    font-style: normal;
-    color: var(--ink-3);
-    white-space: nowrap;
+    left: 50%;
+    top: -9px;
+    width: 18px;
+    height: 8px;
+    border-radius: 3px 3px 0 0;
+    background: var(--fill-3);
+    transform: translateX(-50%);
   }
-  .bar-t .now span {
-    color: var(--ink);
-  }
-  .tf-big {
-    display: flex;
-    align-items: baseline;
-    gap: var(--s2);
-    font-size: var(--fs-title);
-    color: var(--ink);
-  }
-  .tf-big b {
-    font: 500 clamp(28px, 2.6vw, 36px)/1 var(--body);
-    letter-spacing: -0.02em;
-  }
-  .tf-was {
-    display: flex;
-    gap: var(--s2);
-    color: var(--ink-3);
-  }
-  .down {
-    color: var(--green);
-  }
-  .tf-more {
+  .dial {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s4);
-    margin-top: var(--s3);
+    aspect-ratio: 1;
   }
-  .tf-more b {
-    display: block;
-    font-size: var(--fs-title);
-    font-weight: 500;
-    color: var(--ink);
+  .dial svg,
+  .dial-c {
+    grid-area: 1 / 1;
+  }
+  .dial svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    overflow: visible;
+  }
+  .dial circle {
+    fill: none;
+    stroke-width: 7;
+  }
+  .dial .track {
+    stroke: var(--fill-2);
+  }
+  .dial .was {
+    stroke: var(--fill-3);
+    stroke-dasharray: var(--to) 100;
+  }
+  .dial .now {
+    stroke: var(--gold);
+    stroke-linecap: round;
+    stroke-dasharray: var(--to) 100;
+  }
+  /* The big dial: thinner rings, and round its edge a tick every ten seconds, longer every
+     half minute (one lap is 120 s: the ring's length is 120 too) */
+  .dial.big circle {
+    stroke-width: 5;
+  }
+  .dial.big .ticks {
+    stroke: var(--ink-3);
+    stroke-width: 2;
+    stroke-dasharray: 0.5 9.5;
+    stroke-dashoffset: 0.25;
+    opacity: 0.6;
+  }
+  .dial-c {
+    place-self: center;
+    display: grid;
+    justify-items: center;
+    gap: var(--s1);
+  }
+  .dial-c b {
+    font: 500 var(--fs-title)/1 var(--body);
     font-variant-numeric: tabular-nums;
   }
-  .tf-more span:not([data-count-from]) {
+  .dial.big .dial-c b {
+    font-size: clamp(40px, 3.6vw, 52px);
+    letter-spacing: -0.02em;
+  }
+  .dial.big .dial-c small {
+    font-size: var(--fs-title);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+  .dial-c > span {
     font-size: var(--fs-cap);
     color: var(--ink-3);
   }
-  /* Played once in view: the new time grows from nothing */
-  [data-play].armed .bar-t .now {
-    transition: width 1.2s cubic-bezier(0.3, 0.7, 0.2, 1) 0.2s;
+  .sw-x {
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--gold);
   }
-  [data-play].armed:not(.on) .bar-t .now {
-    width: 0;
+  .sw-minis {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s3);
+    margin-top: var(--s5);
+  }
+  .sw-minis > div {
+    display: grid;
+    justify-items: center;
+    gap: var(--s2);
+  }
+  .sw-minis .dial {
+    width: 72px;
+  }
+  .sw-minis .dial-c b {
+    font-size: var(--fs-ui);
+  }
+  .sw-minis > div > span {
+    font-size: var(--fs-cap);
+    line-height: 1.35;
+    color: var(--ink-3);
+  }
+  /* Played once in view: the gold arcs grow from nothing, the big one winds back from the old
+     time to the new one */
+  [data-play].armed .dial .now {
+    transition: stroke-dasharray 1.4s cubic-bezier(0.3, 0.7, 0.2, 1) 0.2s;
+  }
+  [data-play].armed:not(.on) .dial .now {
+    stroke-dasharray: 0 100;
+  }
+  [data-play].armed:not(.on) .dial.big .now {
+    stroke-dasharray: var(--from) 100;
+  }
+
+  /* Contents: a rail of ticks at the middle of the left edge, a tick per chapter, the one in view
+     gold and longer. Hovered or focused, it opens on the glass with the chapter names. Only
+     where the column leaves room for it beside the case */
+  .rail {
+    position: fixed;
+    z-index: 5;
+    left: max(var(--s4), env(safe-area-inset-left, 0px));
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    padding: var(--s2);
+    border-radius: var(--r-ctl);
+    transform: translateY(-50%);
+    transition: background-color 0.2s ease, opacity 0.3s ease;
+  }
+  body:not(.playing) .rail,
+  .rail[hidden] {
+    display: none;
+  }
+  .rail.off {
+    opacity: 0;
+    pointer-events: none;
+  }
+  body.leaving .rail {
+    opacity: 0;
+  }
+  @media (max-width: 1259px) {
+    .rail {
+      display: none;
+    }
+  }
+  .rail:is(:hover, :focus-within) {
+    background: var(--glass-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .rail a {
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    height: 22px;
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .rail a.part {
+    margin-top: var(--s3);
+  }
+  .rail i {
+    flex: none;
+    width: 12px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--ink-3);
+    opacity: 0.6;
+    transition: width 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .rail span {
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-width 0.25s ease, opacity 0.2s ease;
+  }
+  .rail:is(:hover, :focus-within) span {
+    max-width: 240px;
+    opacity: 1;
+  }
+  .rail a:hover {
+    color: var(--ink);
+  }
+  .rail a:hover i {
+    opacity: 1;
+  }
+  .rail a.on {
+    color: var(--ink);
+  }
+  .rail a.on i {
+    width: 20px;
+    background: var(--gold);
+    opacity: 1;
   }
 
   @media (max-width: 860px) {
@@ -3388,15 +3522,11 @@
     .qs ol,
     .grid.two,
     .grid.three,
-    .sub-h,
-    .bar {
+    .sub-h {
       grid-template-columns: 1fr;
     }
     .intro {
       gap: var(--s6);
-    }
-    .bar {
-      gap: var(--s2);
     }
     .stage {
       min-height: 0;
@@ -3622,6 +3752,7 @@
       <!-- The PSB case, the only open one. Built by tools/case-psb/build.js from its data.js:
            edit those and run `node tools/case-psb/build.js`, not this block -->
       <!-- case:psb -->
+<nav class="rail" aria-label="Содержание кейса"><a href="#c-overview"><i></i><span>Обзор</span></a><a href="#c-screens"><i></i><span>Финальные экраны</span></a><a href="#c-process" class="part"><i></i><span>Как мы работали</span></a><a href="#c-interviews"><i></i><span>Интервью</span></a><a href="#c-home" class="part"><i></i><span>Главная</span></a><a href="#c-card-data"><i></i><span>Данные карты</span></a><a href="#c-cashback"><i></i><span>Подключение кешбэка</span></a><a href="#c-categories"><i></i><span>Кешбэк после подключения</span></a><a href="#c-testing" class="part"><i></i><span>Тестирование</span></a><a href="#c-review"><i></i><span>Ревью</span></a><a href="#c-outcome" class="part"><i></i><span>Выводы</span></a></nav>
 <div class="cs">
 <section class="ch" id="c-overview">
   <div class="kpi"><div class="box"><b>23<small> с</small></b><p>Подключение кешбэка</p><span>вместо 105 с, 5 шагов вместо 12</span></div><div class="box"><b>17<small> с</small></b><p>Путь к данным карты</p><span>вместо 42 с, 4 шага вместо 7</span></div><div class="box"><b>89%</b><p>Первый клик верный</p><span>начали с правильного действия</span></div><div class="box"><b>6,4<small> из 7</small></b><p>Оценка лёгкости</p><span>SEQ, среднее по задачам</span></div></div>
@@ -3760,11 +3891,20 @@
 <section class="ch" id="c-testing">
   <h2>Тестирование с 30 клиентами</h2>
   <p class="lead">Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.</p>
-  <div data-play>
-    <div class="box bars"><p class="kick">Медианное время на задачу</p><div class="bar"><p>Подключение кешбэка</p><div class="bar-t"><i class="was" style="width:100.0%"><span>105 с</span></i><i class="now" style="--to:21.9%"><span>23 с</span></i></div></div><div class="bar"><p>Данные карты</p><div class="bar-t"><i class="was" style="width:40.0%"><span>42 с</span></i><i class="now" style="--to:16.2%"><span>17 с</span></i></div></div><div class="bar"><p>Выбор категорий</p><div class="bar-t"><i class="was" style="width:27.3%"><span>28,7 с</span></i><i class="now" style="--to:13.3%"><span>14 с</span></i></div></div></div>
-    <div class="grid three"><div class="box tile tf"><p class="kick">Подключение кешбэка</p><p class="tf-big"><b>5</b> шагов</p><p class="tf-was"><span class="down">−58%</span><span>было 12</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,5 из 7</b><span>оценка лёгкости</span></div></div></div><div class="box tile tf"><p class="kick">Данные карты</p><p class="tf-big"><b>4</b> шага</p><p class="tf-was"><span class="down">−43%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">83</span>%</b><span>first click</span></div><div><b>6,0 из 7</b><span>оценка лёгкости</span></div></div></div><div class="box tile tf"><p class="kick">Выбор категорий</p><p class="tf-big"><b>6</b> шагов</p><p class="tf-was"><span class="down">−14%</span><span>было 7</span></p><div class="tf-more"><div><b><span data-count-from="0">100</span>%</b><span>first click</span></div><div><b>6,7 из 7</b><span>оценка лёгкости</span></div></div></div></div>
-  </div>
-  <p class="aside">Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.</p>
+  <div class="grid three sws" data-play><div class="box sw"><p class="kick">Подключение кешбэка</p>
+    <div class="sw-face"><div class="dial big"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="ticks" cx="50" cy="50" r="49" pathLength="120" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:87.50" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:19.17;--from:87.50" /></svg><div class="dial-c"><b><span data-count-from="105">23</span><small> с</small></b><span>было 105 с</span></div></div><span class="crown" aria-hidden="true"></span></div>
+    <p class="sw-x">в 4,6 раза быстрее</p>
+    <div class="sw-minis"><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:100.00" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:41.67" /></svg><div class="dial-c"><b>5</b></div></div><span>шагов, было 12</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:83.00" /></svg><div class="dial-c"><b><span data-count-from="0">83</span>%</b></div></div><span>first click</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:92.86" /></svg><div class="dial-c"><b>6,5</b></div></div><span>лёгкость из 7</span></div></div>
+  </div><div class="box sw"><p class="kick">Данные карты</p>
+    <div class="sw-face"><div class="dial big"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="ticks" cx="50" cy="50" r="49" pathLength="120" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:35.00" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:14.17;--from:35.00" /></svg><div class="dial-c"><b><span data-count-from="42">17</span><small> с</small></b><span>было 42 с</span></div></div><span class="crown" aria-hidden="true"></span></div>
+    <p class="sw-x">в 2,5 раза быстрее</p>
+    <div class="sw-minis"><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:100.00" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:57.14" /></svg><div class="dial-c"><b>4</b></div></div><span>шагов, было 7</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:83.00" /></svg><div class="dial-c"><b><span data-count-from="0">83</span>%</b></div></div><span>first click</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:85.71" /></svg><div class="dial-c"><b>6,0</b></div></div><span>лёгкость из 7</span></div></div>
+  </div><div class="box sw"><p class="kick">Выбор категорий</p>
+    <div class="sw-face"><div class="dial big"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="ticks" cx="50" cy="50" r="49" pathLength="120" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:23.92" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:11.67;--from:23.92" /></svg><div class="dial-c"><b><span data-count-from="29">14</span><small> с</small></b><span>было 28,7 с</span></div></div><span class="crown" aria-hidden="true"></span></div>
+    <p class="sw-x">в 2 раза быстрее</p>
+    <div class="sw-minis"><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="was" cx="50" cy="50" r="42" pathLength="100" style="--to:100.00" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:85.71" /></svg><div class="dial-c"><b>6</b></div></div><span>шагов, было 7</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:100.00" /></svg><div class="dial-c"><b><span data-count-from="0">100</span>%</b></div></div><span>first click</span></div><div><div class="dial"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" /><circle class="now" cx="50" cy="50" r="42" pathLength="100" style="--to:95.71" /></svg><div class="dial-c"><b>6,7</b></div></div><span>лёгкость из 7</span></div></div>
+  </div></div>
+  <p class="aside"><span>Один круг циферблата — 2 минуты.</span> Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.</p>
 </section>
 <section class="ch" id="c-review">
   <h2>Что сказал сеньор</h2>
@@ -4248,8 +4388,19 @@
       'Квест:': 'Quest:',
       // The PSB case body, written by tools/case-psb/build.js
       // case:psb
-      "с": "s",
+      "Содержание кейса": "Case contents",
+      "Обзор": "Overview",
+      "Финальные экраны": "Final screens",
+      "Как мы работали": "How we worked",
+      "Интервью": "Interviews",
+      "Главная": "Home",
+      "Данные карты": "Card details",
       "Подключение кешбэка": "Activating cashback",
+      "Кешбэк после подключения": "Cashback after activation",
+      "Тестирование": "Testing",
+      "Ревью": "Review",
+      "Выводы": "Takeaways",
+      "с": "s",
       "вместо 105 с, 5 шагов вместо 12": "instead of 105 s, 5 steps instead of 12",
       "Путь к данным карты": "Getting to card details",
       "вместо 42 с, 4 шага вместо 7": "instead of 42 s, 4 steps instead of 7",
@@ -4260,18 +4411,15 @@
       "Оценка лёгкости": "Ease score",
       "SEQ, среднее по задачам": "SEQ, average across tasks",
       "Решение 1": "Solution 1",
-      "Главная": "Home",
       "Промо и продукты банка спорили с повседневными действиями, историю было трудно найти": "Bank promos and products competed with everyday actions, and the history was hard to find",
       "Баланс, частые действия и история наверху, а предложения банка можно закрыть": "Balance, frequent actions and history at the top, and bank offers can be closed",
       "Решение 2": "Solution 2",
-      "Данные карты": "Card details",
       "Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС": "The details were on the third tab, and the CVV only showed after a code from a text message",
       "Их можно посмотреть и скопировать на одном экране, без кода из СМС": "They can be viewed and copied on one screen, with no text message code",
       "Решение 3": "Solution 3",
       "12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение": "12 steps through email and a browser, and the activated cashback didn’t show up until you reopened the app",
       "Одна кнопка рядом с условиями, и сразу выбор категорий": "One button next to the terms, and straight on to choosing categories",
       "Решение 4": "Solution 4",
-      "Кешбэк после подключения": "Cashback after activation",
       "Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало": "Categories had to be chosen every month, and the app never reminded you",
       "Их можно выбрать на месяц вперёд и поменять до его начала": "They can be chosen a month ahead and changed before it starts",
       "Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.": "A usability test with 30 of the bank’s customers: everyone got to the end of every task.",
@@ -4288,7 +4436,6 @@
       "Концепт 2026": "Concept 2026",
       "Инструменты": "Tools",
       "Проблемы и решения": "Problems and solutions",
-      "Финальные экраны": "Final screens",
       "Экраны рабочего прототипа, на котором проходил юзабилити-тест: каждый открывает свой сценарий, а внутри всё приложение целиком.": "Screens of the working prototype we ran the usability test on: each opens its own flow, and the whole app is inside.",
       "Экраны собраны из UI-кита: на каждый компонент написана спецификация, его варианты, размеры и состояния.": "The screens are built from a UI kit: every component has a spec with its variants, sizes and states.",
       "UI-кит в Figma": "UI kit in Figma",
@@ -4326,7 +4473,6 @@
       "Завершили": "Completed",
       "Тест завершён": "Test complete",
       "Запись сохранена. Спасибо за участие!": "The recording is saved. Thank you for taking part!",
-      "Как мы работали": "How we worked",
       "Дизайнили вдвоём, проверяли у сеньора": "Designed as a pair, reviewed by a senior designer",
       "Пока один предлагал концепцию, другой искал в ней слабые места, потом менялись ролями. Результат показывали сеньору и, если было нужно, дорабатывали по его правкам.": "While one of us proposed a concept, the other looked for its weak spots, then we swapped roles. We showed the result to a senior designer and, when needed, reworked it based on the feedback.",
       "Выбрали четыре направления": "Picked four focus areas",
@@ -4500,20 +4646,19 @@
       "Полоса по категориям": "Bar by category",
       "Видно, сколько принесла каждая категория, а «Весь год» одним нажатием показывает выгоду за год.": "You see what each category brought in, and “Whole year” shows the year’s benefit in one tap.",
       "Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.": "The choice works the same as on first activation, so nobody had to figure it out again. The ease score here is the highest in the test.",
-      "105 с": "105 s",
-      "23 с": "23 s",
-      "42 с": "42 s",
-      "17 с": "17 s",
-      "Выбор категорий": "Choosing categories",
-      "28,7 с": "28.7 s",
-      "14 с": "14 s",
-      "шагов": "steps",
-      "было 12": "was 12",
-      "шага": "steps",
-      "было 7": "was 7",
       "Тестирование с 30 клиентами": "Testing with 30 customers",
       "Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.": "Thirty PSB customers took the test in the working prototype, some on their own, some on a call. We looked at task success, the first action and ease. Everyone managed without help.",
-      "Медианное время на задачу": "Median time per task",
+      "было 105 с": "was 105 s",
+      "в 4,6 раза быстрее": "4.6× faster",
+      "шагов, было 12": "steps, was 12",
+      "лёгкость из 7": "ease of 7",
+      "было 42 с": "was 42 s",
+      "в 2,5 раза быстрее": "2.5× faster",
+      "шагов, было 7": "steps, was 7",
+      "Выбор категорий": "Choosing categories",
+      "было 28,7 с": "was 28.7 s",
+      "в 2 раза быстрее": "2× faster",
+      "Один круг циферблата — 2 минуты.": "One lap of the dial is 2 minutes.",
       "Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.": "Median times. “Before” is five of the bank’s customers on a clickable copy of the original screens, the median of those who finished.",
       "Что сказал сеньор": "What the senior designer said",
       "Ревью кейса от сеньор-дизайнера": "Case review by a senior designer",
@@ -6963,6 +7108,7 @@
       () => {
         document.body.classList.add('playing', 'landed');
         window.scrollTo(0, 0);
+        caseBody.spy();
         if (t.veil) t.veil.style.visibility = 'hidden';
       },
       t.anims.length ? LAND_AT : 0,
@@ -7072,7 +7218,29 @@
   /* ── The case body: the problem cards lead to their solutions, films in the page's language,
      the walkthrough and the pixel scenes playing only while they are on screen ── */
   const caseBody = (() => {
-    // The problem cards in the overview lead to their solution, smoothly
+    // The rail lives in the body: the case rises in with a transform, which would pin a fixed
+    // rail to the case instead of the screen. The lit tick is the last chapter whose top has
+    // passed the middle of the screen; above the first one (on the cover) the rail stays away
+    const rail = document.querySelector('.rail');
+    document.body.append(rail);
+    const railLinks = [...rail.querySelectorAll('a')];
+    const chapters = railLinks.map((a) => document.querySelector(a.hash));
+    const spy = () => {
+      if (!document.body.classList.contains('playing')) return;
+      const line = innerHeight / 2;
+      let on = -1;
+      chapters.forEach((c, i) => c && c.getBoundingClientRect().top <= line && (on = i));
+      railLinks.forEach((a, i) => a.classList.toggle('on', i === on));
+      rail.classList.toggle('off', on < 0);
+    };
+    addEventListener('scroll', spy, { passive: true });
+    // The problem cards in the overview and the rail lead to their chapter, smoothly
+    railLinks.forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector(a.hash).scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }),
+    );
     document.querySelectorAll('.qc').forEach((a) =>
       a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -7444,7 +7612,7 @@
     function stop() {
       [...films, ...loops].forEach((v) => v.pause());
     }
-    return { filmsLang, stop };
+    return { spy, filmsLang, stop };
   })();
   document.getElementById('back').addEventListener('click', caseBody.stop);
   addEventListener('keydown', (e) => e.key === 'Escape' && caseBody.stop());

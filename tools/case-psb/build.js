@@ -34,8 +34,6 @@ const pct = (x) => `${(x * 100).toFixed(1)}%`;
 const secs = (x) => (Array.isArray(x) ? x[0] : typeof x === 'object' ? Number(x.en) : x);
 // The same as text in both languages
 const secText = (x) => (Array.isArray(x) ? x[1] : typeof x === 'object' ? x : t(String(x), String(x)));
-// Russian plural of «шаг»
-const steps = (n) => t(`${n} ${n % 10 === 1 && n % 100 !== 11 ? 'шаг' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'шага' : 'шагов'}`, `${n} ${n === 1 ? 'step' : 'steps'}`);
 const nn = (i) => String(i + 1).padStart(2, '0');
 
 // A chapter opens with its title on the left and the lead (gold pixel eyebrows over chapters
@@ -206,31 +204,49 @@ function solution(s, i) {
 </section>`;
 }
 
-/* ── Testing: time on one scale, then a card per flow ── */
+/* ── Testing: a stopwatch per flow ──
+   Time is a dial: one lap is LAP seconds, the same for every flow, ticks every ten seconds. The
+   old median time is a grey arc; the gold one starts on it and winds back to the new time while
+   the number counts down (played once in view, [data-play]). Under it, how many times faster,
+   and three small dials in the same language: steps (the gold share is what is left of the old
+   path), first click and ease out of 7 */
+const LAP = 120;
+// An arc of a dial: `share` of the circle from twelve o'clock, clockwise
+const arc = (cls, share, from) =>
+  `<circle class="${cls}" cx="50" cy="50" r="42" pathLength="100" style="--to:${(share * 100).toFixed(2)}${from != null ? `;--from:${(from * 100).toFixed(2)}` : ''}" />`;
+const dial = (inner, arcs, cls = '') =>
+  `<div class="dial${cls}"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="track" cx="50" cy="50" r="42" pathLength="100" />${cls ? '<circle class="ticks" cx="50" cy="50" r="49" pathLength="120" />' : ''}${arcs}</svg><div class="dial-c">${inner}</div></div>`;
+// One decimal, without a trailing zero: 4,6 and 2
+const fixed1 = (n) => {
+  const x = String(Number(n.toFixed(1)));
+  return t(x.replace('.', ','), x);
+};
+
+function stopwatch(f) {
+  const [tw, tn] = f.time;
+  const was = secs(tw);
+  const [sw, sn] = f.steps;
+  const faster = fixed1(was / tn);
+  const minis = [
+    [dial(`<b>${sn}</b>`, arc('was', 1) + arc('now', sn / sw)), t(`шагов, было ${sw}`, `steps, was ${sw}`)],
+    [dial(`<b><span data-count-from="0">${f.fcs}</span>%</b>`, arc('now', f.fcs / 100)), t('first click', 'first click')],
+    [dial(`<b>${L(f.seq[1])}</b>`, arc('now', f.seq[0] / 7)), t('лёгкость из 7', 'ease of 7')],
+  ];
+  return `<div class="box sw">${kicker(f.name)}
+    <div class="sw-face">${dial(
+      `<b><span data-count-from="${Math.round(was)}">${tn}</span><small> ${L(t('с', 's'))}</small></b><span>${L(t(`было ${secText(tw).ru} с`, `was ${secText(tw).en} s`))}</span>`,
+      arc('was', was / LAP) + arc('now', tn / LAP, was / LAP),
+      ' big',
+    )}<span class="crown" aria-hidden="true"></span></div>
+    <p class="sw-x">${L(t(`в ${faster.ru} раза быстрее`, `${faster.en}× faster`))}</p>
+    <div class="sw-minis">${minis.map(([d, cap]) => `<div>${d}<span>${L(cap)}</span></div>`).join('')}</div>
+  </div>`;
+}
+
 function testing(s) {
-  const longest = Math.max(...s.flows.map((f) => secs(f.time[0])));
-  const word = (n) => {
-    const x = steps(n);
-    return t(x.ru.split(' ')[1], x.en.split(' ')[1]);
-  };
-  const bars = s.flows
-    .map((f) => {
-      const [tw, tn] = f.time;
-      return `<div class="bar"><p>${L(f.name)}</p><div class="bar-t"><i class="was" style="width:${pct(secs(tw) / longest)}"><span>${L(t(`${secText(tw).ru} с`, `${secText(tw).en} s`))}</span></i><i class="now" style="--to:${pct(tn / longest)}"><span>${L(t(`${tn} с`, `${tn} s`))}</span></i></div></div>`;
-    })
-    .join('');
-  const cards = s.flows
-    .map((f) => {
-      const [was, now] = f.steps;
-      return `<div class="box tile tf">${kicker(f.name)}<p class="tf-big"><b>${now}</b> ${L(word(now))}</p><p class="tf-was"><span class="down">−${Math.round((1 - now / was) * 100)}%</span><span>${L(t(`было ${was}`, `was ${was}`))}</span></p><div class="tf-more"><div><b><span data-count-from="0">${f.fcs}</span>%</b><span>first click</span></div><div><b>${L(f.seq[1])} ${L(t('из 7', 'of 7'))}</b><span>${L(t('оценка лёгкости', 'ease score'))}</span></div></div></div>`;
-    })
-    .join('');
   return `${head('testing', s)}
-  <div data-play>
-    <div class="box bars">${kicker(t('Медианное время на задачу', 'Median time per task'))}${bars}</div>
-    <div class="grid three">${cards}</div>
-  </div>
-  <p class="aside">${L(s.note)}</p>
+  <div class="grid three sws" data-play>${s.flows.map(stopwatch).join('')}</div>
+  <p class="aside"><span>${L(t(`Один круг циферблата — ${LAP / 60} минуты.`, `One lap of the dial is ${LAP / 60} minutes.`))}</span> ${L(s.note)}</p>
 </section>`;
 }
 
@@ -244,7 +260,17 @@ const outcome = (s) => `${head('outcome', s)}
   <div class="grid three">${s.next.map(([h, p]) => `<div class="box tile"><h3>${L(h)}</h3><p>${L(p)}</p></div>`).join('')}</div>
 </section>`;
 
+// The contents: a minimal rail of ticks at the middle of the screen's left edge, a tick per
+// chapter, the one in view gold; the names show when the rail is hovered or focused. A little
+// more air before each part of the case (research, solutions, testing, takeaways)
+const PART_STARTS = new Set(['process', 'home', 'testing', 'outcome']);
+const rail = () =>
+  `<nav class="rail" aria-label="${L(t('Содержание кейса', 'Case contents'))}">${D.toc
+    .map(([id, label]) => `<a href="#c-${id}"${PART_STARTS.has(id) ? ' class="part"' : ''}><i></i><span>${L(label)}</span></a>`)
+    .join('')}</nav>`;
+
 const body = [
+  rail(),
   `<div class="cs">`,
   overview(D.overview),
   screens(D.screens),
