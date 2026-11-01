@@ -1,0 +1,470 @@
+<!doctype html>
+<!--
+  CV, one A4 page. The PDF is printed from this page so it carries real text an ATS can read
+  (the Figma export drew letters as Type 3 glyphs and broke words apart):
+
+    node tools/cv/render.mjs
+
+  The main column comes first in the markup, the sidebar after it, so a parser reads the
+  experience in one piece instead of interleaving it with the skills. No strokes and no
+  interpuncts, as on the site; the typograph below keeps prepositions off line ends.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Даниил Тынчеров, продуктовый дизайнер, CV</title>
+    <style>
+      /* Static Golos instances (Fontsource): the variable font from Google Fonts goes into the
+         PDF as Type 3 glyphs, which older ATS parsers read badly; static ones embed as TrueType */
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 400;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-cyrillic-400-normal.woff2') format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 400;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-latin-400-normal.woff2') format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 500;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-cyrillic-500-normal.woff2') format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 500;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-latin-500-normal.woff2') format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 600;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-cyrillic-600-normal.woff2') format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: 'Golos Text';
+        font-weight: 600;
+        src: url('https://cdn.jsdelivr.net/npm/@fontsource/golos-text@5.2.5/files/golos-text-latin-600-normal.woff2') format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      :root {
+        --ink: #15191d;
+        --ink-2: #4f5a64;
+        --ink-3: #7c8791;
+        --paper: #ffffff;
+        --side: #f3f4f6;
+        --chip: #ffffff;
+        --tint: #faf5e8;
+        --gold: #b58714;
+        /* Spacing scale and corners */
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 40px;
+        --r: 14px;
+        --r-in: 8px;
+        /* Type scale */
+        --t-xs: 11px;
+        --t-s: 12.5px;
+        --t-m: 13px;
+        --t-l: 18px;
+        --t-xl: 32px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        background: var(--paper);
+      }
+      body {
+        width: 210mm;
+        height: 297mm;
+        overflow: hidden;
+        font: 400 var(--t-m) / 1.45 'Golos Text', system-ui, sans-serif;
+        color: var(--ink);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        display: grid;
+        grid-template-columns: 1fr 252px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      ul {
+        list-style: none;
+      }
+      .nobr {
+        white-space: nowrap;
+      }
+
+      main {
+        padding: var(--s6) var(--s6) var(--s6) var(--s7);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+      }
+      aside {
+        background: var(--side);
+        padding: var(--s6) var(--s5) var(--s6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s6);
+      }
+
+      /* Section label: one style for every section on both sides, a gold pixel before it */
+      .label {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        font-size: var(--t-xs);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 10px;
+      }
+      .label::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--gold);
+      }
+
+      /* Head */
+      .head {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+      }
+      .head img {
+        width: 88px;
+        height: 88px;
+        border-radius: var(--r);
+        object-fit: cover;
+        /* The site's square keeps room for the fish; here the face fills the frame */
+        object-view-box: inset(12% 20% 32% 24%);
+        flex: none;
+      }
+      h1 {
+        font-size: var(--t-xl);
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+      }
+      .role {
+        margin-top: var(--s1);
+        font-size: var(--t-l);
+        color: var(--ink-2);
+      }
+
+      /* About */
+      .about {
+        background: var(--side);
+        border-radius: var(--r);
+        padding: var(--s3) var(--s5);
+      }
+      /* The marker is a background, not a positioned ::before: a positioned element is painted
+         after the rest, and a PDF parser would then read the list at the very end of the page */
+      .dots li {
+        padding-left: var(--s4);
+        background: linear-gradient(var(--gold), var(--gold)) 0 0.62em / 5px 5px no-repeat;
+      }
+      .dots li + li {
+        margin-top: 6px;
+      }
+
+      /* Experience */
+      .job-head {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+      }
+      .job-head svg {
+        width: 28px;
+        height: 28px;
+        flex: none;
+      }
+      h2 {
+        font-size: var(--t-l);
+        font-weight: 600;
+        line-height: 1.25;
+      }
+      .job-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--s3);
+        margin-top: var(--s2);
+        font-weight: 500;
+      }
+      .job-line time {
+        font-weight: 400;
+        color: var(--ink-2);
+        white-space: nowrap;
+      }
+      .job-about {
+        margin-top: var(--s1);
+        color: var(--ink-2);
+      }
+      h3 {
+        font-size: var(--t-m);
+        font-weight: 600;
+        margin: var(--s3) 0 6px;
+      }
+      .projects {
+        display: grid;
+        gap: var(--s2);
+      }
+      .project {
+        background: var(--tint);
+        border-radius: var(--r-in);
+        padding: var(--s3) var(--s4);
+      }
+      .project b {
+        font-weight: 600;
+      }
+      .project p {
+        color: var(--ink-2);
+      }
+
+      /* Own projects: two columns of short lines */
+      .own {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--s2) var(--s5);
+      }
+      .own b {
+        display: block;
+        font-weight: 600;
+      }
+      .own span {
+        display: block;
+        color: var(--ink-2);
+        font-size: var(--t-s);
+        line-height: 1.45;
+      }
+      .note {
+        margin-top: var(--s3);
+        color: var(--ink-3);
+        font-size: var(--t-s);
+      }
+
+      /* Education */
+      .edu b {
+        font-weight: 600;
+      }
+      .edu p {
+        color: var(--ink-2);
+      }
+
+      /* Sidebar */
+      .contacts {
+        display: grid;
+        gap: var(--s3);
+      }
+      .contacts small {
+        display: block;
+        font-size: var(--t-xs);
+        color: var(--ink-3);
+      }
+      .contacts a,
+      .contacts span {
+        font-size: var(--t-s);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .group + .group {
+        margin-top: var(--s4);
+      }
+      .group h4 {
+        font-size: var(--t-s);
+        font-weight: 600;
+        color: var(--ink-2);
+        margin-bottom: var(--s2);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chips li {
+        background: var(--chip);
+        border-radius: var(--r-in);
+        padding: 3px var(--s2);
+        font-size: var(--t-s);
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="head">
+        <img src="../../sketches/img/portrait.webp" alt="Даниил Тынчеров" />
+        <div>
+          <h1>Даниил Тынчеров</h1>
+          <p class="role">Продуктовый дизайнер</p>
+        </div>
+      </header>
+
+      <section class="about" aria-label="О себе">
+        <ul class="dots">
+          <li>Больше 2,5 лет проектирую мобильные и веб-интерфейсы в продуктовой команде</li>
+          <li>Веду задачу целиком: от исследования и гипотез до прототипа и передачи в разработку</li>
+          <li>Строю и развиваю дизайн-системы</li>
+          <li>Бэкграунд в разработке: собираю прототипы на коде и говорю с программистами на одном языке</li>
+          <!-- Портфолио: добавить ссылку, когда сайт будет на своём адресе -->
+        </ul>
+      </section>
+
+      <section aria-labelledby="exp">
+        <p class="label" id="exp">Опыт работы</p>
+        <div class="job-head">
+          <!-- Bitt.moe's pixel sprout, redrawn on its 9×9 grid from the logo in the Figma CV -->
+          <svg viewBox="0 0 9 9" aria-hidden="true" shape-rendering="crispEdges">
+            <g fill="#b04a74">
+              <rect x="6" y="0" width="2" height="1" />
+              <rect x="5" y="1" width="4" height="1" />
+              <rect x="1" y="2" width="2" height="1" />
+              <rect x="5" y="2" width="3" height="1" />
+              <rect x="0" y="3" width="4" height="1" />
+              <rect x="5" y="3" width="1" height="1" />
+              <rect x="2" y="4" width="2" height="1" />
+            </g>
+            <rect x="4" y="3" width="1" height="6" fill="#2a2024" />
+          </svg>
+          <h2>Bitt.moe</h2>
+        </div>
+        <p class="job-line"><span>Product Designer</span><time>март 2024 — н. в.</time></p>
+        <p class="job-about">Студия: сайты, сервисы и приложения на заказ, B2B и B2C</p>
+
+        <h3>Что делал</h3>
+        <ul class="dots">
+          <li>Работал в команде с PM, тестировщиками и разработчиками</li>
+          <li>Проводил исследования: анализ конкурентов, интервью, <span class="nobr">юзабилити-тесты</span></li>
+          <li>Проектировал MVP и ключевые сценарии в рамках бюджета и сроков, чтобы проверить продуктовые гипотезы</li>
+          <li>Строил user flow, проверял и подтверждал гипотезы тестами</li>
+          <li>Презентовал и защищал дизайн-решения перед заказчиками</li>
+        </ul>
+
+        <h3>Ключевые проекты</h3>
+        <div class="projects">
+          <div class="project">
+            <b>BittVPN, Telegram Mini App для продажи VPN</b>
+            <p>Спроектировал с нуля и довёл до готового продукта: исследование, сценарии, интерфейс, передача в разработку</p>
+          </div>
+          <div class="project">
+            <b>Plex Requests, Telegram Mini App для заявок в медиатеку Plex</b>
+            <p>Спроектировал с нуля: от исследования до готового продукта</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="own">
+        <p class="label" id="own">Свои проекты: дизайн и код, исходники на GitHub</p>
+        <ul class="own">
+          <li><b>Плагин для Figma</b><span>На проверке в Figma Community</span></li>
+          <li><b>UX-тренажёр</b><span>Telegram-бот с тестами по UX и UI для дизайн-сообщества</span></li>
+          <li><b>Vermis librorum</b><span>Читалка в Telegram: книга по одному слову</span></li>
+          <li><b>Таймкоды YT Music</b><span>Расширение для браузера: треклист прямо в плеере</span></li>
+        </ul>
+      </section>
+
+      <section class="edu" aria-labelledby="edu">
+        <p class="label" id="edu">Образование</p>
+        <b>СПбГУТ им. проф. М. А. Бонч-Бруевича</b>
+        <p>Техник-программист, 2018–2022</p>
+      </section>
+    </main>
+
+    <aside>
+      <section aria-labelledby="con">
+        <p class="label" id="con">Контакты</p>
+        <ul class="contacts">
+          <li><small>Город</small><span>Санкт-Петербург</span></li>
+          <li><small>Telegram</small><a href="https://t.me/everlastinghate">@everlastinghate</a></li>
+          <li><small>Почта</small><a href="mailto:tyncherovmail@icloud.com">tyncherovmail@icloud.com</a></li>
+          <li><small>Телефон</small><a href="tel:+79650341488">+7 965 034-14-88</a></li>
+          <li>
+            <small>LinkedIn</small
+            ><a href="https://www.linkedin.com/in/daniil-tyncherov-455b713a8">linkedin.com/in/daniil-tyncherov</a>
+          </li>
+          <li><small>GitHub</small><a href="https://github.com/cybertatar">github.com/cybertatar</a></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="skills">
+        <p class="label" id="skills">Навыки</p>
+        <div class="group">
+          <h4>Продукт</h4>
+          <ul class="chips">
+            <li>Гипотезы и их проверка</li>
+            <li>Продуктовые метрики</li>
+            <li>MVP</li>
+          </ul>
+        </div>
+        <div class="group">
+          <h4>Исследования</h4>
+          <ul class="chips">
+            <li>Глубинные интервью</li>
+            <li>Юзабилити-тесты</li>
+            <li>Анализ конкурентов</li>
+            <li>Jobs To Be Done</li>
+            <li>CJM</li>
+            <li>User Flow</li>
+          </ul>
+        </div>
+        <div class="group">
+          <h4>Интерфейсы</h4>
+          <ul class="chips">
+            <li>Сценарии и прототипы</li>
+            <li>Дизайн-системы</li>
+            <li>HIG и Material Design</li>
+            <li>UX-writing</li>
+          </ul>
+        </div>
+        <div class="group">
+          <h4>Инструменты</h4>
+          <ul class="chips">
+            <li>Figma</li>
+            <li>Прототипы на коде</li>
+            <li>Swift и Xcode</li>
+            <li>Claude и Codex</li>
+          </ul>
+        </div>
+      </section>
+    </aside>
+
+    <script>
+      /* Typograph, as on the site (src/typograph.ts in the main repo): a short word keeps the
+         next one with it, a number stays with what it counts, a dash never starts a line */
+      (() => {
+        const NB = ' ';
+        const RU = 'без|для|над|под|при|про|обо|изо|ото|что|как|или|чем|где|через|перед|после|около|между|вместо|среди|кроме|возле|вокруг|против';
+        const SHORT = new RegExp(`(?<![\\p{L}\\p{N}&#'’\\-])(\\p{Script=Cyrillic}{1,2}|${RU})\\s+(?=\\S)`, 'giu');
+        const NUMBER = /(?<![\p{L}\p{N}])(\p{N}[\p{N},.:/%×]*)\s+(?=\p{L})/gu;
+        const DASH = /(?<=\S)\s+(?=[—–]\s)/gu;
+        const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let n; (n = w.nextNode()); ) {
+          if (n.parentNode.nodeName === 'SCRIPT' || !/\S/.test(n.data)) continue;
+          n.data = n.data.replace(SHORT, (_, x) => x + NB).replace(NUMBER, (_, x) => x + NB).replace(DASH, NB);
+        }
+      })();
+    </script>
+  </body>
+</html>
