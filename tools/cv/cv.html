@@ -72,13 +72,13 @@
         --s4: 16px;
         --s5: 24px;
         --s6: 32px;
-        --s7: 40px;
+        --s7: 44px;
         --r: 14px;
         --r-in: 8px;
         /* Type scale */
         --t-xs: 11px;
         --t-s: 12.5px;
-        --t-m: 13px;
+        --t-m: 13.5px;
         --t-l: 18px;
         --t-xl: 32px;
       }
@@ -95,7 +95,7 @@
         width: 210mm;
         height: 297mm;
         overflow: hidden;
-        font: 400 var(--t-m) / 1.45 'Golos Text', system-ui, sans-serif;
+        font: 400 var(--t-m) / 1.55 'Golos Text', system-ui, sans-serif;
         color: var(--ink);
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -114,14 +114,14 @@
       }
 
       main {
-        padding: var(--s6) var(--s6) var(--s6) var(--s7);
+        padding: var(--s7) var(--s6) var(--s6) var(--s7);
         display: flex;
         flex-direction: column;
-        gap: var(--s5);
+        gap: var(--s6);
       }
       aside {
         background: var(--side);
-        padding: var(--s6) var(--s5) var(--s6);
+        padding: var(--s7) var(--s5) var(--s6);
         display: flex;
         flex-direction: column;
         gap: var(--s6);
@@ -177,7 +177,7 @@
       .about {
         background: var(--side);
         border-radius: var(--r);
-        padding: var(--s3) var(--s5);
+        padding: var(--s4) var(--s5);
       }
       /* The marker is a background, not a positioned ::before: a positioned element is painted
          after the rest, and a PDF parser would then read the list at the very end of the page */
@@ -186,7 +186,7 @@
         background: linear-gradient(var(--gold), var(--gold)) 0 0.62em / 5px 5px no-repeat;
       }
       .dots li + li {
-        margin-top: 6px;
+        margin-top: var(--s2);
       }
 
       /* Experience */
@@ -225,7 +225,7 @@
       h3 {
         font-size: var(--t-m);
         font-weight: 600;
-        margin: var(--s3) 0 6px;
+        margin: var(--s5) 0 var(--s2);
       }
       .projects {
         display: grid;
@@ -243,27 +243,6 @@
         color: var(--ink-2);
       }
 
-      /* Own projects: two columns of short lines */
-      .own {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--s2) var(--s5);
-      }
-      .own b {
-        display: block;
-        font-weight: 600;
-      }
-      .own span {
-        display: block;
-        color: var(--ink-2);
-        font-size: var(--t-s);
-        line-height: 1.45;
-      }
-      .note {
-        margin-top: var(--s3);
-        color: var(--ink-3);
-        font-size: var(--t-s);
-      }
 
       /* Education */
       .edu b {
@@ -375,16 +354,6 @@
         </div>
       </section>
 
-      <section aria-labelledby="own">
-        <p class="label" id="own">Свои проекты: дизайн и код, исходники на GitHub</p>
-        <ul class="own">
-          <li><b>Плагин для Figma</b><span>На проверке в Figma Community</span></li>
-          <li><b>UX-тренажёр</b><span>Telegram-бот с тестами по UX и UI для дизайн-сообщества</span></li>
-          <li><b>Vermis librorum</b><span>Читалка в Telegram: книга по одному слову</span></li>
-          <li><b>Таймкоды YT Music</b><span>Расширение для браузера: треклист прямо в плеере</span></li>
-        </ul>
-      </section>
-
       <section class="edu" aria-labelledby="edu">
         <p class="label" id="edu">Образование</p>
         <b>СПбГУТ им. проф. М. А. Бонч-Бруевича</b>
@@ -404,7 +373,6 @@
             <small>LinkedIn</small
             ><a href="https://www.linkedin.com/in/daniil-tyncherov-455b713a8">linkedin.com/in/daniil-tyncherov</a>
           </li>
-          <li><small>GitHub</small><a href="https://github.com/cybertatar">github.com/cybertatar</a></li>
         </ul>
       </section>
 
