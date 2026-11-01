@@ -48,11 +48,19 @@ module.exports = {
         'Each of these decisions makes sense on its own, but together they make simple actions harder than they need to be. I set out to find where exactly the difficulties arise and how to make these flows easier.',
       ),
     ],
-    facts: [
-      [t('Роль', 'Role'), t('Продуктовый дизайнер, в паре', 'Product designer, in a team of two')],
-      [t('Формат', 'Format'), t('Концепт, 2026', 'Concept, 2026')],
-      [t('Сфера', 'Industry'), t('Банк, B2C, мобильное приложение', 'Banking, B2C, mobile app')],
-    ],
+    // Who, what kind of project and with what, beside the intro (after the co-author's version)
+    about: {
+      team: t('2 продуктовых дизайнера', '2 product designers'),
+      project: [t('Финтех', 'Fintech'), 'B2C', t('Мобильное приложение', 'Mobile app'), t('Концепт 2026', 'Concept 2026')],
+      // [icon in img/tools, name]
+      tools: [
+        ['figma', 'Figma'],
+        ['claude', 'Claude'],
+        ['codex', 'Codex'],
+        ['mobbin', 'Mobbin'],
+        ['rive', 'Rive'],
+      ],
+    },
     quests: [
       [
         'home',
@@ -522,17 +530,14 @@ module.exports = {
       'Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.',
       'Thirty PSB customers took the test in the working prototype, some on their own, some on a call. We looked at task success, the first action and ease. Everyone managed without help.',
     ),
-    bars: [
-      [t('Подключение кешбэка', 'Activating cashback'), 105, 23],
-      [t('Данные карты', 'Card details'), 42, 17],
-      [t('Выбор категорий', 'Choosing categories'), 28.7, 14],
+    // Every flow on one build: steps and median time before and after, first click success,
+    // ease (SEQ, of 7) and how many finished. Time bars share one scale across the flows
+    flows: [
+      { name: t('Подключение кешбэка', 'Activating cashback'), steps: [12, 5], time: [105, 23], fcs: 83, seq: [6.5, t('6,5', '6.5')] },
+      { name: t('Данные карты', 'Card details'), steps: [7, 4], time: [42, 17], fcs: 83, seq: [6.0, t('6,0', '6.0')] },
+      { name: t('Выбор категорий', 'Choosing categories'), steps: [7, 6], time: [[28.7, t('28,7', '28.7')], 14], fcs: 100, seq: [6.7, t('6,7', '6.7')] },
     ],
-    head: [t('Сценарий', 'Flow'), t('Завершили', 'Completed'), t('Первый клик', 'First click'), 'SEQ'],
-    tests: [
-      [t('Подключить кешбэк', 'Activate cashback'), '30/30', '83%', t('6,5/7', '6.5/7')],
-      [t('Выбрать категории', 'Choose categories'), '30/30', '100%', t('6,7/7', '6.7/7')],
-      [t('Скопировать данные карты', 'Copy card details'), '30/30', '83%', t('6,0/7', '6.0/7')],
-    ],
+    people: 30,
     note: t(
       'Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.',
       'Median times. “Before” is five of the bank’s customers on a clickable copy of the original screens, the median of those who finished.',

@@ -40,6 +40,20 @@ const shot = (src, cap, cls = '') =>
 const stat = ([n, unit, what]) =>
   `<div class="st"><p class="st-n"><b>${L(num(n))}</b>${unit ? `<span>${L(unit)}</span>` : ''}</p><p class="st-what">${L(what)}</p></div>`;
 
+const pct = (x) => `${(x * 100).toFixed(1)}%`;
+
+// Team, project and tools beside the intro, as chips
+function about(a) {
+  const pill = (x) => `<span class="pill">${L(x)}</span>`;
+  return `<aside class="about">
+    <div><p class="about-k">${L(t('Команда', 'Team'))}</p><p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>${L(a.team)}</span></p></div>
+    <div><p class="about-k">${L(t('Проект', 'Project'))}</p><p class="pills">${a.project.map(pill).join('')}</p></div>
+    <div><p class="about-k">${L(t('Инструменты', 'Tools'))}</p><p class="pills">${a.tools
+      .map(([icon, name]) => `<span class="pill tool"><img src="img/tools/${icon}.svg" alt="" />${L(name)}</span>`)
+      .join('')}</p></div>
+  </aside>`;
+}
+
 function overview(o) {
   const quests = o.quests
     .map(
@@ -51,19 +65,19 @@ function overview(o) {
     .join('');
   const stats = o.stats
     .map(([n, unit, what, more, g]) => {
+      // Time shrinks from the old length to the new one, a share fills from empty
       const gauge = Array.isArray(g)
-        ? `<span class="g"><i style="width:100%"></i><i class="now" style="width:${((g[1] / g[0]) * 100).toFixed(1)}%"></i></span>`
-        : `<span class="g"><i class="now" style="width:${(g * 100).toFixed(1)}%"></i></span>`;
+        ? `<span class="g"><i style="width:100%"></i><i class="now time" style="--to:${pct(g[1] / g[0])}"></i></span>`
+        : `<span class="g"><i class="now" style="--to:${pct(g)}"></i></span>`;
       return `<div class="st big"><p class="st-what">${L(what)}</p><p class="st-n"><b>${L(num(n))}</b>${unit ? `<span>${L(unit)}</span>` : ''}</p>${gauge}<p class="st-more">${L(more)}</p></div>`;
     })
     .join('');
   return `${head('overview', o)}
-  ${prose(o.prose)}
-  <dl class="facts-row">${o.facts.map(([k, v]) => `<div><dt>${L(k)}</dt><dd>${L(v)}</dd></div>`).join('')}</dl>
+  <div class="intro">${prose(o.prose)}${about(o.about)}</div>
   <h3>${L(t('Проблемы и решения', 'Problems and solutions'))}</h3>
   <div class="qcs">${quests}</div>
   <h3>${L(t('Результаты', 'Results'))}</h3>
-  <div class="sts four">${stats}</div>
+  <div class="sts four" data-play>${stats}</div>
   <p class="aside">${L(o.statsNote)}</p>
 </section>`;
 }
@@ -107,15 +121,40 @@ function interviews(s) {
 </section>`;
 }
 
+// The clock of a flow: 1:45, 0:28,7 (0:28.7 in English)
+const clock = (sec) => {
+  const n = secs(sec);
+  const tenths = Math.round((n % 1) * 10);
+  const base = `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`;
+  return tenths ? t(`${base},${tenths}`, `${base}.${tenths}`) : t(base, base);
+};
+const secs = (x) => (Array.isArray(x) ? x[0] : typeof x === "object" ? Number(x.en) : x);
+
+// "Before / after" as a race: both flows start together and run at their measured median times,
+// sped up; the screens are spread evenly over the time of the flow. The bars share one scale, so
+// the faster flow stops short. Without the script, or with reduced motion, it shows the finish
 function race(lanes) {
-  return `<div class="race">${lanes
-    .map(([label, n, sec, shots], i) => {
-      const s = num(sec);
-      return `<div class="lane${i ? ' win' : ''}"><p class="lane-h"><b>${L(label)}</b><span>${L(steps(n))}</span><span>${L(t(`${s.ru} с`, `${s.en} s`))}</span></p><div class="strip">${shots
-        .map(([src, cap], k) => `<figure class="shot sm"><span class="shot-n">${k + 1}</span><img src="img/psb/${src}.webp" alt="${L(cap)}" loading="lazy" decoding="async" /><figcaption>${L(cap)}</figcaption></figure>`)
-        .join('')}</div></div>`;
-    })
-    .join('')}</div>`;
+  const longest = Math.max(...lanes.map((l) => secs(l[2])));
+  return `<div class="race" data-race>
+    <div class="lanes">${lanes
+      .map(([label, n, sec, shots], i) => {
+        const s = secs(sec);
+        const screens = shots
+          .map(([src, cap], k) => `<img src="img/psb/${src}.webp" alt="${L(cap)}" loading="lazy" decoding="async"${k === shots.length - 1 ? ' class="on"' : ''} />`)
+          .join('');
+        const caps = shots.map(([, cap], k) => `<span${k === shots.length - 1 ? ' class="on"' : ''}>${L(cap)}</span>`).join('');
+        return `<div class="lane${i ? ' win' : ''}" data-lane data-sec="${s}" data-steps="${n}">
+        <p class="lane-h">${L(label)}</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen">${screens}</div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:${pct(s / longest)}"></i></span>
+        <p class="rclock"><b data-clock>${L(clock(sec))}</b><span class="rend">${L(i ? t('Готово', 'Done') : t('Дошли до конца', 'Got there'))}</span></p>
+        <p class="rstep"><span>${L(t('Шаг', 'Step'))}</span> <b data-step>${n}</b> <span>${L(t('из', 'of'))}</span> <span>${n}</span></p>
+        <p class="rcap">${caps}</p>
+      </div>`;
+      })
+      .join('')}</div>
+    <button class="btn replay" type="button" data-replay hidden>${L(t('Ещё раз', 'Replay'))}</button>
+  </div>`;
 }
 
 function variants(v, id) {
@@ -158,20 +197,66 @@ function solution(s, i, all) {
 </section>`;
 }
 
+// A pixel heart, 9×8, Zelda's container: edge, fill, shine; part of the last one filled
+const HEART = ['.RR...RR.', 'RrrR.RrrR', 'RqrrRrrrR', 'RqrrrrrrR', '.RrrrrrR.', '..RrrrR..', '...RrR...', '....R....'];
+const heartPaths = (() => {
+  const d = {};
+  HEART.forEach((row, y) => {
+    for (let x = 0; x < row.length; ) {
+      let end = x + 1;
+      while (end < row.length && row[end] === row[x]) end++;
+      if (row[x] !== '.') d[row[x]] = (d[row[x]] || '') + `M${x} ${y}h${end - x}v1h-${end - x}z`;
+      x = end;
+    }
+  });
+  return d;
+})();
+const hearts = (value, max = 7) =>
+  `<span class="hearts" aria-hidden="true">${Array.from({ length: max }, (_, i) => {
+    const px = Math.round(Math.max(0, Math.min(1, value - i)) * 9);
+    const shape = (cls) => Object.entries(heartPaths).map(([c, d]) => `<path class="${cls}${c}" d="${d}"/>`).join('');
+    return `<svg class="heart" style="--i:${i}" viewBox="0 0 9 8" shape-rendering="crispEdges">${shape('e-')}${
+      px ? `<g style="clip-path:inset(0 ${9 - px}px 0 0)">${shape('f-')}</g>` : ''
+    }</svg>`;
+  }).join('')}</span>`;
+
 function testing(s) {
-  const max = Math.max(...s.bars.map((b) => b[1]));
-  const fmt = (n) => t(String(n).replace('.', ','), String(n));
-  const bars = s.bars
-    .map(
-      ([label, was, now]) =>
-        `<div class="bar"><b>${L(label)}</b><div class="bar-track"><i class="was" style="width:${((was / max) * 100).toFixed(1)}%"><span>${L(t(`${fmt(was).ru} с`, `${fmt(was).en} s`))}</span></i><i class="now" style="width:${((now / max) * 100).toFixed(1)}%"><span>${L(t(`${now} с`, `${now} s`))}</span></i></div></div>`,
-    )
+  const longest = Math.max(...s.flows.map((f) => secs(f.time[0])));
+  const word = (n) => {
+    const x = steps(n);
+    return t(x.ru.split(' ')[1], x.en.split(' ')[1]);
+  };
+  const flows = s.flows
+    .map((f) => {
+      const [was, now] = f.steps;
+      const [tw, tn] = f.time;
+      const down = Math.round((1 - now / was) * 100);
+      const pips = Array.from({ length: was }, (_, i) => `<i${i < now ? ' class="now"' : ''} style="--i:${was - 1 - i}"></i>`).join('');
+      return `<article class="tf">
+      <h3 class="tf-name">${L(f.name)}</h3>
+      <div class="tf-steps">
+        <p class="tf-big"><b>${now}</b><span>${L(word(now))}</span></p>
+        <p class="tf-was"><span class="down">−${down}%</span><span>${L(t(`было ${was}`, `was ${was}`))}</span></p>
+        <span class="pips" aria-hidden="true">${pips}</span>
+      </div>
+      <div class="tf-time">
+        <p class="tf-k">${L(t('Медианное время', 'Median time'))}</p>
+        <span class="tbar" aria-hidden="true"><i class="was" style="width:${pct(secs(tw) / longest)}"></i><i class="now" style="--from:${pct(secs(tw) / longest)};--to:${pct(tn / longest)}"></i></span>
+        <p class="tf-sec"><b><span data-count-from="${Math.round(secs(tw))}">${tn}</span> ${L(t('с', 's'))}</b><span>${L(t(`вместо ${typeof tw === 'object' ? tw[1].ru : tw} с`, `instead of ${typeof tw === 'object' ? tw[1].en : tw} s`))}</span></p>
+      </div>
+      <div class="tf-more">
+        <div><p class="tf-k">${L(t('Первый клик', 'First click'))}</p><p class="tf-n"><b><span data-count-from="0">${f.fcs}</span>%</b></p><span class="mana" aria-hidden="true"><i style="--to:${f.fcs}%"></i></span></div>
+        <div><p class="tf-k">${L(t('Лёгкость', 'Ease'))}</p><p class="tf-n"><b>${L(f.seq[1])}</b><span>${L(t('из 7', 'of 7'))}</span></p>${hearts(f.seq[0])}</div>
+      </div>
+    </article>`;
+    })
     .join('');
+  const dots = Array.from({ length: s.people }, (_, i) => `<i style="--i:${i}"></i>`).join('');
   return `${head('testing', s)}
-  <div class="bars">${bars}</div>
-  <table class="tbl"><thead><tr>${s.head.map((h, i) => `<th scope="col">${L(num(h))}</th>`).join('')}</tr></thead><tbody>${s.tests
-    .map(([task, done, fcs, seq]) => `<tr><th scope="row">${L(task)}</th><td>${done}</td><td>${fcs}</td><td>${L(num(seq))}</td></tr>`)
-    .join('')}</tbody></table>
+  <div class="tst" data-play>
+    <div class="tdone"><span class="crowd" aria-hidden="true">${dots}</span><p><b>${L(t(`${s.people} из ${s.people}`, `${s.people} of ${s.people}`))}</b> <span>${L(t('прошли все три задачи сами, без подсказок', 'did all three tasks on their own, with no hints'))}</span></p></div>
+    <div class="tflows">${flows}</div>
+  </div>
   <p class="aside">${L(s.note)}</p>
 </section>`;
 }

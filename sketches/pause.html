@@ -1844,9 +1844,6 @@
     .reading .inner {
       grid-template-columns: 1fr;
     }
-    .toc {
-      display: none;
-    }
   }
   .toc {
     position: sticky;
@@ -1938,24 +1935,59 @@
     color: var(--gold);
   }
 
-  /* Overview: role and format in a row, then the four quests and the results */
-  .facts-row {
+  /* Overview: the intro, and beside it who made it, what kind of project and with what (after
+     the co-author's version of the case); pills like the skills on «Персонаж» */
+  .intro {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s3);
-    margin: var(--s6) 0 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 260px);
+    gap: var(--s7);
+    align-items: start;
   }
-  .facts-row div {
-    padding: var(--s3) var(--s4);
+  .about {
+    display: grid;
+    gap: var(--s5);
+  }
+  .about-k {
+    margin-bottom: var(--s2);
+    font: 700 var(--fs-px)/1 var(--pixel);
+    color: var(--gold);
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    padding: var(--s2) var(--s3);
     border-radius: var(--r-ctl);
-    background: var(--fill);
+    background: var(--fill-2);
+    font-size: var(--fs-ui);
+    line-height: 1.2;
+    white-space: nowrap;
   }
-  .facts-row dt {
-    font-size: var(--fs-cap);
-    color: var(--ink-3);
+  .pill img {
+    width: 20px;
+    height: 20px;
+    flex: none;
   }
-  .facts-row dd {
-    margin: var(--s1) 0 0;
+  .pill.team,
+  .pill.tool {
+    padding-left: var(--s2);
+  }
+  .ava {
+    display: flex;
+  }
+  .ava img {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--r-key);
+    image-rendering: pixelated;
+  }
+  .ava img + img {
+    margin-left: calc(-1 * var(--s1));
   }
   .qcs {
     display: grid;
@@ -2048,6 +2080,7 @@
     background: var(--fill-3);
   }
   .g i.now {
+    width: var(--to);
     background: var(--gold);
   }
 
@@ -2235,58 +2268,158 @@
   .result .st {
     background: var(--fill-2);
   }
-  /* The race: the old path and the new one, screen by screen, side-scrolling */
+  /* The race: before and after start together and run at their measured median times, sped up.
+     Each phone pushes its next screen in as the flow moves on; the time bars share one scale, so
+     the faster flow stops short. Without the script it stands at the finish */
   .race {
     display: grid;
-    gap: var(--s4);
+    justify-items: center;
+    gap: var(--s5);
     margin-top: var(--s6);
-  }
-  .lane {
-    padding: var(--pad) 0 var(--pad) var(--pad);
+    padding: var(--s6) var(--pad);
     border-radius: var(--r);
     background: var(--fill);
   }
-  .lane.win {
-    background: var(--fill-2);
+  .lanes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 260px));
+    justify-content: center;
+    gap: var(--s7);
+    width: 100%;
+  }
+  .lane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
   .lane-h {
+    align-self: center;
+    margin-bottom: var(--s4);
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--ink-2);
+  }
+  .lane.win .lane-h {
+    color: var(--gold);
+  }
+  /* The phone as on the case head: the body over a screen window cut to its display */
+  .rph {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 450 / 920;
+    container-type: inline-size;
+  }
+  .rph .body {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .rph .screen {
+    position: absolute;
+    left: calc(20 / 450 * 100%);
+    top: calc(19 / 920 * 100%);
+    width: calc(410 / 450 * 100%);
+    height: calc(882 / 920 * 100%);
+    border-radius: calc(64 / 450 * 100cqi);
+    overflow: hidden;
+    background: #000;
+  }
+  .rph .screen img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    visibility: hidden;
+  }
+  .rph .screen img.on,
+  .rph .screen img.was {
+    visibility: visible;
+  }
+  .rph .screen img.on {
+    z-index: 1;
+  }
+  .rph .screen img.enter {
+    animation: push 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  @keyframes push {
+    from {
+      transform: translateX(6%);
+      opacity: 0;
+    }
+  }
+  .rbar {
+    display: block;
+    height: var(--s2);
+    margin-top: var(--s5);
+    border-radius: var(--r-key);
+    background: var(--fill-2);
+    overflow: hidden;
+  }
+  .rbar i {
+    display: block;
+    width: var(--to);
+    height: 100%;
+    border-radius: var(--r-key);
+    background: var(--ink-3);
+  }
+  .win .rbar i {
+    background: var(--gold);
+  }
+  .rclock {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--s4);
-    padding-right: var(--pad);
-    margin-bottom: var(--s4);
-    color: var(--ink-2);
+    gap: 0 var(--s2);
+    margin-top: var(--s3);
   }
-  .lane-h b {
-    font: 700 var(--fs-px-l)/1 var(--pixel);
-    color: var(--ink);
+  .rclock b {
+    font: 600 var(--fs-h3)/1.05 var(--body);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
   }
-  .lane.win .lane-h b {
+  .rend {
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .win .rend {
     color: var(--gold);
   }
-  .strip {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 132px;
-    gap: var(--s4);
-    overflow-x: auto;
-    padding-right: var(--pad);
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
+  .race.running .lane:not(.done) .rend {
+    visibility: hidden;
   }
-  .strip::-webkit-scrollbar {
+  .rstep {
+    margin-top: var(--s1);
+    font-size: var(--fs-cap);
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Every caption in one cell: the tallest holds the height, so nothing below jumps */
+  .rcap {
+    display: grid;
+    margin-top: var(--s1);
+    font-size: var(--fs-ui);
+    color: var(--ink);
+  }
+  .rcap span {
+    grid-area: 1 / 1;
+    visibility: hidden;
+  }
+  .rcap span.on {
+    visibility: visible;
+  }
+  .replay[hidden] {
     display: none;
   }
-  .shot.sm {
-    scroll-snap-align: start;
-    grid-template-rows: auto auto auto;
+  button.btn {
+    border: 0;
+    cursor: pointer;
   }
-  .shot.sm img {
-    border-radius: var(--r-ctl);
-  }
-  .shot-n {
-    font-size: var(--fs-px);
+  button.btn:hover {
+    background: var(--fill-3);
   }
   /* Options tried: the list says why, the screen shows it */
   .vars {
@@ -2380,72 +2513,228 @@
     color: var(--ink-3);
   }
 
-  /* Testing: time before and after on one scale, then the table */
-  .bars {
+  /* Testing: everyone finished, then one card per flow on the same build: steps before and
+     after as pips, the median time on one scale for every flow, the first click as a gauge and
+     ease as Zelda's heart containers. It plays once when scrolled into view ([data-play]) */
+  .tst {
     display: grid;
     gap: var(--s4);
+  }
+  .tdone {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s3) var(--s5);
     padding: var(--pad);
     border-radius: var(--r);
     background: var(--fill);
   }
-  .bar {
-    display: grid;
-    grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
-    align-items: center;
-    gap: var(--s4);
+  .tdone p {
+    color: var(--ink-2);
+    font-size: var(--fs-title);
   }
-  .bar b {
-    font-weight: 500;
+  .tdone b {
+    font: 600 var(--fs-h3)/1 var(--body);
+    color: var(--ink);
+    margin-right: var(--s2);
   }
-  .bar-track {
+  .crowd {
     display: grid;
+    grid-template-columns: repeat(15, var(--s3));
     gap: var(--s1);
   }
-  .bar-track i {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 64px;
-    height: var(--s5);
-    padding: 0 var(--s2);
-    border-radius: var(--r-key);
-    background: var(--fill-3);
-    font: normal var(--fs-cap)/1 var(--body);
-    color: var(--ink-2);
-  }
-  .bar-track i.now {
+  .crowd i {
+    height: var(--s3);
+    border-radius: 3px;
     background: var(--gold);
-    color: var(--gold-ink);
-    font-weight: 600;
   }
-  .tbl {
-    width: 100%;
-    margin-top: var(--s4);
-    border-collapse: separate;
-    border-spacing: 0 var(--s2);
-    font-variant-numeric: tabular-nums;
+  .tflows {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s4);
   }
-  .tbl th,
-  .tbl td {
-    padding: var(--s3) var(--s4);
-    text-align: left;
-    font-weight: 400;
-  }
-  .tbl thead th {
-    padding-block: 0;
-    font: 700 var(--fs-px)/1 var(--pixel);
-    color: var(--ink-3);
-  }
-  .tbl tbody th,
-  .tbl tbody td {
+  .tf {
+    display: grid;
+    align-content: start;
+    gap: var(--s5);
+    padding: var(--pad);
+    border-radius: var(--r);
     background: var(--fill);
   }
-  .tbl tbody th {
-    border-radius: var(--r-ctl) 0 0 var(--r-ctl);
-    font-weight: 500;
+  .reading .tf-name {
+    margin: 0;
+    font: 700 var(--fs-px-l)/1 var(--pixel);
+    color: var(--gold);
   }
-  .tbl tbody td:last-child {
-    border-radius: 0 var(--r-ctl) var(--r-ctl) 0;
+  .tf-big {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+  }
+  .tf-big b {
+    font: 600 var(--fs-h2)/1 var(--body);
+    letter-spacing: -0.02em;
+  }
+  .tf-big span {
+    font-size: var(--fs-title);
+  }
+  .tf-was {
+    display: flex;
+    gap: var(--s2);
+    margin-top: var(--s1);
+    font-size: var(--fs-ui);
+    color: var(--ink-3);
+  }
+  .down {
+    color: var(--green);
+    font-weight: 600;
+  }
+  /* A pip per step of the old flow: the new flow keeps the gold ones */
+  .pips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s1);
+    margin-top: var(--s3);
+  }
+  .pips i {
+    width: var(--s3);
+    height: var(--s3);
+    border-radius: 3px;
+    background: var(--fill-3);
+  }
+  .pips i.now {
+    background: var(--gold);
+  }
+  .tf-k {
+    margin-bottom: var(--s2);
+    font-size: var(--fs-cap);
+    color: var(--ink-3);
+  }
+  .tbar {
+    position: relative;
+    display: block;
+    height: var(--s3);
+  }
+  .tbar i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: var(--r-key);
+  }
+  .tbar .was {
+    background: var(--fill-3);
+  }
+  .tbar .now {
+    width: var(--to);
+    background: var(--gold);
+  }
+  .tf-sec {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s2);
+    margin-top: var(--s2);
+    color: var(--ink-3);
+    font-size: var(--fs-ui);
+  }
+  .tf-sec b,
+  .tf-n b {
+    font: 600 var(--fs-h3)/1.1 var(--body);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .tf-more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+  .tf-n {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s1);
+    color: var(--ink-3);
+  }
+  .mana {
+    display: block;
+    height: var(--s2);
+    margin-top: var(--s2);
+    border-radius: var(--r-key);
+    background: var(--fill-2);
+    overflow: hidden;
+  }
+  .mana i {
+    display: block;
+    width: var(--to);
+    height: 100%;
+    border-radius: var(--r-key);
+    background: var(--gold);
+  }
+  .hearts {
+    display: flex;
+    gap: 2px;
+    margin-top: var(--s2);
+  }
+  .heart {
+    width: 18px;
+    height: 16px;
+  }
+  .heart .e-R {
+    fill: rgba(238, 242, 245, 0.22);
+  }
+  .heart .e-r,
+  .heart .e-q {
+    fill: rgba(238, 242, 245, 0.08);
+  }
+  .heart .f-R {
+    fill: #b5313c;
+  }
+  .heart .f-r {
+    fill: #e5484d;
+  }
+  .heart .f-q {
+    fill: #ffb3b5;
+  }
+
+  /* Played once on view: everything starts where the old flow was and moves to the new one */
+  [data-play].armed :is(.g i.now, .tbar .now, .mana i, .crowd i, .pips i, .heart) {
+    transition: 0.9s cubic-bezier(0.3, 0.7, 0.2, 1);
+    transition-property: width, opacity, background-color, transform;
+  }
+  [data-play].armed:not(.on) .g i.now {
+    width: 0;
+  }
+  [data-play].armed:not(.on) .g i.now.time,
+  [data-play].armed:not(.on) .tbar .now {
+    width: var(--from, 100%);
+  }
+  [data-play].armed:not(.on) .mana i {
+    width: 0;
+  }
+  [data-play].armed:not(.on) .crowd i {
+    opacity: 0.15;
+  }
+  [data-play].armed .crowd i {
+    transition-duration: 0.3s;
+    transition-delay: calc(var(--i) * 30ms);
+  }
+  [data-play].armed:not(.on) .pips i {
+    background: var(--gold);
+  }
+  [data-play].armed .pips i:not(.now) {
+    transition-duration: 0.3s;
+    transition-delay: calc(0.3s + var(--i) * 70ms);
+  }
+  [data-play].armed:not(.on) .heart {
+    transform: scale(0);
+  }
+  [data-play].armed .heart {
+    transition-duration: 0.35s;
+    transition-delay: calc(0.6s + var(--i) * 80ms);
+    transition-timing-function: cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  [data-play].armed .tbar .now,
+  [data-play].armed .g i.now.time {
+    transition-duration: 1.4s;
+    transition-delay: 0.2s;
   }
   .next {
     display: grid;
@@ -2471,7 +2760,8 @@
     .finds,
     .next,
     .crit,
-    .facts-row {
+    .intro,
+    .tflows {
       grid-template-columns: 1fr;
     }
     .sts.four {
@@ -2497,16 +2787,20 @@
     .rows-h span:first-child {
       display: none;
     }
-    .bar {
-      grid-template-columns: 1fr;
-      gap: var(--s2);
+    /* The contents stay a desktop sidebar (this has to follow the base rule to win) */
+    .toc {
+      display: none;
     }
-    .tbl {
-      font-size: var(--fs-cap);
+    .lanes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s4);
     }
-    .tbl th,
-    .tbl td {
-      padding: var(--s2);
+    .race {
+      padding-inline: var(--s4);
+    }
+    .crowd {
+      grid-template-columns: repeat(15, minmax(0, 1fr));
+      width: 100%;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -2682,12 +2976,15 @@
 <section class="ch" id="c-overview">
   <p class="eyebrow">ПСБ Mobile, концепт-редизайн</p>
   <h2>Упростил ежедневные действия, которые в приложении ощущались как поход в отделение</h2>
-  <div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div>
-  <dl class="facts-row"><div><dt>Роль</dt><dd>Продуктовый дизайнер, в паре</dd></div><div><dt>Формат</dt><dd>Концепт, 2026</dd></div><div><dt>Сфера</dt><dd>Банк, B2C, мобильное приложение</dd></div></dl>
+  <div class="intro"><div class="prose"><p>Я не клиент ПСБ, но не раз слышал от друзей и знакомых, что они бросали подключение кешбэка на полпути. В какой-то момент любопытство взяло верх: что же там так путает людей? Я изучил приложение банка и его условия.</p><p>Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.</p><p>Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.</p><p>Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.</p></div><aside class="about">
+    <div><p class="about-k">Команда</p><p class="pills"><span class="pill team"><span class="ava"><img src="img/tools/team-swordsman.svg" alt="" /><img src="img/tools/team-mage.svg" alt="" /></span>2 продуктовых дизайнера</span></p></div>
+    <div><p class="about-k">Проект</p><p class="pills"><span class="pill">Финтех</span><span class="pill">B2C</span><span class="pill">Мобильное приложение</span><span class="pill">Концепт 2026</span></p></div>
+    <div><p class="about-k">Инструменты</p><p class="pills"><span class="pill tool"><img src="img/tools/figma.svg" alt="" />Figma</span><span class="pill tool"><img src="img/tools/claude.svg" alt="" />Claude</span><span class="pill tool"><img src="img/tools/codex.svg" alt="" />Codex</span><span class="pill tool"><img src="img/tools/mobbin.svg" alt="" />Mobbin</span><span class="pill tool"><img src="img/tools/rive.svg" alt="" />Rive</span></p></div>
+  </aside></div>
   <h3>Проблемы и решения</h3>
   <div class="qcs"><a class="qc" href="#c-home"><span class="qc-n">1</span><b>Главная</b><span class="qc-k">Проблема</span><span class="qc-t">Промо и продукты банка спорили с повседневными действиями, историю было трудно найти</span><span class="qc-k">Решение</span><span class="qc-t">Баланс, частые действия и история наверху, а предложения банка можно закрыть</span></a><a class="qc" href="#c-card-data"><span class="qc-n">2</span><b>Данные карты</b><span class="qc-k">Проблема</span><span class="qc-t">Данные лежали на третьей вкладке, а CVV открывался только по коду из СМС</span><span class="qc-k">Решение</span><span class="qc-t">Их можно посмотреть и скопировать на одном экране, без кода из СМС</span></a><a class="qc" href="#c-cashback"><span class="qc-n">3</span><b>Подключение кешбэка</b><span class="qc-k">Проблема</span><span class="qc-t">12 шагов через почту и браузер, а подключённый кешбэк не появлялся, пока не перезайдёшь в приложение</span><span class="qc-k">Решение</span><span class="qc-t">Одна кнопка рядом с условиями, и сразу выбор категорий</span></a><a class="qc" href="#c-categories"><span class="qc-n">4</span><b>Кешбэк после подключения</b><span class="qc-k">Проблема</span><span class="qc-t">Категории нужно было выбирать каждый месяц, а приложение об этом не напоминало</span><span class="qc-k">Решение</span><span class="qc-t">Их можно выбрать на месяц вперёд и поменять до его начала</span></a></div>
   <h3>Результаты</h3>
-  <div class="sts four"><div class="st big"><p class="st-what">Подключение кешбэка</p><p class="st-n"><b>23</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now" style="width:21.9%"></i></span><p class="st-more">вместо 105 с, 5 шагов вместо 12</p></div><div class="st big"><p class="st-what">Путь к данным карты</p><p class="st-n"><b>17</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now" style="width:40.5%"></i></span><p class="st-more">вместо 42 с, 4 шага вместо 7</p></div><div class="st big"><p class="st-what">Первый клик верный</p><p class="st-n"><b>89%</b></p><span class="g"><i class="now" style="width:89.0%"></i></span><p class="st-more">начали с правильного действия</p></div><div class="st big"><p class="st-what">Оценка лёгкости</p><p class="st-n"><b>6,4</b><span>из 7</span></p><span class="g"><i class="now" style="width:91.4%"></i></span><p class="st-more">SEQ, среднее по задачам</p></div></div>
+  <div class="sts four" data-play><div class="st big"><p class="st-what">Подключение кешбэка</p><p class="st-n"><b>23</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now time" style="--to:21.9%"></i></span><p class="st-more">вместо 105 с, 5 шагов вместо 12</p></div><div class="st big"><p class="st-what">Путь к данным карты</p><p class="st-n"><b>17</b><span>с</span></p><span class="g"><i style="width:100%"></i><i class="now time" style="--to:40.5%"></i></span><p class="st-more">вместо 42 с, 4 шага вместо 7</p></div><div class="st big"><p class="st-what">Первый клик верный</p><p class="st-n"><b>89%</b></p><span class="g"><i class="now" style="--to:89.0%"></i></span><p class="st-more">начали с правильного действия</p></div><div class="st big"><p class="st-what">Оценка лёгкости</p><p class="st-n"><b>6,4</b><span>из 7</span></p><span class="g"><i class="now" style="--to:91.4%"></i></span><p class="st-more">SEQ, среднее по задачам</p></div></div>
   <p class="aside">Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.</p>
 </section>
 <section class="ch" id="c-screens">
@@ -2741,7 +3038,24 @@
     <div><p class="psr-k">Проблема</p><p>Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.</p><p>Один участник из-за долгого поиска достал физическую карту и списал данные с неё.</p></div>
     <div><p class="psr-k">Решение</p><p>Связали счета и их карты и собрали просмотр и копирование на одном экране.</p><p>Код из СМС перед показом CVV убрали: клиент уже вошёл по ПИН-коду или биометрии, и у конкурентов этого хватает, пока сессия активна. Сейчас так делает и сам ПСБ.</p></div>
   </div>
-  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>7 шагов</span><span>42 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/card-01.webp" alt="Главная, карта в «Картах»" loading="lazy" decoding="async" /><figcaption>Главная, карта в «Картах»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/card-02.webp" alt="«Настройки» карты" loading="lazy" decoding="async" /><figcaption>«Настройки» карты</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/card-03.webp" alt="Свайп, «История»" loading="lazy" decoding="async" /><figcaption>Свайп, «История»</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/card-04.webp" alt="Третья вкладка, «О карте»" loading="lazy" decoding="async" /><figcaption>Третья вкладка, «О карте»</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/card-05.webp" alt="Номер скрыт" loading="lazy" decoding="async" /><figcaption>Номер скрыт</figcaption></figure><figure class="shot sm"><span class="shot-n">6</span><img src="img/psb/before/card-07.webp" alt="Удержал поле, скопировано" loading="lazy" decoding="async" /><figcaption>Удержал поле, скопировано</figcaption></figure><figure class="shot sm"><span class="shot-n">7</span><img src="img/psb/before/card-08.webp" alt="CVV только по СМС" loading="lazy" decoding="async" /><figcaption>CVV только по СМС</figcaption></figure><figure class="shot sm"><span class="shot-n">8</span><img src="img/psb/before/card-09.webp" alt="Код не подставился" loading="lazy" decoding="async" /><figcaption>Код не подставился</figcaption></figure><figure class="shot sm"><span class="shot-n">9</span><img src="img/psb/before/card-10.webp" alt="Согласие подтверждено" loading="lazy" decoding="async" /><figcaption>Согласие подтверждено</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>4 шага</span><span>17 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/card-home.webp" alt="Главная, текущий счёт" loading="lazy" decoding="async" /><figcaption>Главная, текущий счёт</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/card-account.webp" alt="Карта внутри счёта" loading="lazy" decoding="async" /><figcaption>Карта внутри счёта</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/card-card.webp" alt="«Данные карты» на карте" loading="lazy" decoding="async" /><figcaption>«Данные карты» на карте</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/card-data.webp" alt="Номер, срок и CVV сразу" loading="lazy" decoding="async" /><figcaption>Номер, срок и CVV сразу</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/race/card-copied.webp" alt="Скопировано" loading="lazy" decoding="async" /><figcaption>Скопировано</figcaption></figure></div></div></div>
+  <div class="race" data-race>
+    <div class="lanes"><div class="lane" data-lane data-sec="42" data-steps="7">
+        <p class="lane-h">Было</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/card-01.webp" alt="Главная, карта в «Картах»" loading="lazy" decoding="async" /><img src="img/psb/before/card-02.webp" alt="«Настройки» карты" loading="lazy" decoding="async" /><img src="img/psb/before/card-03.webp" alt="Свайп, «История»" loading="lazy" decoding="async" /><img src="img/psb/before/card-04.webp" alt="Третья вкладка, «О карте»" loading="lazy" decoding="async" /><img src="img/psb/before/card-05.webp" alt="Номер скрыт" loading="lazy" decoding="async" /><img src="img/psb/before/card-07.webp" alt="Удержал поле, скопировано" loading="lazy" decoding="async" /><img src="img/psb/before/card-08.webp" alt="CVV только по СМС" loading="lazy" decoding="async" /><img src="img/psb/before/card-09.webp" alt="Код не подставился" loading="lazy" decoding="async" /><img src="img/psb/before/card-10.webp" alt="Согласие подтверждено" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:100.0%"></i></span>
+        <p class="rclock"><b data-clock>0:42</b><span class="rend">Дошли до конца</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>7</b> <span>из</span> <span>7</span></p>
+        <p class="rcap"><span>Главная, карта в «Картах»</span><span>«Настройки» карты</span><span>Свайп, «История»</span><span>Третья вкладка, «О карте»</span><span>Номер скрыт</span><span>Удержал поле, скопировано</span><span>CVV только по СМС</span><span>Код не подставился</span><span class="on">Согласие подтверждено</span></p>
+      </div><div class="lane win" data-lane data-sec="17" data-steps="4">
+        <p class="lane-h">Стало</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/race/card-home.webp" alt="Главная, текущий счёт" loading="lazy" decoding="async" /><img src="img/psb/race/card-account.webp" alt="Карта внутри счёта" loading="lazy" decoding="async" /><img src="img/psb/race/card-card.webp" alt="«Данные карты» на карте" loading="lazy" decoding="async" /><img src="img/psb/race/card-data.webp" alt="Номер, срок и CVV сразу" loading="lazy" decoding="async" /><img src="img/psb/race/card-copied.webp" alt="Скопировано" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:40.5%"></i></span>
+        <p class="rclock"><b data-clock>0:17</b><span class="rend">Готово</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>4</b> <span>из</span> <span>4</span></p>
+        <p class="rcap"><span>Главная, текущий счёт</span><span>Карта внутри счёта</span><span>«Данные карты» на карте</span><span>Номер, срок и CVV сразу</span><span class="on">Скопировано</span></p>
+      </div></div>
+    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+  </div>
   
   <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="rows-r"><b>Где найти</b><span class="was">Третья вкладка в карточке карты</span><span class="now">Карта внутри счёта, данные на ней</span></div><div class="rows-r"><b>CVV</b><span class="was">Только по коду из СМС, даже после входа по биометрии</span><span class="now">Сразу, вместе с номером и сроком</span></div><div class="rows-r"><b>Выход из приложения</b><span class="was">В сообщения за кодом: сам он не подставлялся</span><span class="now">Не нужен</span></div><div class="rows-r"><b>Копирование</b><span class="was">Удержать поле, пока внизу не появится подсказка</span><span class="now">Кнопка у каждого поля и плашка «Скопировано»</span></div></div>
   <div class="result"><p class="psr-k">Результат</p><p>Большинство нашли данные сразу. Но тем, у кого ПСБ единственный банк, карты внутри счёта были непривычны, а переворот карты оказался не самым явным способом показать данные. Это видно по оценке лёгкости, самой низкой в тесте.</p><div class="sts"><div class="st"><p class="st-n"><b>83%</b></p><p class="st-what">сразу начали с правильного действия</p></div><div class="st"><p class="st-n"><b>67%</b></p><p class="st-what">прошли без единой ошибки</p></div><div class="st"><p class="st-n"><b>6,0</b><span>из 7</span></p><p class="st-what">оценка лёгкости</p></div></div></div>
@@ -2754,7 +3068,24 @@
     <div><p class="psr-k">Проблема</p><p>Один человек на замере старого приложения бросил поиски: в «Кешбэк и скидки» был только список партнёров, а сам кешбэк прятался в «Бонусном счёте».</p><p>Те, кто дошёл до конца, упирались в тупик: после подключения ничего не менялось, пока не перезайдёшь в приложение.</p></div>
     <div><p class="psr-k">Решение</p><p>Саму программу не трогали, упростили путь: убрали выходы в почту и браузер и объединили подключение с первым выбором категорий.</p><p>Вместо нескольких согласий осталась кнопка «Подключить кешбэк» с условиями под ней, как у других банков.</p></div>
   </div>
-  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>12 шагов</span><span>105 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/cb-01.webp" alt="Главная" loading="lazy" decoding="async" /><figcaption>Главная</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/cb-02.webp" alt="Внизу «Бонусный счёт»" loading="lazy" decoding="async" /><figcaption>Внизу «Бонусный счёт»</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/cb-03.webp" alt="Условия и «Подключить»" loading="lazy" decoding="async" /><figcaption>Условия и «Подключить»</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/cb-04.webp" alt="Почта и два согласия" loading="lazy" decoding="async" /><figcaption>Почта и два согласия</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/cb-05.webp" alt="Ждём письмо" loading="lazy" decoding="async" /><figcaption>Ждём письмо</figcaption></figure><figure class="shot sm"><span class="shot-n">6</span><img src="img/psb/before/cb-06.webp" alt="Не дождался, ошибка" loading="lazy" decoding="async" /><figcaption>Не дождался, ошибка</figcaption></figure><figure class="shot sm"><span class="shot-n">7</span><img src="img/psb/before/cb-07.webp" alt="Письмо в почте" loading="lazy" decoding="async" /><figcaption>Письмо в почте</figcaption></figure><figure class="shot sm"><span class="shot-n">8</span><img src="img/psb/before/cb-08.webp" alt="Ссылка в браузере" loading="lazy" decoding="async" /><figcaption>Ссылка в браузере</figcaption></figure><figure class="shot sm"><span class="shot-n">9</span><img src="img/psb/before/cb-09.webp" alt="Согласие не открыть" loading="lazy" decoding="async" /><figcaption>Согласие не открыть</figcaption></figure><figure class="shot sm"><span class="shot-n">10</span><img src="img/psb/before/cb-10.webp" alt="Готово" loading="lazy" decoding="async" /><figcaption>Готово</figcaption></figure><figure class="shot sm"><span class="shot-n">11</span><img src="img/psb/before/cb-01.webp" alt="А на главной кешбэка нет" loading="lazy" decoding="async" /><figcaption>А на главной кешбэка нет</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>5 шагов</span><span>23 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/start.webp" alt="«Хочу подключить» в «Выгоде»" loading="lazy" decoding="async" /><figcaption>«Хочу подключить» в «Выгоде»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/cats-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><figcaption>Выбор трёх категорий</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/cats-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><figcaption>Отметил три</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/success.webp" alt="Кешбэк подключён" loading="lazy" decoding="async" /><figcaption>Кешбэк подключён</figcaption></figure></div></div></div>
+  <div class="race" data-race>
+    <div class="lanes"><div class="lane" data-lane data-sec="105" data-steps="12">
+        <p class="lane-h">Было</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/cb-01.webp" alt="Главная" loading="lazy" decoding="async" /><img src="img/psb/before/cb-02.webp" alt="Внизу «Бонусный счёт»" loading="lazy" decoding="async" /><img src="img/psb/before/cb-03.webp" alt="Условия и «Подключить»" loading="lazy" decoding="async" /><img src="img/psb/before/cb-04.webp" alt="Почта и два согласия" loading="lazy" decoding="async" /><img src="img/psb/before/cb-05.webp" alt="Ждём письмо" loading="lazy" decoding="async" /><img src="img/psb/before/cb-06.webp" alt="Не дождался, ошибка" loading="lazy" decoding="async" /><img src="img/psb/before/cb-07.webp" alt="Письмо в почте" loading="lazy" decoding="async" /><img src="img/psb/before/cb-08.webp" alt="Ссылка в браузере" loading="lazy" decoding="async" /><img src="img/psb/before/cb-09.webp" alt="Согласие не открыть" loading="lazy" decoding="async" /><img src="img/psb/before/cb-10.webp" alt="Готово" loading="lazy" decoding="async" /><img src="img/psb/before/cb-01.webp" alt="А на главной кешбэка нет" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:100.0%"></i></span>
+        <p class="rclock"><b data-clock>1:45</b><span class="rend">Дошли до конца</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>12</b> <span>из</span> <span>12</span></p>
+        <p class="rcap"><span>Главная</span><span>Внизу «Бонусный счёт»</span><span>Условия и «Подключить»</span><span>Почта и два согласия</span><span>Ждём письмо</span><span>Не дождался, ошибка</span><span>Письмо в почте</span><span>Ссылка в браузере</span><span>Согласие не открыть</span><span>Готово</span><span class="on">А на главной кешбэка нет</span></p>
+      </div><div class="lane win" data-lane data-sec="23" data-steps="5">
+        <p class="lane-h">Стало</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/race/start.webp" alt="«Хочу подключить» в «Выгоде»" loading="lazy" decoding="async" /><img src="img/psb/race/cats-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><img src="img/psb/race/cats-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><img src="img/psb/race/success.webp" alt="Кешбэк подключён" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:21.9%"></i></span>
+        <p class="rclock"><b data-clock>0:23</b><span class="rend">Готово</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>5</b> <span>из</span> <span>5</span></p>
+        <p class="rcap"><span>«Хочу подключить» в «Выгоде»</span><span>Выбор трёх категорий</span><span>Отметил три</span><span class="on">Кешбэк подключён</span></p>
+      </div></div>
+    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+  </div>
   
   <div class="rows"><p class="rows-h"><span></span><span>Было</span><span>Стало</span></p><div class="rows-r"><b>Где найти</b><span class="was">«Бонусный счёт» внизу главной</span><span class="now">«Выгода» в таббаре и бейдж у баланса</span></div><div class="rows-r"><b>Выход из приложения</b><span class="was">В почту за письмом, в браузер по ссылке</span><span class="now">Не нужен</span></div><div class="rows-r"><b>Согласия</b><span class="was">Два переключателя и экран, который не открыть</span><span class="now">Одна кнопка рядом с условиями</span></div><div class="rows-r"><b>Категории</b><span class="was">Отдельно, после подключения</span><span class="now">Сразу, кнопка считает выбранные</span></div><div class="rows-r"><b>После подключения</b><span class="was">Главная как раньше, пока не перезайдёшь</span><span class="now">Кешбэк сразу виден у баланса</span></div></div>
   <div class="result"><p class="psr-k">Результат</p><p>Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.</p><div class="sts"><div class="st"><p class="st-n"><b>83%</b></p><p class="st-what">сразу начали с правильного действия</p></div><div class="st"><p class="st-n"><b>63%</b></p><p class="st-what">прошли без единой ошибки</p></div><div class="st"><p class="st-n"><b>6,5</b><span>из 7</span></p><p class="st-what">оценка лёгкости</p></div></div></div>
@@ -2767,7 +3098,24 @@
     <div><p class="psr-k">Проблема</p><p>В интервью человек рассказал, что забывает выбрать категории в начале месяца, а иногда вообще не находит кешбэк. Приложение не напоминало, а кнопка выбора была незаметной.</p><p>Выгоду нельзя было увидеть сразу, поэтому не было повода возвращаться.</p></div>
     <div><p class="psr-k">Решение</p><p>Категории на следующий месяц можно выбрать заранее и поменять до его начала.</p><p>Блок статистики показывает, сколько баллов принесла каждая категория: это повод пользоваться кешбэком дальше.</p></div>
   </div>
-  <div class="race"><div class="lane"><p class="lane-h"><b>Было</b><span>7 шагов</span><span>28,7 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/before/card-01.webp" alt="Главная" loading="lazy" decoding="async" /><figcaption>Главная</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/before/cats-02.webp" alt="Ищет кешбэк, листая главную" loading="lazy" decoding="async" /><figcaption>Ищет кешбэк, листая главную</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/before/cats-03.webp" alt="«Бонусный счёт» внизу" loading="lazy" decoding="async" /><figcaption>«Бонусный счёт» внизу</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/before/cats-04.webp" alt="Выбрал, проверка данных" loading="lazy" decoding="async" /><figcaption>Выбрал, проверка данных</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/before/cats-05.webp" alt="Операция выполнена" loading="lazy" decoding="async" /><figcaption>Операция выполнена</figcaption></figure></div></div><div class="lane win"><p class="lane-h"><b>Стало</b><span>6 шагов</span><span>14 с</span></p><div class="strip"><figure class="shot sm"><span class="shot-n">1</span><img src="img/psb/race/next-home.webp" alt="Главная, вкладка «Выгода»" loading="lazy" decoding="async" /><figcaption>Главная, вкладка «Выгода»</figcaption></figure><figure class="shot sm"><span class="shot-n">2</span><img src="img/psb/race/next-cashback.webp" alt="«Категории на октябрь»" loading="lazy" decoding="async" /><figcaption>«Категории на октябрь»</figcaption></figure><figure class="shot sm"><span class="shot-n">3</span><img src="img/psb/race/next-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><figcaption>Выбор трёх категорий</figcaption></figure><figure class="shot sm"><span class="shot-n">4</span><img src="img/psb/race/next-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><figcaption>Отметил три</figcaption></figure><figure class="shot sm"><span class="shot-n">5</span><img src="img/psb/race/next-success.webp" alt="Категории выбраны" loading="lazy" decoding="async" /><figcaption>Категории выбраны</figcaption></figure></div></div></div>
+  <div class="race" data-race>
+    <div class="lanes"><div class="lane" data-lane data-sec="28.7" data-steps="7">
+        <p class="lane-h">Было</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/before/card-01.webp" alt="Главная" loading="lazy" decoding="async" /><img src="img/psb/before/cats-02.webp" alt="Ищет кешбэк, листая главную" loading="lazy" decoding="async" /><img src="img/psb/before/cats-03.webp" alt="«Бонусный счёт» внизу" loading="lazy" decoding="async" /><img src="img/psb/before/cats-04.webp" alt="Выбрал, проверка данных" loading="lazy" decoding="async" /><img src="img/psb/before/cats-05.webp" alt="Операция выполнена" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:100.0%"></i></span>
+        <p class="rclock"><b data-clock>0:28,7</b><span class="rend">Дошли до конца</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>7</b> <span>из</span> <span>7</span></p>
+        <p class="rcap"><span>Главная</span><span>Ищет кешбэк, листая главную</span><span>«Бонусный счёт» внизу</span><span>Выбрал, проверка данных</span><span class="on">Операция выполнена</span></p>
+      </div><div class="lane win" data-lane data-sec="14" data-steps="6">
+        <p class="lane-h">Стало</p>
+        <div class="rph"><img class="body" src="img/iphone-17-pro.webp" alt="" /><div class="screen"><img src="img/psb/race/next-home.webp" alt="Главная, вкладка «Выгода»" loading="lazy" decoding="async" /><img src="img/psb/race/next-cashback.webp" alt="«Категории на октябрь»" loading="lazy" decoding="async" /><img src="img/psb/race/next-0.webp" alt="Выбор трёх категорий" loading="lazy" decoding="async" /><img src="img/psb/race/next-3.webp" alt="Отметил три" loading="lazy" decoding="async" /><img src="img/psb/race/next-success.webp" alt="Категории выбраны" loading="lazy" decoding="async" class="on" /></div></div>
+        <span class="rbar" aria-hidden="true"><i style="--to:48.8%"></i></span>
+        <p class="rclock"><b data-clock>0:14</b><span class="rend">Готово</span></p>
+        <p class="rstep"><span>Шаг</span> <b data-step>6</b> <span>из</span> <span>6</span></p>
+        <p class="rcap"><span>Главная, вкладка «Выгода»</span><span>«Категории на октябрь»</span><span>Выбор трёх категорий</span><span>Отметил три</span><span class="on">Категории выбраны</span></p>
+      </div></div>
+    <button class="btn replay" type="button" data-replay hidden>Ещё раз</button>
+  </div>
   <div class="vars" data-vars>
     <h4>Варианты блока статистики</h4>
     <div class="vars-grid">
@@ -2782,8 +3130,58 @@
   <p class="eyebrow">Проверка</p>
   <h2>Тестирование с 30 клиентами</h2>
   <p class="lead">Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.</p>
-  <div class="bars"><div class="bar"><b>Подключение кешбэка</b><div class="bar-track"><i class="was" style="width:100.0%"><span>105 с</span></i><i class="now" style="width:21.9%"><span>23 с</span></i></div></div><div class="bar"><b>Данные карты</b><div class="bar-track"><i class="was" style="width:40.0%"><span>42 с</span></i><i class="now" style="width:16.2%"><span>17 с</span></i></div></div><div class="bar"><b>Выбор категорий</b><div class="bar-track"><i class="was" style="width:27.3%"><span>28,7 с</span></i><i class="now" style="width:13.3%"><span>14 с</span></i></div></div></div>
-  <table class="tbl"><thead><tr><th scope="col">Сценарий</th><th scope="col">Завершили</th><th scope="col">Первый клик</th><th scope="col">SEQ</th></tr></thead><tbody><tr><th scope="row">Подключить кешбэк</th><td>30/30</td><td>83%</td><td>6,5/7</td></tr><tr><th scope="row">Выбрать категории</th><td>30/30</td><td>100%</td><td>6,7/7</td></tr><tr><th scope="row">Скопировать данные карты</th><td>30/30</td><td>83%</td><td>6,0/7</td></tr></tbody></table>
+  <div class="tst" data-play>
+    <div class="tdone"><span class="crowd" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:13"></i><i style="--i:14"></i><i style="--i:15"></i><i style="--i:16"></i><i style="--i:17"></i><i style="--i:18"></i><i style="--i:19"></i><i style="--i:20"></i><i style="--i:21"></i><i style="--i:22"></i><i style="--i:23"></i><i style="--i:24"></i><i style="--i:25"></i><i style="--i:26"></i><i style="--i:27"></i><i style="--i:28"></i><i style="--i:29"></i></span><p><b>30 из 30</b> <span>прошли все три задачи сами, без подсказок</span></p></div>
+    <div class="tflows"><article class="tf">
+      <h3 class="tf-name">Подключение кешбэка</h3>
+      <div class="tf-steps">
+        <p class="tf-big"><b>5</b><span>шагов</span></p>
+        <p class="tf-was"><span class="down">−58%</span><span>было 12</span></p>
+        <span class="pips" aria-hidden="true"><i class="now" style="--i:11"></i><i class="now" style="--i:10"></i><i class="now" style="--i:9"></i><i class="now" style="--i:8"></i><i class="now" style="--i:7"></i><i style="--i:6"></i><i style="--i:5"></i><i style="--i:4"></i><i style="--i:3"></i><i style="--i:2"></i><i style="--i:1"></i><i style="--i:0"></i></span>
+      </div>
+      <div class="tf-time">
+        <p class="tf-k">Медианное время</p>
+        <span class="tbar" aria-hidden="true"><i class="was" style="width:100.0%"></i><i class="now" style="--from:100.0%;--to:21.9%"></i></span>
+        <p class="tf-sec"><b><span data-count-from="105">23</span> с</b><span>вместо 105 с</span></p>
+      </div>
+      <div class="tf-more">
+        <div><p class="tf-k">Первый клик</p><p class="tf-n"><b><span data-count-from="0">83</span>%</b></p><span class="mana" aria-hidden="true"><i style="--to:83%"></i></span></div>
+        <div><p class="tf-k">Лёгкость</p><p class="tf-n"><b>6,5</b><span>из 7</span></p><span class="hearts" aria-hidden="true"><svg class="heart" style="--i:0" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:1" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:2" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:3" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:4" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:5" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:6" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 4px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg></span></div>
+      </div>
+    </article><article class="tf">
+      <h3 class="tf-name">Данные карты</h3>
+      <div class="tf-steps">
+        <p class="tf-big"><b>4</b><span>шага</span></p>
+        <p class="tf-was"><span class="down">−43%</span><span>было 7</span></p>
+        <span class="pips" aria-hidden="true"><i class="now" style="--i:6"></i><i class="now" style="--i:5"></i><i class="now" style="--i:4"></i><i class="now" style="--i:3"></i><i style="--i:2"></i><i style="--i:1"></i><i style="--i:0"></i></span>
+      </div>
+      <div class="tf-time">
+        <p class="tf-k">Медианное время</p>
+        <span class="tbar" aria-hidden="true"><i class="was" style="width:40.0%"></i><i class="now" style="--from:40.0%;--to:16.2%"></i></span>
+        <p class="tf-sec"><b><span data-count-from="42">17</span> с</b><span>вместо 42 с</span></p>
+      </div>
+      <div class="tf-more">
+        <div><p class="tf-k">Первый клик</p><p class="tf-n"><b><span data-count-from="0">83</span>%</b></p><span class="mana" aria-hidden="true"><i style="--to:83%"></i></span></div>
+        <div><p class="tf-k">Лёгкость</p><p class="tf-n"><b>6,0</b><span>из 7</span></p><span class="hearts" aria-hidden="true"><svg class="heart" style="--i:0" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:1" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:2" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:3" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:4" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:5" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:6" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></svg></span></div>
+      </div>
+    </article><article class="tf">
+      <h3 class="tf-name">Выбор категорий</h3>
+      <div class="tf-steps">
+        <p class="tf-big"><b>6</b><span>шагов</span></p>
+        <p class="tf-was"><span class="down">−14%</span><span>было 7</span></p>
+        <span class="pips" aria-hidden="true"><i class="now" style="--i:6"></i><i class="now" style="--i:5"></i><i class="now" style="--i:4"></i><i class="now" style="--i:3"></i><i class="now" style="--i:2"></i><i class="now" style="--i:1"></i><i style="--i:0"></i></span>
+      </div>
+      <div class="tf-time">
+        <p class="tf-k">Медианное время</p>
+        <span class="tbar" aria-hidden="true"><i class="was" style="width:27.3%"></i><i class="now" style="--from:27.3%;--to:13.3%"></i></span>
+        <p class="tf-sec"><b><span data-count-from="29">14</span> с</b><span>вместо 28,7 с</span></p>
+      </div>
+      <div class="tf-more">
+        <div><p class="tf-k">Первый клик</p><p class="tf-n"><b><span data-count-from="0">100</span>%</b></p><span class="mana" aria-hidden="true"><i style="--to:100%"></i></span></div>
+        <div><p class="tf-k">Лёгкость</p><p class="tf-n"><b>6,7</b><span>из 7</span></p><span class="hearts" aria-hidden="true"><svg class="heart" style="--i:0" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:1" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:2" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:3" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:4" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:5" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 0px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg><svg class="heart" style="--i:6" viewBox="0 0 9 8" shape-rendering="crispEdges"><path class="e-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="e-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="e-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/><g style="clip-path:inset(0 3px 0 0)"><path class="f-R" d="M1 0h2v1h-2zM6 0h2v1h-2zM0 1h1v1h-1zM3 1h1v1h-1zM5 1h1v1h-1zM8 1h1v1h-1zM0 2h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM0 3h1v1h-1zM8 3h1v1h-1zM1 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM6 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1z"/><path class="f-r" d="M1 1h2v1h-2zM6 1h2v1h-2zM2 2h2v1h-2zM5 2h3v1h-3zM2 3h6v1h-6zM2 4h5v1h-5zM3 5h3v1h-3zM4 6h1v1h-1z"/><path class="f-q" d="M1 2h1v1h-1zM1 3h1v1h-1z"/></g></svg></span></div>
+      </div>
+    </article></div>
+  </div>
   <p class="aside">Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.</p>
 </section>
 <section class="ch" id="c-review">
@@ -3308,12 +3706,13 @@
       "Условия по кешбэку хорошие, но подключение растянулось на 12 шагов: переходы в браузер и почтовый клиент, подтверждение почты, несколько согласий, а в конце так и не было понятно, получилось ли.": "The cashback terms are good, but activation took 12 steps: jumps to a browser and a mail app, email confirmation, several consents, and at the end it still wasn’t clear whether it had worked.",
       "Нашлись сложности и в других сценариях: реквизиты счёта спрятаны глубоко в меню, история операций разбита по картам, а чтобы посмотреть CVV, нужен код из СМС даже после входа по биометрии.": "Other flows had their difficulties too: account details are buried deep in the menu, the history is split by card, and viewing the CVV takes a code from a text message even after biometric login.",
       "Каждое из этих решений по отдельности объяснимо, но вместе они делают простые действия сложнее, чем нужно. Я решил разобраться, где именно возникают трудности и как сделать эти сценарии удобнее.": "Each of these decisions makes sense on its own, but together they make simple actions harder than they need to be. I set out to find where exactly the difficulties arise and how to make these flows easier.",
-      "Роль": "Role",
-      "Продуктовый дизайнер, в паре": "Product designer, in a team of two",
-      "Формат": "Format",
-      "Концепт, 2026": "Concept, 2026",
-      "Сфера": "Industry",
-      "Банк, B2C, мобильное приложение": "Banking, B2C, mobile app",
+      "Команда": "Team",
+      "2 продуктовых дизайнера": "2 product designers",
+      "Проект": "Project",
+      "Финтех": "Fintech",
+      "Мобильное приложение": "Mobile app",
+      "Концепт 2026": "Concept 2026",
+      "Инструменты": "Tools",
       "Проблемы и решения": "Problems and solutions",
       "Результаты": "Results",
       "Юзабилити-тест с 30 клиентами банка: все дошли до конца каждой задачи.": "A usability test with 30 of the bank’s customers: everyone got to the end of every task.",
@@ -3392,8 +3791,6 @@
       "История стала общей и всегда видна на первом экране. Кешбэк нашли все 30 участников. Бейдж заметили, его стоит проверить A/B-тестом.": "The history is shared now and always on the first screen. All 30 participants found cashback. The badge got noticed; it’s worth an A/B test.",
       "нашли кешбэк через вкладку «Выгода»": "found cashback through the “Benefits” tab",
       "через бейдж у баланса: второй вход не остался незамеченным": "through the badge by the balance: the second way in got noticed",
-      "7 шагов": "7 steps",
-      "42 с": "42 s",
       "Главная, карта в «Картах»": "Home, the card under “Cards”",
       "«Настройки» карты": "The card’s “Settings”",
       "Свайп, «История»": "Swipe, “History”",
@@ -3403,13 +3800,16 @@
       "CVV только по СМС": "CVV only via text message",
       "Код не подставился": "The code didn’t autofill",
       "Согласие подтверждено": "Consent confirmed",
-      "4 шага": "4 steps",
-      "17 с": "17 s",
+      "Дошли до конца": "Got there",
+      "Шаг": "Step",
+      "из": "of",
       "Главная, текущий счёт": "Home, current account",
       "Карта внутри счёта": "The card inside the account",
       "«Данные карты» на карте": "“Card details” on the card",
       "Номер, срок и CVV сразу": "Number, expiry and CVV at once",
       "Скопировано": "Copied",
+      "Готово": "Done",
+      "Ещё раз": "Replay",
       "Решение 2 из 4": "Solution 2 of 4",
       "Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.": "Viewing and copying card details should be a simple, clear action right after opening the app.",
       "Данные лежали на третьей вкладке карты, а CVV открывался только по коду из СМС, даже после входа по биометрии или ПИН-коду.": "The details were on the card’s third tab, and the CVV only opened with a code from a text message, even after logging in with biometrics or a PIN.",
@@ -3432,8 +3832,6 @@
       "прошли без единой ошибки": "finished without a single error",
       "6,0": "6.0",
       "оценка лёгкости": "ease score",
-      "12 шагов": "12 steps",
-      "105 с": "105 s",
       "Внизу «Бонусный счёт»": "“Bonus account” at the bottom",
       "Условия и «Подключить»": "Terms and “Activate”",
       "Почта и два согласия": "Email and two consents",
@@ -3442,10 +3840,7 @@
       "Письмо в почте": "The email in the mail app",
       "Ссылка в браузере": "The link in a browser",
       "Согласие не открыть": "The consent won’t open",
-      "Готово": "Done",
       "А на главной кешбэка нет": "Still no cashback on the home screen",
-      "5 шагов": "5 steps",
-      "23 с": "23 s",
       "«Хочу подключить» в «Выгоде»": "“I want to activate” in “Benefits”",
       "Выбор трёх категорий": "Choosing three categories",
       "Отметил три": "Ticked three",
@@ -3470,13 +3865,11 @@
       "Кешбэк сразу виден у баланса": "Cashback shows by the balance right away",
       "Все участники подключили кешбэк, и большинство сразу начали с правильного действия. Без ошибок прошли не все: по пути отвлекались на плитки предложений, их вес стоит ослабить в следующей итерации.": "Every participant activated cashback, and most started with the right action. Not everyone got through without errors: the offer tiles drew attention along the way, and their weight is worth toning down next.",
       "6,5": "6.5",
-      "28,7 с": "28.7 s",
       "Ищет кешбэк, листая главную": "Scrolling home for cashback",
       "«Бонусный счёт» внизу": "“Bonus account” at the bottom",
       "Выбрал, проверка данных": "Chosen, checking the details",
       "Операция выполнена": "Operation completed",
-      "6 шагов": "6 steps",
-      "14 с": "14 s",
+      "0:28,7": "0:28.7",
       "Главная, вкладка «Выгода»": "Home, the “Benefits” tab",
       "«Категории на октябрь»": "“Categories for October”",
       "Категории выбраны": "Categories chosen",
@@ -3505,18 +3898,20 @@
       "Кнопка «Подключить» под категориями": "An “Activate” button under the categories",
       "Выбор устроен так же, как при первом подключении, поэтому разбираться заново не пришлось. Оценка лёгкости здесь самая высокая в тесте.": "The choice works the same as on first activation, so nobody had to figure it out again. The ease score here is the highest in the test.",
       "6,7": "6.7",
+      "шагов": "steps",
+      "было 12": "was 12",
+      "Медианное время": "Median time",
+      "вместо 105 с": "instead of 105 s",
+      "шага": "steps",
+      "было 7": "was 7",
+      "вместо 42 с": "instead of 42 s",
       "Выбор категорий": "Choosing categories",
+      "вместо 28,7 с": "instead of 28.7 s",
       "Проверка": "Validation",
       "Тестирование с 30 клиентами": "Testing with 30 customers",
       "Тест в рабочем прототипе прошли 30 клиентов ПСБ, часть сами, часть на созвоне. Мы смотрели на достижение цели, первое действие и лёгкость. Все справились без помощи.": "Thirty PSB customers took the test in the working prototype, some on their own, some on a call. We looked at task success, the first action and ease. Everyone managed without help.",
-      "Сценарий": "Flow",
-      "Завершили": "Completed",
-      "Подключить кешбэк": "Activate cashback",
-      "6,5/7": "6.5/7",
-      "Выбрать категории": "Choose categories",
-      "6,7/7": "6.7/7",
-      "Скопировать данные карты": "Copy card details",
-      "6,0/7": "6.0/7",
+      "30 из 30": "30 of 30",
+      "прошли все три задачи сами, без подсказок": "did all three tasks on their own, with no hints",
       "Медианное время. «Было» — пять клиентов банка на кликабельной копии исходных экранов, медиана тех, кто дошёл до конца.": "Median times. “Before” is five of the bank’s customers on a clickable copy of the original screens, the median of those who finished.",
       "Что сказал сеньор": "What the senior designer said",
       "Ревью кейса от сеньор-дизайнера": "Case review by a senior designer",
@@ -3542,8 +3937,8 @@
     const isEn = () => document.documentElement.lang === 'en';
     function english(s) {
       const k = key(s);
-      if (!RUSSIAN.test(k)) return s;
       let en = EN[k];
+      if (en == null && !RUSSIAN.test(k)) return s;
       for (const [re, to] of RULES) if (en == null && re.test(k)) en = k.replace(re, to);
       if (en == null) return s;
       const [, lead, tail] = /^(\s*)[\s\S]*?(\s*)$/.exec(s);
@@ -6151,6 +6546,124 @@
       }),
     );
     loops.forEach((v) => seen.observe(v));
+
+    // Gauges and numbers play once when their block comes into view ([data-play]): the bars move
+    // from the old value to the new one, the numbers count to the figure the page holds
+    const COUNT_DELAY = 200,
+      COUNT_MS = 1400;
+    const counters = (root) =>
+      root.querySelectorAll('[data-count-from]').forEach((el) => {
+        const n = el.firstChild,
+          from = +el.dataset.countFrom,
+          to = +i18n.text(n);
+        const t0 = performance.now() + COUNT_DELAY;
+        const step = (now) => {
+          const k = Math.min(1, Math.max(0, (now - t0) / COUNT_MS));
+          n.data = String(Math.round(from + (to - from) * (1 - (1 - k) ** 3)));
+          if (k < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    if (!reduceMotion.matches) {
+      const seenPlay = new IntersectionObserver(
+        (es) =>
+          es.forEach((e) => {
+            if (!e.isIntersecting) return;
+            e.target.classList.add('on');
+            counters(e.target);
+            seenPlay.unobserve(e.target);
+          }),
+        { threshold: 0.35 },
+      );
+      document.querySelectorAll('[data-play]').forEach((el) => {
+        el.classList.add('armed');
+        el.querySelectorAll('[data-count-from]').forEach((c) => (c.firstChild.data = c.dataset.countFrom));
+        seenPlay.observe(el);
+      });
+    }
+
+    // Races: before and after start together and run at their median times, RACE_SPEED times
+    // faster; a flow's screens are spread evenly over its time. They start once half in view
+    // (after every screen is decoded, or a phone flashes black on its first swap); «Ещё раз»
+    // runs them again. Without motion they stay at the finish the page holds
+    const RACE_SPEED = 7;
+    const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+    document.querySelectorAll('[data-race]').forEach((race) => {
+      if (reduceMotion.matches) return;
+      const replay = race.querySelector('[data-replay]');
+      const lanes = [...race.querySelectorAll('[data-lane]')].map((el) => ({
+        el,
+        sec: +el.dataset.sec,
+        steps: +el.dataset.steps,
+        imgs: [...el.querySelectorAll('.screen img')],
+        caps: [...el.querySelectorAll('.rcap span')],
+        clock: el.querySelector('[data-clock]').firstChild,
+        step: el.querySelector('[data-step]').firstChild,
+        bar: el.querySelector('.rbar i'),
+        at: -1,
+      }));
+      const longest = Math.max(...lanes.map((l) => l.sec));
+      const show = (l, k) => {
+        if (k === l.at) return;
+        l.imgs.forEach((img) => img.classList.remove('was', 'enter'));
+        const prev = l.imgs[l.at];
+        if (prev) prev.classList.replace('on', 'was');
+        l.imgs[k].classList.add('on');
+        if (l.at >= 0) l.imgs[k].classList.add('enter');
+        l.caps.forEach((c, j) => c.classList.toggle('on', j === k));
+        l.at = k;
+      };
+      // Every lane at `s` real seconds into the race; true once all have finished
+      const paint = (s) => {
+        let all = true;
+        lanes.forEach((l) => {
+          const p = Math.min(1, s / l.sec),
+            done = p >= 1,
+            last = l.imgs.length - 1;
+          if (!done) all = false;
+          show(l, done ? last : Math.min(last - 1, Math.floor(p * last)));
+          l.step.data = String(done ? l.steps : Math.max(1, Math.ceil(p * l.steps)));
+          l.clock.data = done ? i18n.text(l.clock) : mmss(s);
+          l.bar.style.width = ((Math.min(s, l.sec) / longest) * 100).toFixed(2) + '%';
+          l.el.classList.toggle('done', done);
+        });
+        return all;
+      };
+      let raf = 0;
+      const reset = () => {
+        cancelAnimationFrame(raf);
+        lanes.forEach((l) => {
+          l.imgs.forEach((img) => img.classList.remove('on', 'was', 'enter'));
+          l.at = -1;
+        });
+        race.classList.add('running');
+        replay.hidden = true;
+        paint(0);
+      };
+      async function run() {
+        reset();
+        await Promise.all(lanes.flatMap((l) => l.imgs.map((img) => ((img.loading = 'eager'), img.decode().catch(() => {})))));
+        const t0 = performance.now();
+        const tick = (now) => {
+          if (paint(((now - t0) / 1000) * RACE_SPEED)) {
+            race.classList.remove('running');
+            replay.hidden = false;
+          } else raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      }
+      reset();
+      const seenRace = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          seenRace.disconnect();
+          run();
+        },
+        { threshold: 0.5 },
+      );
+      seenRace.observe(race);
+      replay.addEventListener('click', run);
+    });
 
     // On pause everything stops
     function stop() {
