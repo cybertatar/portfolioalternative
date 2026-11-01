@@ -171,8 +171,6 @@
         border-radius: var(--r);
         object-fit: cover;
         flex: none;
-        /* The site's square keeps room for the fish; here the face fills the frame */
-        object-view-box: inset(12% 20% 32% 24%);
       }
       h1 {
         font-size: var(--t-xl);
@@ -292,7 +290,7 @@
   <body>
     <main>
       <header class="head">
-        <img src="../../sketches/img/portrait.webp" alt="Даниил Тынчеров" />
+        <img src="photo.jpg" alt="Даниил Тынчеров" />
         <div>
           <h1>Даниил Тынчеров</h1>
           <p class="role">Продуктовый дизайнер</p>
@@ -419,13 +417,89 @@
     </aside>
 
     <script>
+      /* English: ?lang=en swaps each text for its pair below. The Russian is the page as written;
+         an element whose whole text is a key gets the English whole, otherwise its children are
+         tried. render.mjs refuses an English page with any Cyrillic left */
+      const EN = {
+        'Даниил Тынчеров, продуктовый дизайнер, CV': 'Daniil Tyncherov, Product Designer, CV',
+        'Даниил Тынчеров': 'Daniil Tyncherov',
+        'Продуктовый дизайнер': 'Product Designer',
+        'Больше 2,5 лет проектирую мобильные и веб-интерфейсы в продуктовой команде':
+          '2.5+ years designing mobile and web interfaces in a product team',
+        'Веду задачу целиком: от исследования и гипотез до прототипа и передачи в разработку':
+          'I own a task end to end: from research and hypotheses to a prototype and developer handoff',
+        'Строю и развиваю дизайн-системы': 'I build and grow design systems',
+        'Бэкграунд в разработке: собираю прототипы на коде и говорю с программистами на одном языке':
+          'Development background: I build prototypes in code and speak the same language as engineers',
+        'Опыт работы': 'Experience',
+        'март 2024 — н. в.': 'March 2024 – present',
+        'Студия: сайты, сервисы и приложения на заказ, B2B и B2C':
+          'Studio building custom websites, services and apps, B2B and B2C',
+        'Что делал': 'What I did',
+        'Работал в команде с PM, тестировщиками и разработчиками': 'Worked with PMs, QA engineers and developers',
+        'Проводил интервью, юзабилити-тесты и анализ конкурентов':
+          'Ran user interviews, usability tests and competitor analysis',
+        'Проектировал MVP и ключевые сценарии в рамках бюджета и сроков, чтобы проверить продуктовые гипотезы':
+          'Designed MVPs and key flows within budget and deadlines to test product hypotheses',
+        'Строил user flow, проверял и подтверждал гипотезы тестами': 'Mapped user flows and validated hypotheses with tests',
+        'Презентовал и защищал дизайн-решения перед заказчиками': 'Presented and defended design decisions to clients',
+        'Ключевые проекты': 'Key projects',
+        'BittVPN, Telegram Mini App для продажи VPN': 'BittVPN, a Telegram Mini App for selling VPN',
+        'Спроектировал с нуля и довёл до готового продукта: исследование, сценарии, интерфейс, передача в разработку':
+          'Designed from scratch through to a finished product: research, flows, interface, developer handoff',
+        'Plex Requests, Telegram Mini App для медиатеки Plex': 'Plex Requests, a Telegram Mini App for a Plex media library',
+        'Спроектировал с нуля: от исследования до готового продукта':
+          'Designed from scratch, from research to a finished product',
+        'Образование': 'Education',
+        'СПбГУТ им. проф. М. А. Бонч-Бруевича': 'Bonch-Bruevich Saint Petersburg State University of Telecommunications',
+        'Техник-программист, 2018–2022': 'Software Technician, 2018–2022',
+        'Контакты': 'Contacts',
+        'Город': 'City',
+        'Санкт-Петербург': 'Saint Petersburg',
+        'Портфолио': 'Portfolio',
+        'ссылка появится скоро': 'link coming soon',
+        'Почта': 'Email',
+        'Телефон': 'Phone',
+        'Навыки': 'Skills',
+        'Продукт': 'Product',
+        'Гипотезы и их проверка': 'Hypothesis testing',
+        'Продуктовые метрики': 'Product metrics',
+        'Исследования': 'Research',
+        'Глубинные интервью': 'In-depth interviews',
+        'Юзабилити-тесты': 'Usability testing',
+        'Анализ конкурентов': 'Competitor analysis',
+        'Интерфейсы': 'Interfaces',
+        'Сценарии и прототипы': 'Flows and prototypes',
+        'Дизайн-системы': 'Design systems',
+        'HIG и Material Design': 'HIG and Material Design',
+        'UX-writing': 'UX writing',
+        'Инструменты': 'Tools',
+        'Прототипы на коде': 'Prototypes in code',
+        'Программы Adobe': 'Adobe apps',
+        'Swift и Xcode': 'Swift and Xcode',
+        'Claude и Codex': 'Claude and Codex',
+      };
+      const key = (s) => s.replace(/\s+/g, ' ').trim();
+      if (/[?&]lang=en\b/.test(location.search)) {
+        document.documentElement.lang = 'en';
+        document.title = EN[document.title] || document.title;
+        const swap = (el) => {
+          const t = EN[key(el.textContent)];
+          if (t) return void (el.textContent = t);
+          [...el.children].forEach(swap);
+        };
+        document.querySelectorAll('main, aside').forEach(swap);
+        document.querySelectorAll('[alt]').forEach((el) => (el.alt = EN[el.alt] || el.alt));
+      }
+
       /* Typograph, as on the site (src/typograph.ts in the main repo): a short word keeps the
          next one with it, a number stays with what it counts, a dash never starts a line */
       (() => {
         const NB = ' ';
         const RU = 'без|для|над|под|при|про|обо|изо|ото|что|как|или|чем|где|через|перед|после|около|между|вместо|среди|кроме|возле|вокруг|против';
-        const SHORT = new RegExp(`(?<![\\p{L}\\p{N}&#'’\\-])(\\p{Script=Cyrillic}{1,2}|${RU})\\s+(?=\\S)`, 'giu');
-        const NUMBER = /(?<![\p{L}\p{N}])(\p{N}[\p{N},.:/%×]*)\s+(?=\p{L})/gu;
+        const ENW = 'a|an|the|i|to|of|in|on|at|by|for|per|via|and|or|but|nor|as|if|so|no|not|my|our|its|your|their|with|from|into|onto|over|upon|than|about|after|before|under|without';
+        const SHORT = new RegExp(`(?<![\\p{L}\\p{N}&#'’\\-])(\\p{Script=Cyrillic}{1,2}|${RU}|${ENW})\\s+(?=\\S)`, 'giu');
+        const NUMBER = /(?<![\p{L}\p{N}])(\p{N}[\p{N},.:/%×+]*)\s+(?=\p{L})/gu;
         const DASH = /(?<=\S)\s+(?=[—–]\s)/gu;
         const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
         for (let n; (n = w.nextNode()); ) {

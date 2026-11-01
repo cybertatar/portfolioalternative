@@ -4116,7 +4116,7 @@
             target="_blank"
             rel="noopener"
             >LinkedIn</a
-          ><a class="btn" href="cv/Tyncherov_Daniil_Product_Designer_RU.pdf" target="_blank" rel="noopener"
+          ><a class="btn" id="cv" href="DRIVE_RU" data-href-ru="DRIVE_RU" data-href-en="DRIVE_EN" target="_blank" rel="noopener"
             >CV</a
           >
         </div>
@@ -4793,8 +4793,6 @@
       'Открыт к предложениям': 'Open to opportunities',
       'Написать в Telegram': 'Message on Telegram',
       'Написать на почту': 'Send an email',
-      // The CV is in Russian only for now
-      'CV': 'CV (in Russian)',
       'О персонаже': 'About',
       'Проектирую мобильные приложения и веб-сервисы. Веду задачу от исследования до передачи в разработку.':
         'I design mobile apps and web services. I take projects from research through to developer handoff.',
@@ -7840,6 +7838,10 @@
       });
     }
     filmsLang();
+
+    // The CV opens in the page's language: two PDFs on the owner's Google Drive (tools/cv)
+    const cv = document.getElementById('cv');
+    if (cv) cv.href = cv.dataset[i18n.isEn() ? 'hrefEn' : 'hrefRu'];
 
     // The walkthrough loops only while it is seen
     // A picture of «Как мы работали» that is not the one shown stands still too
