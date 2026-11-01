@@ -237,6 +237,8 @@ module.exports = {
   solutions: [
     {
       id: 'home',
+      // The phone beside the problem and beside the solution (the options, if any, swap the second)
+      stage: ['img/psb/before/cb-01.webp', 'img/psb/main.webp'],
       title: t('Главная страница', 'Home screen'),
       lead: t(
         'Повседневные задачи и предложения банка должны быть заметны одновременно, но не конкурировать между собой.',
@@ -315,6 +317,8 @@ module.exports = {
     },
     {
       id: 'card-data',
+      // The phone beside the problem and beside the solution (the options, if any, swap the second)
+      stage: ['img/psb/before/card-04.webp', 'img/psb/race/card-data.webp'],
       title: t('Данные карты', 'Card details'),
       lead: t(
         'Посмотреть и скопировать данные карты должно быть простым и понятным действием сразу после входа в приложение.',
@@ -378,6 +382,8 @@ module.exports = {
     },
     {
       id: 'cashback',
+      // The phone beside the problem and beside the solution (the options, if any, swap the second)
+      stage: ['img/psb/before/cb-02.webp', 'img/psb/race/cats-3.webp'],
       title: t('Подключение кешбэка', 'Activating cashback'),
       lead: t(
         'Кешбэк — самая популярная программа лояльности в российских банках, и подключить его должно быть не сложнее, чем прочитать условия.',
@@ -443,6 +449,8 @@ module.exports = {
     },
     {
       id: 'categories',
+      // The phone beside the problem and beside the solution (the options, if any, swap the second)
+      stage: ['img/psb/before/cats-03.webp', 'img/psb/race/next-cashback.webp'],
       title: t('Кешбэк после подключения', 'Cashback after activation'),
       lead: t(
         'Кешбэк должен приносить выгоду каждый месяц, а не только после первого подключения.',
