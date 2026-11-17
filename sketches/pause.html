@@ -4168,9 +4168,9 @@
           </div>
           <div class="wl-card">
           <ul class="wl">
-            <li class="wip">
-              <canvas class="px" data-sprite="wish-wip" data-scale="2"></canvas>
-              <span>Выпустить плагин для Figma <em class="wl-tag">На проверке</em></span>
+            <li>
+              <canvas class="px" data-sprite="wish-done" data-scale="2"></canvas>
+              <span>Выпустить плагин для Figma <em class="wl-tag">Выполнено</em></span>
             </li>
             <li>
               <canvas class="px" data-sprite="wish-box" data-scale="2"></canvas>
@@ -4655,8 +4655,8 @@
       'PpqqqppppppppppP',
       '.PPPPPPPPPPPPPP.',
     ],
-    /* Wishlist markers: one 12x12 grid each — a star for the main goal, a box with a coin for one
-       under way, an empty box for the rest */
+    /* Wishlist markers: one 12x12 grid each — a star for the main goal, a checked box for a
+       completed wish, an empty box for the rest */
     'wish-star': [
       '.....OO.....',
       '.....oO.....',
@@ -4671,15 +4671,15 @@
       '..oO....OO..',
       '............',
     ],
-    'wish-wip': [
+    'wish-done': [
       '............',
       '.SSSSSSSSSS.',
       '.SkkkkkkkkS.',
-      '.SkkkkkkkkS.',
-      '.SkkooOOkkS.',
-      '.SkkoqoOkkS.',
-      '.SkkooOOkkS.',
-      '.SkkOOOOkkS.',
+      '.SkkkkkookS.',
+      '.SkkkkoookS.',
+      '.SkokooOkkS.',
+      '.SkooOOkkkS.',
+      '.SkkoOkkkkS.',
       '.SkkkkkkkkS.',
       '.SkkkkkkkkS.',
       '.SSSSSSSSSS.',
@@ -4812,7 +4812,7 @@
       'Попасть в сильную продуктовую команду': 'Join a strong product team',
       'Главная цель': 'Main goal',
       'Выпустить плагин для Figma': 'Ship a Figma plugin',
-      'На проверке': 'In review',
+      'Выполнено': 'Completed',
       'Выпустить приложение в App Store': 'Ship an app to the App Store',
       'Освоить моушн-графику': 'Learn motion graphics',
       'Научиться кататься на коньках': 'Learn to ice skate',
@@ -4868,9 +4868,8 @@
       '=Добро и позитив=': '=Kindness and Positivity=',
       'Приложение для Mac: =добро и позитив= в каждом сообщении':
         'A Mac app: =kindness and positivity= in every message',
-      'Плагин для Figma': 'Figma plugin',
-      'Плагин для Figma. Описание будет позже': 'A Figma plugin. Description coming later',
-      'На рассмотрении в Figma': 'In review at Figma',
+      'Плагин для дизайна Mini Apps с нативными темами и компонентами Telegram.':
+        'A plugin for designing Mini Apps with native Telegram themes and components.',
       // The case
       'Назад': 'Back',
       'Квест:': 'Quest:',
@@ -6720,10 +6719,12 @@
     ],
     [
       'figma',
-      'Плагин для Figma',
-      'Плагин для Figma. Описание будет позже',
-      [['GitHub', 'https://github.com/cybertatar/tgminiappfigmaplugin']],
-      'На рассмотрении в Figma',
+      'Native Kit for Telegram Mini Apps',
+      'Плагин для дизайна Mini Apps с нативными темами и компонентами Telegram.',
+      [
+        ['Figma', 'https://www.figma.com/community/plugin/1694455897646802978/native-kit-for-telegram-mini-apps', 1],
+        ['GitHub', 'https://github.com/cybertatar/tgminiappfigmaplugin'],
+      ],
     ],
   ];
 
