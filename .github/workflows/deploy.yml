@@ -22,14 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      # The sketch is a page body written for artifacts, which add the document around it; here
-      # it gets its own doctype and charset and becomes the site's front page
       - name: Build the site
         run: |
-          mkdir -p _site
-          cp -r sketches/img _site/img
-          cp -r sketches/live _site/live
-          { printf '<!doctype html>\n<html lang="ru">\n<meta charset="utf-8" />\n'; cat sketches/pause.html; } > _site/index.html
+          bash tools/build-site.sh
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
